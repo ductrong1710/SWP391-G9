@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Medical Management System - API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            color: #34495e;
+            margin-top: 0;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 School Medical Management System</h1>
+            <h2>Backend API Testing Interface</h2>
+        </div>
+
+        <!-- User Management Tests -->
+        <div class="test-section">
+            <h3>👥 User Management</h3>
+            <button onclick="testGetAllUsers()">Get All Users</button>
+            <button onclick="testUserRegistration()">Test Registration</button>
+            <button onclick="testUserLogin()">Test Login</button>
+            <div id="userResult" class="result"></div>
+        </div>
+
+        <!-- Health Declaration Tests -->
+        <div class="test-section">
+            <h3>🏥 Health Declarations</h3>
+            <button onclick="testGetAllHealthDeclarations()">Get All Declarations</button>
+            <button onclick="testCreateHealthDeclaration()">Create Declaration</button>
+            <div id="healthResult" class="result"></div>
+        </div>
+
+        <!-- Vaccination Tests -->
+        <div class="test-section">
+            <h3>💉 Vaccination Records</h3>
+            <button onclick="testGetAllVaccinations()">Get All Vaccinations</button>
+            <button onclick="testCreateVaccination()">Create Vaccination</button>
+            <div id="vaccinationResult" class="result"></div>
+        </div>
+
+        <!-- Medicine Record Tests -->
+        <div class="test-section">
+            <h3>💊 Medicine Records</h3>
+            <button onclick="testGetAllMedicineRecords()">Get All Medicine Records</button>
+            <button onclick="testCreateMedicineRecord()">Create Medicine Record</button>
+            <div id="medicineResult" class="result"></div>
+        </div>
+
+        <!-- Database Test -->
+        <div class="test-section">
+            <h3>🔧 System Status</h3>
+            <button onclick="testDatabaseConnection()">Test Database Connection</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+            <div id="systemResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';  // Same domain
+
+        // Utility function to display results
+        function displayResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = isError ? 'result error' : 'result success';
+        }
+
+        // User Management Tests
+        async function testGetAllUsers() {
+            try {
+                const response = await fetch(API_BASE + '/users?action=getAll');
+                const data = await response.json();
+                displayResult('userResult', data, !response.ok);
+            } catch (error) {
+                displayResult('userResult', {error: error.message}, true);
+            }
+        }
+
+        async function testUserRegistration() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'register');
+                formData.append('username', 'testuser' + Date.now());
+                formData.append('password', 'password123');
+                formData.append('firstName', 'Test');
+                formData.append('lastName', 'User');
+                formData.append('email', 'test@example.com');
+                formData.append('phone', '1234567890');
+                formData.append('userType', 'student');
+
+                const response = await fetch(API_BASE + '/users', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                displayResult('userResult', data, !response.ok);
+            } catch (error) {
+                displayResult('userResult', {error: error.message}, true);
+            }
+        }
+
+        async function testUserLogin() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('username', 'admin');
+                formData.append('password', 'admin123');
+
+                const response = await fetch(API_BASE + '/users', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                displayResult('userResult', data, !response.ok);
+            } catch (error) {
+                displayResult('userResult', {error: error.message}, true);
+            }
+        }
+
+        // Health Declaration Tests
+        async function testGetAllHealthDeclarations() {
+            try {
+                const response = await fetch(API_BASE + '/health-declarations?action=getAll');
+                const data = await response.json();
+                displayResult('healthResult', data, !response.ok);
+            } catch (error) {
+                displayResult('healthResult', {error: error.message}, true);
+            }
+        }
+
+        async function testCreateHealthDeclaration() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'create');
+                formData.append('studentId', '1');
+                formData.append('disease', 'None');
+                formData.append('allergy', 'Pollen');
+                formData.append('medication', 'Antihistamine');
+                formData.append('emergencyContact', 'John Doe');
+                formData.append('emergencyPhone', '9876543210');
+                formData.append('additionalInfo', 'Test declaration');
+
+                const response = await fetch(API_BASE + '/health-declarations', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                displayResult('healthResult', data, !response.ok);
+            } catch (error) {
+                displayResult('healthResult', {error: error.message}, true);
+            }
+        }
+
+        // Vaccination Tests
+        async function testGetAllVaccinations() {
+            try {
+                const response = await fetch(API_BASE + '/vaccinations?action=getAll');
+                const data = await response.json();
+                displayResult('vaccinationResult', data, !response.ok);
+            } catch (error) {
+                displayResult('vaccinationResult', {error: error.message}, true);
+            }
+        }
+
+        async function testCreateVaccination() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'create');
+                formData.append('studentId', '1');
+                formData.append('vaccineName', 'COVID-19');
+                formData.append('vaccinationDate', '2024-01-15');
+                formData.append('location', 'School Health Center');
+                formData.append('nextDueDate', '2024-07-15');
+                formData.append('notes', 'First dose completed');
+
+                const response = await fetch(API_BASE + '/vaccinations', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                displayResult('vaccinationResult', data, !response.ok);
+            } catch (error) {
+                displayResult('vaccinationResult', {error: error.message}, true);
+            }
+        }
+
+        // Medicine Record Tests
+        async function testGetAllMedicineRecords() {
+            try {
+                const response = await fetch(API_BASE + '/medicine-records?action=getAll');
+                const data = await response.json();
+                displayResult('medicineResult', data, !response.ok);
+            } catch (error) {
+                displayResult('medicineResult', {error: error.message}, true);
+            }
+        }
+
+        async function testCreateMedicineRecord() {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'create');
+                formData.append('studentId', '1');
+                formData.append('medicineName', 'Paracetamol');
+                formData.append('dosage', '500mg');
+                formData.append('frequency', 'Twice daily');
+                formData.append('startDate', '2024-01-10');
+                formData.append('endDate', '2024-01-17');
+                formData.append('prescribedBy', 'Dr. Smith');
+                formData.append('notes', 'For fever management');
+
+                const response = await fetch(API_BASE + '/medicine-records', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                displayResult('medicineResult', data, !response.ok);
+            } catch (error) {
+                displayResult('medicineResult', {error: error.message}, true);
+            }
+        }
+
+        // Database Connection Test
+        async function testDatabaseConnection() {
+            try {
+                const response = await fetch(API_BASE + '/users?action=getAll');
+                if (response.ok) {
+                    displayResult('systemResult', {
+                        status: 'SUCCESS',
+                        message: 'Database connection is working',
+                        timestamp: new Date().toISOString()
+                    });
+                } else {
+                    displayResult('systemResult', {
+                        status: 'ERROR',
+                        message: 'Database connection failed',
+                        statusCode: response.status
+                    }, true);
+                }
+            } catch (error) {
+                displayResult('systemResult', {
+                    status: 'ERROR',
+                    message: 'System error: ' + error.message
+                }, true);
+            }
+        }
+
+        // Run All Tests
+        async function runAllTests() {
+            displayResult('systemResult', {message: 'Running all tests...'});
+            
+            const tests = [
+                {name: 'User Management', fn: testGetAllUsers},
+                {name: 'Health Declarations', fn: testGetAllHealthDeclarations},
+                {name: 'Vaccinations', fn: testGetAllVaccinations},
+                {name: 'Medicine Records', fn: testGetAllMedicineRecords}
+            ];
+
+            const results = [];
+            for (const test of tests) {
+                try {
+                    await test.fn();
+                    results.push({test: test.name, status: 'PASSED'});
+                } catch (error) {
+                    results.push({test: test.name, status: 'FAILED', error: error.message});
+                }
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            displayResult('systemResult', {
+                message: 'All tests completed',
+                results: results,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Auto-test database connection on page load
+        window.addEventListener('load', () => {
+            setTimeout(testDatabaseConnection, 1000);
+        });
+    </script>
+</body>
+</html>

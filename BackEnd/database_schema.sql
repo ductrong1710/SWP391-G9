@@ -154,6 +154,36 @@ WHERE v.status = 'scheduled' AND v.vaccinationDate >= GETDATE();
 
 GO
 
+-- Tạo bảng lịch trực nhân viên y tế
+CREATE TABLE Schedules (
+    scheduleId INT IDENTITY(1,1) PRIMARY KEY,
+    staffId INT NOT NULL,
+    day VARCHAR(10) NOT NULL, -- 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
+    time VARCHAR(10) NOT NULL, -- 'morning', 'afternoon'
+    weekStart DATE NOT NULL,
+    FOREIGN KEY (staffId) REFERENCES Users(userId)
+);
+
+-- Thêm cột specialty vào bảng Users để lưu chuyên môn của nhân viên y tế
+ALTER TABLE Users ADD specialty NVARCHAR(100);
+
+-- Tạo view để xem lịch trực
+CREATE VIEW vw_MedicalStaffSchedule AS
+SELECT 
+    s.scheduleId,
+    s.staffId,
+    s.day,
+    s.time,
+    s.weekStart,
+    u.firstName + ' ' + u.lastName AS staffName,
+    u.specialty AS staffSpecialty,
+    u.email AS staffEmail,
+    u.phone AS staffPhone
+FROM Schedules s
+JOIN Users u ON s.staffId = u.userId;
+
+GO
+
 PRINT 'Database schema created successfully!';
 PRINT 'Sample data inserted successfully!';
 PRINT 'Views created successfully!';

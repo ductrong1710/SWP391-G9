@@ -106,6 +106,15 @@
             <div id="medicineResult" class="result"></div>
         </div>
 
+        <!-- Schedule Tests -->
+        <div class="test-section">
+            <h3>📅 Medical Staff Schedule</h3>
+            <button onclick="testGetAllSchedules()">Get All Schedules</button>
+            <button onclick="testGetMedicalStaff()">Get Medical Staff</button>
+            <button onclick="testAddSchedule()">Add Test Schedule</button>
+            <div id="scheduleResult" class="result"></div>
+        </div>
+
         <!-- Database Test -->
         <div class="test-section">
             <h3>🔧 System Status</h3>
@@ -276,6 +285,65 @@
                 displayResult('medicineResult', data, !response.ok);
             } catch (error) {
                 displayResult('medicineResult', {error: error.message}, true);
+            }
+        }
+
+        // Schedule Tests
+        async function testGetAllSchedules() {
+            try {
+                const response = await fetch(API_BASE + '/api/schedule');
+                const data = await response.json();
+                displayResult('scheduleResult', data, !response.ok);
+            } catch (error) {
+                displayResult('scheduleResult', {error: error.message}, true);
+            }
+        }
+        
+        async function testGetMedicalStaff() {
+            try {
+                const response = await fetch(API_BASE + '/api/schedule?action=getMedicalStaff');
+                const data = await response.json();
+                displayResult('scheduleResult', data, !response.ok);
+            } catch (error) {
+                displayResult('scheduleResult', {error: error.message}, true);
+            }
+        }
+        
+        async function testAddSchedule() {
+            try {
+                // Get first medical staff
+                const staffResponse = await fetch(API_BASE + '/api/schedule?action=getMedicalStaff');
+                const staffData = await staffResponse.json();
+                
+                if (staffData.length === 0) {
+                    displayResult('scheduleResult', {error: 'No medical staff available'}, true);
+                    return;
+                }
+                
+                const staffId = staffData[0].userId;
+                const today = new Date();
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay() + 1); // Monday of current week
+                
+                const testSchedule = {
+                    staffId: staffId,
+                    day: 'mon',
+                    time: 'morning',
+                    weekStart: weekStart.toISOString().split('T')[0]
+                };
+                
+                const response = await fetch(API_BASE + '/api/schedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testSchedule)
+                });
+                
+                const data = await response.json();
+                displayResult('scheduleResult', data, !response.ok);
+            } catch (error) {
+                displayResult('scheduleResult', {error: error.message}, true);
             }
         }
 

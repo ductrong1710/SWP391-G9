@@ -59,4 +59,14 @@
     <!-- Servlet Definitions (if not using annotations) -->
     <!-- The servlets are defined using @WebServlet annotations in the code -->
     
+    <!-- Schedule Servlet Mapping -->
+    <servlet>
+        <servlet-name>ScheduleServlet</servlet-name>
+        <servlet-class>pe.servlet.ScheduleServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ScheduleServlet</servlet-name>
+        <url-pattern>/api/schedule</url-pattern>
+    </servlet-mapping>
+    
 </web-app>

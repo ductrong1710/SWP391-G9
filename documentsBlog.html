@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu và Blog sức khỏe</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: #f4f8fb;
+            margin: 0;
+            padding: 0;
+        }
+        .el-main {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+        }
+        .el-section-title {
+            font-size: 1.8rem;
+            color: #1976d2;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 1rem;
+        }
+        .section {
+            margin-bottom: 3rem;
+        }
+        .section h3 {
+            color: #1976d2;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #1976d2;
+            padding-left: 1rem;
+        }
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .document-card {
+            background: #f8f9fa;
+            border: 1px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .document-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .document-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .document-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        .download-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .download-btn:hover {
+            background: #1565c0;
+        }
+        .blog-form {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .form-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .form-btn:hover {
+            background: #1565c0;
+        }
+        .blog-posts {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .blog-post {
+            background: #fff;
+            border: 1px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .post-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .post-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .post-meta {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .post-content {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .post-category {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .success-message, .error-message {
+            display: none;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.2rem;
+        }
+        .success-message {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .back-btn {
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .back-btn:hover {
+            background: #555;
+        }
+        .delete-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            float: right;
+        }
+        .delete-btn:hover {
+            background: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <main class="el-main">
+        <a href="dashBoard.html" class="back-btn">← Quay lại Dashboard</a>
+        <h2 class="el-section-title">Tài liệu và Blog sức khỏe học đường</h2>
+        
+        <!-- Documents Section -->
+        <div class="section">
+            <h3>📚 Tài liệu sức khỏe</h3>
+            <div class="documents-grid">
+                <div class="document-card">
+                    <div class="document-title">Hướng dẫn chăm sóc sức khỏe học sinh</div>
+                    <div class="document-description">Tài liệu hướng dẫn chi tiết về cách chăm sóc sức khỏe cho học sinh từ lớp 1 đến lớp 5, bao gồm dinh dưỡng, vệ sinh cá nhân và phòng chống bệnh tật.</div>
+                    <button class="download-btn" onclick="downloadDocument('health-care-guide.pdf')">Tải xuống PDF</button>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-title">Lịch tiêm chủng theo độ tuổi</div>
+                    <div class="document-description">Lịch tiêm chủng đầy đủ theo khuyến cáo của Bộ Y tế, phù hợp với từng độ tuổi học sinh tiểu học.</div>
+                    <button class="download-btn" onclick="downloadDocument('vaccination-schedule.pdf')">Tải xuống PDF</button>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-title">Biểu mẫu khai báo sức khỏe</div>
+                    <div class="document-description">Các biểu mẫu chuẩn để khai báo tình trạng sức khỏe học sinh, phục vụ cho việc theo dõi và quản lý y tế.</div>
+                    <button class="download-btn" onclick="downloadDocument('health-forms.pdf')">Tải xuống PDF</button>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-title">Hướng dẫn sơ cứu cơ bản</div>
+                    <div class="document-description">Kiến thức sơ cứu cơ bản dành cho giáo viên và phụ huynh khi xử lý các tình huống khẩn cấp về sức khỏe học sinh.</div>
+                    <button class="download-btn" onclick="downloadDocument('first-aid-guide.pdf')">Tải xuống PDF</button>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-title">Thực đơn dinh dưỡng học đường</div>
+                    <div class="document-description">Gợi ý thực đơn dinh dưỡng cân bằng cho học sinh, đảm bảo cung cấp đủ năng lượng và chất dinh dưỡng cần thiết.</div>
+                    <button class="download-btn" onclick="downloadDocument('nutrition-menu.pdf')">Tải xuống PDF</button>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-title">Phòng chống dịch bệnh trong trường học</div>
+                    <div class="document-description">Hướng dẫn các biện pháp phòng chống dịch bệnh, giữ gìn vệ sinh môi trường học đường và bảo vệ sức khỏe cộng đồng.</div>
+                    <button class="download-btn" onclick="downloadDocument('disease-prevention.pdf')">Tải xuống PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Section -->
+        <div class="section">
+            <h3>✍️ Blog chia sẻ kinh nghiệm</h3>
+            <div class="blog-form">
+                <div class="success-message" id="successMessage">Đăng bài thành công!</div>
+                <div class="error-message" id="errorMessage">Có lỗi xảy ra, vui lòng thử lại!</div>
+                
+                <form id="blogForm">
+                    <div class="form-group">
+                        <label class="form-label" for="postTitle">Tiêu đề bài viết</label>
+                        <input type="text" class="form-input" id="postTitle" placeholder="Nhập tiêu đề bài viết..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="authorName">Tên tác giả</label>
+                        <input type="text" class="form-input" id="authorName" placeholder="Nhập tên của bạn..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="category">Danh mục</label>
+                        <select class="form-select" id="category" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <option value="Dinh dưỡng">Dinh dưỡng</option>
+                            <option value="Vệ sinh">Vệ sinh cá nhân</option>
+                            <option value="Thể dục">Thể dục thể thao</option>
+                            <option value="Phòng bệnh">Phòng chống bệnh tật</option>
+                            <option value="Tâm lý">Sức khỏe tâm lý</option>
+                            <option value="Kinh nghiệm">Kinh nghiệm chung</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="postContent">Nội dung bài viết</label>
+                        <textarea class="form-textarea" id="postContent" placeholder="Chia sẻ kinh nghiệm, câu chuyện hoặc kiến thức về sức khỏe học đường..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-btn">Đăng bài</button>
+                </form>
+            </div>
+            
+            <div class="blog-posts" id="blogPosts">
+                <!-- Blog posts will be rendered here -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Function to simulate document download
+        function downloadDocument(filename) {
+            // In a real application, this would trigger actual file download
+            alert(`Đang tải xuống tài liệu: ${filename}\n\nTrong ứng dụng thực tế, tệp sẽ được tải xuống tự động.`);
+        }
+
+        // Function to render blog posts
+        function renderBlogPosts() {
+            const blogPostsContainer = document.getElementById('blogPosts');
+            const posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+            
+            if (posts.length === 0) {
+                blogPostsContainer.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Chưa có bài viết nào. Hãy chia sẻ kinh nghiệm của bạn!</p>';
+                return;
+            }
+            
+            blogPostsContainer.innerHTML = posts.map((post, index) => `
+                <div class="blog-post">
+                    <div class="post-header">
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-meta">
+                            Tác giả: <strong>${post.author}</strong> • 
+                            Ngày đăng: ${post.date} • 
+                            <span class="post-category">${post.category}</span>
+                            <button class="delete-btn" onclick="deleteBlogPost(${index})">Xóa</button>
+                        </div>
+                    </div>
+                    <div class="post-content">${post.content.replace(/\n/g, '<br>')}</div>
+                </div>
+            `).join('');
+        }
+
+        // Function to delete blog post
+        function deleteBlogPost(index) {
+            if (confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+                let posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+                posts.splice(index, 1);
+                localStorage.setItem('blogPosts', JSON.stringify(posts));
+                renderBlogPosts();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderBlogPosts();
+            
+            const blogForm = document.getElementById('blogForm');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            blogForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const postData = {
+                    title: document.getElementById('postTitle').value.trim(),
+                    author: document.getElementById('authorName').value.trim(),
+                    category: document.getElementById('category').value,
+                    content: document.getElementById('postContent').value.trim(),
+                    date: new Date().toLocaleDateString('vi-VN')
+                };
+                
+                // Validate form
+                if (!postData.title || !postData.author || !postData.category || !postData.content) {
+                    errorMessage.textContent = 'Vui lòng điền đầy đủ tất cả các trường.';
+                    errorMessage.style.display = 'block';
+                    setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+                    return;
+                }
+                
+                try {
+                    // Save to localStorage
+                    let posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+                    posts.unshift(postData); // Add new post at the beginning
+                    localStorage.setItem('blogPosts', JSON.stringify(posts));
+                    
+                    // Show success message and reset form
+                    successMessage.style.display = 'block';
+                    blogForm.reset();
+                    renderBlogPosts();
+                    
+                    setTimeout(() => { successMessage.style.display = 'none'; }, 3000);
+                } catch (error) {
+                    errorMessage.textContent = 'Có lỗi xảy ra khi đăng bài, vui lòng thử lại!';
+                    errorMessage.style.display = 'block';
+                    setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

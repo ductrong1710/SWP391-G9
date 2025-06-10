@@ -1,0 +1,3410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Medical Management System</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        /* ========== LAYOUT & GENERAL ========== */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: #f4f8fb;
+            margin: 0;
+            padding: 0;
+        }
+        .el-main {
+            max-width: 1100px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+        }
+        .el-section-title {
+            font-size: 1.6rem;
+            color: #1976d2;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        /* ========== HERO ========== */
+        .el-hero {
+            background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+            color: #fff;
+            padding: 2.5rem 0 2rem 0;
+        }
+        .el-hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2.5rem;
+            position: relative;
+        }
+        .el-hero-left { flex: 1; }
+        .el-hero-title { font-size: 2.5rem; margin-bottom: 1rem; }
+        .el-hero-slogan { font-size: 1.3rem; margin-bottom: 1.5rem; }
+        .el-hero-btn {
+            display: inline-block;
+            background: #fff;
+            color: #1976d2;
+            font-weight: 600;
+            padding: 0.7rem 2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .el-hero-btn:hover {
+            background: #1976d2;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+        .el-hero-right { flex: 0 0 380px; }
+        .el-hero-slider {
+            position: relative;
+            width: 340px;
+            height: 220px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+        }
+        .el-slider-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.7s;
+            z-index: 1;
+        }
+        .el-slider-img.active { opacity: 1; z-index: 2; }
+        /* ========== TABS ========== */
+        .el-tabs {
+            background: linear-gradient(90deg, #bbdefb 0%, #e3f2fd 100%);
+            border-radius: 0;
+            margin: 0 0 2rem 0;
+            max-width: 100vw;
+            width: 100vw;
+            box-shadow: 0 1px 4px rgba(25, 118, 210, 0.07);
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+        .el-tabs ul {
+            list-style: none;
+            margin: 0;
+            padding: 0.5rem 0;
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 0;
+            justify-content: space-between;
+        }
+        .el-tabs li { flex: 1 1 0; margin: 0; }
+        .el-tab-link {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 0.7rem 0;
+            color: #1976d2;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 0;
+            background: transparent;
+            transition: background 0.2s, color 0.2s;
+        }
+        .el-tab-link:hover, .el-tab-link.active {
+            background: #1976d2;
+            color: #fff;
+        }
+        /* ========== AVATAR DROPDOWN ========== */
+        .el-avatar-dropdown {
+            /* default: absolute for header, overridden below for below-tab */
+            position: absolute;
+            top: 24px;
+            right: 36px;
+            z-index: 100;
+        }
+        .el-avatar-below-tab {
+            position: relative;
+            top: 0;
+            right: 0;
+            margin: 0 2.5vw 0 0;
+            display: flex;
+            justify-content: flex-end;
+            z-index: 10;
+            width: 100%;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .el-avatar-below-tab .el-dropdown-menu {
+            top: 54px;
+            right: 0;
+        }
+        .el-avatar-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.12);
+            background: #fff;
+            object-fit: cover;
+        }
+        .el-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 54px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+            min-width: 160px;
+            padding: 0.5rem 0;
+        }
+        .el-dropdown-menu.show { display: block; }
+        .el-dropdown-item {
+            display: block;
+            padding: 0.8rem 1.5rem;
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 1.08rem;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .el-dropdown-item:hover { background: #e3f2fd; }
+        .el-dropdown-logout { color: #e53935; font-weight: 600; }
+        .el-dropdown-logout:hover { background: #ffebee; }
+        /* Remove old absolute position for avatar dropdown in header */
+        .el-avatar-dropdown:not(.el-avatar-below-tab) {
+            position: absolute;
+            top: 24px;
+            right: 36px;
+            z-index: 100;
+        }
+        /* ========== PRODUCT & BLOG ========== */
+        .el-product-list, .el-why-list {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .el-product-item, .el-why-item {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(25, 118, 210, 0.08);
+        }
+        .el-product-item { width: 260px; }
+        .el-why-item { width: 220px; }
+        .el-product-icon img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            background: #fff;
+        }
+        .el-product-title, .el-why-title {
+            color: #1976d2;
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .el-product-desc, .el-why-desc {
+            color: #333;
+            font-size: 1rem;
+        }
+        .el-why-item img {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+        }
+        /* ========== FEATURE LIST ========== */
+        .el-feature-list {
+            margin: 2rem 0 0 0;
+            padding: 0 0 0 1.2rem;
+            font-size: 1.08rem;
+            color: #222;
+        }
+        .el-feature-list li {
+            margin-bottom: 0.7rem;
+            line-height: 1.6;
+        }
+        /* ========== CTA ========== */
+        .el-cta {
+            text-align: center;
+            margin: 3rem 0 2rem 0;
+        }
+        .el-cta-title {
+            font-size: 1.4rem;
+            color: #1976d2;
+            margin-bottom: 1.2rem;
+        }
+        .el-cta-btn {
+            display: inline-block;
+            background: #1976d2;
+            color: #fff;
+            font-weight: 600;
+            padding: 0.8rem 2.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.15rem;
+            margin-top: 1.2rem;
+            transition: background 0.2s;
+        }
+        .el-cta-btn:hover { background: #1565c0; }
+        /* ========== FOOTER ========== */
+        .el-footer {
+            background: #1976d2;
+            color: #fff;
+            padding: 2rem 0 1rem 0;
+        }
+        .el-footer-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .el-footer-logo img {
+            background: #fff;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .el-footer-info { font-size: 1rem; }
+        .el-footer-social a {
+            color: #fff;
+            text-decoration: underline;
+            margin: 0 0.5rem;
+        }
+        .el-footer-social a:hover { color: #bbdefb; }
+        .el-footer-copyright {
+            text-align: center;
+            color: #bbdefb;
+            margin-top: 1.5rem;
+            font-size: 0.98rem;
+        }
+        /* ========== CHAT BOX STYLES ========== */
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            max-height: 500px;
+        }
+        
+        .chat-header {
+            background: #1976d2;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .chat-messages {
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 300px;
+            flex-grow: 1;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background: #e3f2fd;
+            color: #333;
+            margin-left: auto;
+            border-top-right-radius: 4px;
+        }
+        
+        .admin-message {
+            background: #f5f5f5;
+            color: #333;
+            margin-right: auto;
+            border-top-left-radius: 4px;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input {
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            outline: none;
+        }
+        
+        .chat-send {
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chat-send:hover {
+            background: #1565c0;
+        }
+        
+        .chat-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+        
+        .chat-button svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .chat-button:hover {
+            background: #1565c0;
+        }
+        
+        @media (max-width: 500px) {
+            .chat-container {
+                width: 90%;
+                right: 5%;
+                left: 5%;
+                bottom: 80px;
+            }
+        }
+        
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 900px) {
+            .el-hero-content, .el-main, .el-footer-content {
+                max-width: 98vw;
+                padding: 1rem;
+            }
+            .el-product-list, .el-why-list, .el-footer-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            .el-hero-right { flex-basis: auto; }
+            .el-avatar-below-tab { max-width: 98vw; margin-right: 1vw; }
+        }
+        @media (max-width: 700px) {
+            .el-hero-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            .el-hero-slider {
+                width: 90vw;
+                max-width: 320px;
+                height: 180px;
+            }
+            .el-tabs ul { flex-wrap: wrap; }
+            .el-main { padding: 1rem; }
+            .el-avatar-dropdown { top: 12px; right: 12px; }
+            .el-avatar-below-tab { margin-right: 0.5vw; }
+        }
+        
+        /* Blog Modal Styles */
+        .blog-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .blog-modal-content {
+            background-color: #fefefe;
+            margin: 3% auto;
+            padding: 0;
+            border: none;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90%;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .blog-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .blog-modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .close-blog-modal {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-blog-modal:hover {
+            color: #f1c40f;
+        }
+        
+        .blog-tabs {
+            display: flex;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .blog-tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .blog-tab-btn.active {
+            background-color: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .blog-tab-btn:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        
+        .blog-content {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .blog-tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .blog-tab-content.active {
+            display: block;
+        }
+        
+        .blog-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .blog-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .blog-form input,
+        .blog-form select,
+        .blog-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .blog-form input:focus,
+        .blog-form select:focus,
+        .blog-form textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .submit-blog-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        
+        .submit-blog-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .blog-posts {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .blog-post-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .blog-post-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .blog-post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .blog-post-header h4 {
+            margin: 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .blog-post-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .blog-category {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .blog-date {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .delete-post-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-post-btn:hover {
+            background: #c82333;
+        }
+        
+        .blog-post-content p {
+            color: #555;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        
+        .blog-post-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .blog-author {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .like-btn {
+            background: none;
+            border: 1px solid #e9ecef;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .like-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .like-icon {
+            margin-right: 5px;
+        }
+        
+        .no-posts {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+          .no-posts p {
+            font-size: 16px;
+            margin: 0;
+        }
+          /* ========== DOCUMENTS TOGGLE STYLES ========== */
+        .el-additional-documents {
+            width: 100%;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.4s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+        
+        .el-additional-documents.show {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 2000px;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .el-documents-toggle-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .el-documents-toggle-btn {
+            background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .el-documents-toggle-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .el-documents-toggle-btn:hover::before {
+            left: 100%;
+        }
+        
+        .el-documents-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+        }
+        
+        .el-documents-toggle-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+        }
+        
+        .toggle-icon {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .toggle-icon.rotate {
+            transform: rotate(180deg);
+        }
+        
+        /* Responsive styles for toggle */
+        @media (max-width: 600px) {
+            .el-documents-toggle-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="el-hero">
+        <div class="el-hero-content">            <div class="el-hero-left">
+                <!-- Modern Health Connect Logo -->
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    margin-bottom: 1.5rem;
+                ">
+                    <!-- Ultra Modern Logo Text -->
+                    <h1 style="
+                        margin: 0;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+                        font-size: 3.5rem;
+                        font-weight: 100;
+                        color: #fff;
+                        letter-spacing: -1.5px;
+                        position: relative;
+                        line-height: 1;
+                        display: flex;
+                        align-items: baseline;
+                        gap: 0;
+                    ">                        <span style="
+                            font-weight: 100;
+                            font-size: 1em;
+                            color: rgba(255,255,255,0.95);
+                            margin-right: 0;                        ">Health</span><span style="
+                            font-weight: 800;
+                            font-size: 1em;
+                            color: #ffffff;
+                            position: relative;
+                            margin-left: 0;
+                        ">Connect
+                            <span style="
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+                                animation: shimmer 3s ease-in-out infinite;
+                            "></span>
+                        </span>
+                    </h1>
+                </div>
+                
+                <!-- CSS Animation for shimmer effect -->
+                <style>
+                    @keyframes shimmer {
+                        0% { transform: translateX(-100%); }
+                        100% { transform: translateX(100%); }
+                    }
+                </style>
+            </div>
+            <div class="el-hero-right">
+                <div class="el-hero-slider">
+                    <img src="https://edulinkvn.com/Upload/Articles/Photos/main-slider-1.jpg" alt="Slider 1"
+                        class="el-slider-img active">
+                    <img src="https://edulinkvn.com/Upload/Articles/Photos/main-slider-2.jpg" alt="Slider 2"
+                        class="el-slider-img">
+                </div>
+            </div>
+        </div>
+    </header>    <nav class="el-tabs">
+        <ul>
+            <li><a href="#" class="el-tab-link">Khai báo hồ sơ sức khỏe</a></li>
+            <li><a href="#" class="el-tab-link">Gửi thuốc cho con</a></li>
+            <li><a href="#" class="el-tab-link">Ghi nhận & xử lý</a></li>
+            <li><a href="#" class="el-tab-link">Quản lý quá trình tiêm chủng</a></li>
+            <li><a href="#" class="el-tab-link">Quản lý quá trình kiểm tra y tế định kỳ</a></li>
+            <li><a href="#" class="el-tab-link">Tài liệu và Blog</a></li>
+        </ul>
+    </nav><!-- Avatar Dropdown (moved below tab) -->
+    <div class="el-avatar-dropdown el-avatar-below-tab">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar" class="el-avatar-icon"
+            id="avatarBtn">
+        <div class="el-dropdown-menu" id="avatarMenu">
+            <!-- Menu items will be dynamically set based on login state -->
+        </div>
+    </div>
+    <main class="el-main">
+        <section class="el-about">
+            <h2 class="el-section-title">Về chúng tôi</h2>
+            <div class="el-about-content">
+             
+            </div>
+        </section>        <section class="el-documents">
+            <h2 class="el-section-title">Tài liệu về sức khỏe học đường</h2>
+            <div class="el-product-list">
+                <!-- Luôn hiển thị 3 tài liệu chính -->
+                <div class="el-product-item" data-doc-type="nutrition" style="cursor: pointer;">
+                    <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/2991/2991108.png"
+                            alt="Dinh dưỡng"></div>
+                    <div class="el-product-title">Dinh dưỡng học đường</div>
+                    <div class="el-product-desc">Tài liệu hướng dẫn xây dựng thực đơn, chế độ dinh dưỡng hợp lý cho học
+                        sinh các cấp.</div>
+                </div>
+                <div class="el-product-item" data-doc-type="disease-prevention" style="cursor: pointer;">
+                    <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png"
+                            alt="Phòng chống dịch bệnh"></div>
+                    <div class="el-product-title">Phòng chống dịch bệnh</div>
+                    <div class="el-product-desc">Thông tin, khuyến nghị và tài liệu phòng chống các bệnh truyền nhiễm
+                        trong trường học.</div>
+                </div>
+                <div class="el-product-item" data-doc-type="mental-health" style="cursor: pointer;">
+                    <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                            alt="Sức khỏe tâm thần"></div>
+                    <div class="el-product-title">Sức khỏe tâm thần</div>
+                    <div class="el-product-desc">Tài liệu về chăm sóc sức khỏe tinh thần, phòng tránh stress, kỹ năng
+                        sống cho học sinh.</div>
+                </div>
+                  <!-- Tài liệu mở rộng - ban đầu được ẩn -->
+                <div class="el-additional-documents" id="additionalDocuments">
+                    <div class="el-product-item" data-doc-type="first-aid" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/2382/2382459.png"
+                                alt="Sơ cứu"></div>
+                        <div class="el-product-title">Hướng dẫn sơ cứu</div>
+                        <div class="el-product-desc">Kiến thức sơ cứu cơ bản dành cho giáo viên và nhân viên y tế trường học
+                            khi xử lý các tình huống khẩn cấp.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="vaccination" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/2382/2382533.png"
+                                alt="Tiêm chủng"></div>
+                        <div class="el-product-title">Lịch tiêm chủng</div>
+                        <div class="el-product-desc">Lịch tiêm chủng đầy đủ theo khuyến cáo của Bộ Y tế, phù hợp với từng
+                            độ tuổi học sinh.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="physical-development" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/2382/2382716.png"
+                                alt="Phát triển thể chất"></div>
+                        <div class="el-product-title">Phát triển thể chất</div>
+                        <div class="el-product-desc">Hướng dẫn theo dõi và đánh giá sự phát triển thể chất của học sinh
+                            qua các độ tuổi.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="hygiene" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/2382/2382582.png"
+                                alt="Vệ sinh"></div>
+                        <div class="el-product-title">Vệ sinh cá nhân</div>
+                        <div class="el-product-desc">Hướng dẫn giáo dục kỹ năng vệ sinh cá nhân và môi trường cho học sinh
+                            tiểu học.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="screen-health" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/3062/3062795.png"
+                                alt="Sức khỏe mắt"></div>
+                        <div class="el-product-title">Bảo vệ thị lực</div>
+                        <div class="el-product-desc">Hướng dẫn bảo vệ mắt khỏi tác hại của màn hình và ánh sáng xanh trong
+                            học tập trực tuyến.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="dental-health" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/2382/2382648.png"
+                                alt="Sức khỏe răng miệng"></div>
+                        <div class="el-product-title">Chăm sóc răng miệng</div>
+                        <div class="el-product-desc">Hướng dẫn chăm sóc răng miệng đúng cách, phòng ngừa sâu răng và các
+                            bệnh lý về răng.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="allergy-management" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135824.png"
+                                alt="Quản lý dị ứng"></div>
+                        <div class="el-product-title">Quản lý dị ứng</div>
+                        <div class="el-product-desc">Hướng dẫn nhận biết, xử lý và phòng ngừa các phản ứng dị ứng phổ biến
+                            ở học sinh.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="sports-safety" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/2382/2382679.png"
+                                alt="An toàn thể thao"></div>
+                        <div class="el-product-title">An toàn thể thao</div>
+                        <div class="el-product-desc">Biện pháp đảm bảo an toàn trong các hoạt động thể thao và vui chơi tại
+                            trường học.</div>
+                    </div>
+                    <div class="el-product-item" data-doc-type="sleep-health" style="cursor: pointer;">
+                        <div class="el-product-icon"><img src="https://cdn-icons-png.flaticon.com/512/3135/3135673.png"
+                                alt="Giấc ngủ"></div>
+                        <div class="el-product-title">Tầm quan trọng của giấc ngủ</div>
+                        <div class="el-product-desc">Hướng dẫn về thói quen ngủ nghỉ khoa học và tác động của giấc ngủ đến
+                            sức khỏe và học tập.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nút Show More/Show Less -->
+            <div class="el-documents-toggle-container">
+                <button class="el-documents-toggle-btn" id="documentsToggleBtn">
+                    <span id="toggleBtnText">Xem thêm tài liệu</span>
+                    <span class="toggle-icon" id="toggleIcon">▼</span>
+                </button>
+            </div>
+        </section><section class="el-blog">
+            <h2 class="el-section-title">Blog chia sẻ kinh nghiệm</h2>
+            <div class="el-why-list">
+                <div class="el-why-item" data-blog-type="parents" style="cursor: pointer;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3132/3132693.png" alt="Chia sẻ phụ huynh">
+                    <div class="el-why-title">Chia sẻ từ phụ huynh</div>
+                    <div class="el-why-desc">Kinh nghiệm thực tế trong việc chăm sóc sức khỏe, dinh dưỡng, phòng bệnh
+                        cho con tại nhà và ở trường.</div>
+                </div>
+                <div class="el-why-item" data-blog-type="teachers" style="cursor: pointer;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3132/3132687.png" alt="Chia sẻ giáo viên">
+                    <div class="el-why-title">Chia sẻ từ giáo viên</div>
+                    <div class="el-why-desc">Những câu chuyện, bài học, hoạt động ngoại khóa giúp nâng cao sức khỏe và
+                        kỹ năng sống cho học sinh.</div>
+                </div>
+                <div class="el-why-item" data-blog-type="experts" style="cursor: pointer;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3132/3132679.png" alt="Chuyên gia tư vấn">
+                    <div class="el-why-title">Chuyên gia tư vấn</div>
+                    <div class="el-why-desc">Bài viết, video tư vấn từ chuyên gia y tế, tâm lý về các vấn đề sức khỏe
+                        học đường.</div>
+                </div>
+            </div>
+        </section><section class="el-cta">
+            <h2 class="el-cta-title">Cùng chung tay xây dựng môi trường học tập an toàn, hiện đại!</h2>
+            <a href="#" class="el-cta-btn">Liên hệ tư vấn</a>
+        </section>
+    </main>
+    <!-- Chat Box UI -->
+    <button class="chat-button" id="chatButton">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </button>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <div>Tư vấn trực tuyến</div>
+            <button class="chat-close" id="chatClose">×</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message admin-message">
+                Xin chào! Chúng tôi có thể giúp gì cho bạn về sức khỏe học đường?
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn..." />
+            <button class="chat-send" id="chatSend">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <footer class="el-footer">
+        <div class="el-footer-copyright">
+            &copy; 2025 School Medical Management System. All rights reserved.
+        </div>
+    </footer>    <script>
+        // Thêm modal đăng nhập
+        function createLoginModal() {
+            const modal = document.createElement('div');
+            modal.classList.add('login-modal');
+            modal.innerHTML = `
+                <div class="login-modal-content">
+                    <div class="login-modal-header">
+                        <h3>Đăng nhập</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="login-modal-body">
+                        <div class="error-message" id="errorMessageModal" style="display: none;">
+                            Thông tin đăng nhập không chính xác. Vui lòng thử lại!
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="usernameModal">Tên đăng nhập</label>
+                            <input type="text" class="form-input" id="usernameModal" placeholder="Nhập tên đăng nhập hoặc email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="passwordModal">Mật khẩu</label>
+                            <input type="password" class="form-input" id="passwordModal" placeholder="Nhập mật khẩu" required>
+                        </div>
+                        <button id="loginBtnModal" class="login-btn-modal">Đăng nhập</button>
+                        <div class="login-footer-modal">
+                            <a href="register.html">Đăng ký mới</a> | <a href="#" id="forgotPassModal">Quên mật khẩu?</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Xử lý đóng modal
+            const closeBtn = modal.querySelector('.close-modal');
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            };
+            
+            // Đóng khi click ngoài modal
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            };
+            
+            // Xử lý đăng nhập từ modal
+            const loginBtn = modal.querySelector('#loginBtnModal');
+            loginBtn.onclick = function() {
+                const username = document.getElementById('usernameModal').value;
+                const password = document.getElementById('passwordModal').value;
+                const errorMsg = document.getElementById('errorMessageModal');
+                
+                // Thông tin đăng nhập mới
+                if (username === 'user' && password === 'password') {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', username);
+                    modal.style.display = 'none';
+                    location.reload();
+                } else {
+                    errorMsg.style.display = 'block';
+                    setTimeout(() => {
+                        errorMsg.style.display = 'none';
+                    }, 3000);
+                }
+            };
+              return modal;
+        }
+        
+        // Function to create document modal
+        function createDocumentModal() {
+            const documentModal = document.createElement('div');
+            documentModal.classList.add('document-modal');
+            documentModal.id = 'documentModal';
+            documentModal.innerHTML = `
+                <div class="document-modal-content">
+                    <div class="document-modal-header">
+                        <h3 id="documentTitle">Tài liệu sức khỏe</h3>
+                        <span class="close-document-modal">&times;</span>
+                    </div>
+                    <div class="document-content" id="documentContent">
+                        <!-- Nội dung tài liệu sẽ được load ở đây -->
+                    </div>
+                    <button class="download-document-btn" id="downloadBtn">Tải xuống PDF</button>
+                </div>
+            `;
+            document.body.appendChild(documentModal);
+            
+            // Xử lý đóng modal
+            const closeBtn = documentModal.querySelector('.close-document-modal');
+            closeBtn.onclick = function() {
+                documentModal.style.display = 'none';
+            };
+            
+            // Đóng khi click ngoài modal
+            window.onclick = function(event) {
+                if (event.target == documentModal) {
+                    documentModal.style.display = 'none';
+                }
+            };
+            
+            return documentModal;
+        }
+        
+        // Function to show document content
+        function showDocument(docType) {
+            const modal = document.getElementById('documentModal');
+            const title = document.getElementById('documentTitle');
+            const content = document.getElementById('documentContent');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            let documentData = getDocumentData(docType);
+            
+            title.textContent = documentData.title;
+            content.innerHTML = documentData.content;
+            downloadBtn.onclick = function() {
+                downloadDocument(documentData.filename);
+            };
+            
+            modal.style.display = 'block';
+        }
+        
+        // Function to get document data
+        function getDocumentData(docType) {
+            const documents = {
+                'nutrition': {
+                    title: 'Dinh dưỡng học đường',
+                    filename: 'dinh-duong-hoc-duong.pdf',
+                    content: `
+                        <h4>1. Nguyên tắc dinh dưỡng cơ bản cho học sinh</h4>
+                        <p>Dinh dưỡng cân bằng là yếu tố quan trọng nhất trong việc phát triển thể chất và trí tuệ của học sinh. Thực đơn cần đảm bảo đủ 4 nhóm chất dinh dưỡng cơ bản:</p>
+                        <ul>
+                            <li><strong>Nhóm 1 - Chất đạm:</strong> Thịt, cá, trứng, sữa, đậu phụ (20-25% tổng năng lượng)</li>
+                            <li><strong>Nhóm 2 - Chất béo:</strong> Dầu thực vật, bơ, các loại hạt (25-30% tổng năng lượng)</li>
+                            <li><strong>Nhóm 3 - Chất bột đường:</strong> Cơm, bánh mì, khoai lang (45-50% tổng năng lượng)</li>
+                            <li><strong>Nhóm 4 - Vitamin và khoáng chất:</strong> Rau xanh, trái cây tươi</li>
+                        </ul>
+                        
+                        <h4>2. Thực đơn mẫu cho học sinh tiểu học</h4>
+                        <p><strong>Bữa sáng (7:00-8:00):</strong></p>
+                        <ul>
+                            <li>1 tô cháo thịt băm hoặc phở</li>
+                            <li>1 ly sữa tươi</li>
+                            <li>1 quả chuối hoặc táo</li>
+                        </ul>
+                        
+                        <p><strong>Bữa trưa (11:30-12:30):</strong></p>
+                        <ul>
+                            <li>Cơm trắng</li>
+                            <li>Thịt/cá nướng hoặc kho</li>
+                            <li>Canh rau củ</li>
+                            <li>Rau luộc chấm tương</li>
+                        </ul>
+                        
+                        <p><strong>Bữa chiều (15:00-16:00):</strong></p>
+                        <ul>
+                            <li>Bánh mì sandwich</li>
+                            <li>1 ly nước ép trái cây</li>
+                        </ul>
+                        
+                        <h4>3. Lưu ý quan trọng</h4>
+                        <ul>
+                            <li>Đảm bảo vệ sinh an toàn thực phẩm</li>
+                            <li>Hạn chế đồ ăn nhanh, đồ uống có gas</li>
+                            <li>Khuyến khích uống nhiều nước lọc</li>
+                            <li>Ăn đều đặn, đúng giờ</li>
+                            <li>Tạo môi trường ăn uống vui vẻ, thoải mái</li>
+                        </ul>
+                    `
+                },
+                'disease-prevention': {
+                    title: 'Phòng chống dịch bệnh trong trường học',
+                    filename: 'phong-chong-dich-benh.pdf',
+                    content: `
+                        <h4>1. Các bệnh truyền nhiễm thường gặp trong trường học</h4>
+                        <ul>
+                            <li><strong>Cảm cúm:</strong> Lây qua đường hô hấp, triệu chứng sốt, ho, chảy nước mũi</li>
+                            <li><strong>Tay chân miệng:</strong> Lây qua tiếp xúc, triệu chứng phát ban ở tay, chân, miệng</li>
+                            <li><strong>Thủy đậu:</strong> Lây qua đường hô hấp, triệu chứng phát ban nước trên da</li>
+                            <li><strong>Viêm kết mạc:</strong> Lây qua tiếp xúc, triệu chứng đỏ mắt, chảy nước mắt</li>
+                            <li><strong>Tiêu chảy:</strong> Lây qua đường tiêu hóa, do vệ sinh kém</li>
+                        </ul>
+                        
+                        <h4>2. Biện pháp phòng chống</h4>
+                        <p><strong>A. Vệ sinh cá nhân:</strong></p>
+                        <ul>
+                            <li>Rửa tay thường xuyên bằng xà phòng</li>
+                            <li>Che miệng khi ho, hắt hơi</li>
+                            <li>Không chia sẻ đồ dùng cá nhân</li>
+                            <li>Mặc đồng phục sạch sẽ</li>
+                        </ul>
+                        
+                        <p><strong>B. Vệ sinh môi trường:</strong></p>
+                        <ul>
+                            <li>Thông thoáng lớp học</li>
+                            <li>Vệ sinh bàn ghế hàng ngày</li>
+                            <li>Xử lý rác thải đúng cách</li>
+                            <li>Đảm bảo nguồn nước sạch</li>
+                        </ul>
+                        
+                        <h4>3. Quy trình xử lý khi có học sinh mắc bệnh</h4>
+                        <ol>
+                            <li>Cách ly học sinh ngay lập tức</li>
+                            <li>Thông báo cho phụ huynh</li>
+                            <li>Khử trùng khu vực liên quan</li>
+                            <li>Theo dõi các trường hợp tiếp xúc</li>
+                            <li>Báo cáo với cơ quan y tế</li>
+                        </ol>
+                        
+                        <h4>4. Lịch khử trùng định kỳ</h4>
+                        <ul>
+                            <li><strong>Hàng ngày:</strong> Lau bàn ghế, tay nắm cửa</li>
+                            <li><strong>Hàng tuần:</strong> Vệ sinh toàn bộ lớp học</li>
+                            <li><strong>Hàng tháng:</strong> Khử trùng tổng thể trường học</li>
+                        </ul>
+                    `
+                },
+                'mental-health': {
+                    title: 'Sức khỏe tâm thần học sinh',
+                    filename: 'suc-khoe-tam-than.pdf',
+                    content: `
+                        <h4>1. Tầm quan trọng của sức khỏe tâm thần</h4>
+                        <p>Sức khỏe tâm thần là nền tảng cho sự phát triển toàn diện của học sinh, ảnh hưởng trực tiếp đến:</p>
+                        <ul>
+                            <li>Khả năng học tập và tiếp thu kiến thức</li>
+                            <li>Kỹ năng giao tiếp và quan hệ xã hội</li>
+                            <li>Sự tự tin và lòng tự trọng</li>
+                            <li>Khả năng thích ứng với môi trường</li>
+                        </ul>
+                        
+                        <h4>2. Dấu hiệu nhận biết vấn đề tâm lý</h4>
+                        <p><strong>Dấu hiệu cảnh báo:</strong></p>
+                        <ul>
+                            <li>Thay đổi đột ngột về hành vi, tính cách</li>
+                            <li>Suy giảm kết quả học tập</li>
+                            <li>Tránh né giao tiếp, cô lập bản thân</li>
+                            <li>Biểu hiện lo âu, sợ hãi thường xuyên</li>
+                            <li>Rối loạn ăn uống, ngủ nghỉ</li>
+                            <li>Có biểu hiện tự làm tổn thương</li>
+                        </ul>
+                        
+                        <h4>3. Cách hỗ trợ sức khỏe tâm thần</h4>
+                        <p><strong>A. Tại trường học:</strong></p>
+                        <ul>
+                            <li>Tạo môi trường học tập tích cực, an toàn</li>
+                            <li>Khuyến khích học sinh chia sẻ cảm xúc</li>
+                            <li>Tổ chức các hoạt động vui chơi, thể thao</li>
+                            <li>Đào tạo giáo viên về kỹ năng tâm lý</li>
+                        </ul>
+                        
+                        <p><strong>B. Tại gia đình:</strong></p>
+                        <ul>
+                            <li>Lắng nghe và thấu hiểu con</li>
+                            <li>Tạo thời gian gia đình chất lượng</li>
+                            <li>Hạn chế áp lực học tập quá mức</li>
+                            <li>Ghi nhận và khen ngợi những tiến bộ</li>
+                        </ul>
+                        
+                        <h4>4. Các hoạt động giảm stress</h4>
+                        <ul>
+                            <li><strong>Thể thao:</strong> Bơi lội, chạy bộ, yoga trẻ em</li>
+                            <li><strong>Nghệ thuật:</strong> Vẽ, múa, hát, chơi nhạc cụ</li>
+                            <li><strong>Thiên nhiên:</strong> Dã ngoại, làm vườn, nuôi thú cưng</li>
+                            <li><strong>Xã hội:</strong> Tham gia câu lạc bộ, hoạt động nhóm</li>
+                        </ul>
+                        
+                        <h4>5. Khi nào cần tìm đến chuyên gia?</h4>
+                        <ul>
+                            <li>Triệu chứng kéo dài trên 2 tuần</li>
+                            <li>Ảnh hưởng nghiêm trọng đến học tập</li>
+                            <li>Có ý tưởng tự làm hại bản thân</li>
+                            <li>Gia đình không thể xử lý được</li>                        </ul>
+                    `
+                },
+                'first-aid': {
+                    title: 'Hướng dẫn sơ cứu cơ bản cho trường học',
+                    filename: 'huong-dan-so-cuu-co-ban.pdf',
+                    content: `
+                        <h4>1. Nguyên tắc sơ cứu cơ bản</h4>
+                        <p>Sơ cứu là những biện pháp y tế đầu tiên được thực hiện ngay tại chỗ để cứu sống và hạn chế tổn thương cho nạn nhân.</p>
+                        <ul>
+                            <li><strong>Nguyên tắc 3 không:</strong> Không hoảng loạn, không di chuyển nạn nhân khi chưa cần thiết, không cho ăn uống</li>
+                            <li><strong>Nguyên tắc ABC:</strong> Airway (đường thở), Breathing (hô hấp), Circulation (tuần hoàn)</li>
+                            <li><strong>Gọi cấp cứu:</strong> 115 (cấp cứu y tế), 114 (cứu hỏa), 113 (công an)</li>
+                        </ul>
+                        
+                        <h4>2. Xử lý các tình huống thường gặp</h4>
+                        <p><strong>A. Vết thương chảy máu:</strong></p>
+                        <ol>
+                            <li>Rửa tay sạch trước khi xử lý</li>
+                            <li>Dùng gạc hoặc vải sạch ấn trực tiếp lên vết thương</li>
+                            <li>Nâng cao vùng bị thương (nếu có thể)</li>
+                            <li>Băng ép cầm máu, không quá chặt</li>
+                            <li>Không rút dị vật cắm sâu trong vết thương</li>
+                        </ol>
+                        
+                        <p><strong>B. Bỏng:</strong></p>
+                        <ol>
+                            <li>Tách nguồn nhiệt khỏi nạn nhân</li>
+                            <li>Làm mát vết bỏng bằng nước lạnh (15-20 phút)</li>
+                            <li>Không thoa kem, dầu ăn lên vết bỏng</li>
+                            <li>Che phủ vết bỏng bằng gạc vô trùng</li>
+                            <li>Đưa đến bệnh viện nếu bỏng > 10% diện tích cơ thể</li>
+                        </ol>
+                        
+                        <p><strong>C. Ngạt thở:</strong></p>
+                        <ol>
+                            <li>Kiểm tra đường thở, loại bỏ dị vật</li>
+                            <li>Đặt nạn nhân nằm ngửa, ngửa đầu ra sau</li>
+                            <li>Thực hiện hô hấp nhân tạo nếu cần</li>
+                            <li>Ấn tim ngoài lồng ngực: 30 lần ấn + 2 lần thổi</li>
+                        </ol>
+                        
+                        <h4>3. Hộp sơ cứu cơ bản cho trường học</h4>
+                        <ul>
+                            <li>Gạc vô trùng, băng cuộn</li>
+                            <li>Cồn 70%, nước sát khuẩn</li>
+                            <li>Kéo, nhíp vô trùng</li>
+                            <li>Thuốc hạ sốt, giảm đau</li>
+                            <li>Nhiệt kế, găng tay y tế</li>
+                            <li>Túi chườm lạnh tức thì</li>
+                        </ul>
+                    `
+                },
+                'vaccination': {
+                    title: 'Lịch tiêm chủng cho học sinh',
+                    filename: 'lich-tiem-chung-hoc-sinh.pdf',
+                    content: `
+                        <h4>1. Tầm quan trọng của tiêm chủng</h4>
+                        <p>Tiêm chủng là biện pháp phòng bệnh hiệu quả nhất, giúp cơ thể tạo ra kháng thể chống lại các bệnh truyền nhiễm nguy hiểm.</p>
+                        
+                        <h4>2. Lịch tiêm chủng mở rộng cho trẻ 0-6 tuổi</h4>
+                        <table style="width:100%; border-collapse: collapse; border: 1px solid #ddd;">
+                            <tr style="background: #f5f5f5;">
+                                <th style="border: 1px solid #ddd; padding: 8px;">Tuổi</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Vaccine</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Phòng bệnh</th>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Sơ sinh</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">BCG, Viêm gan B (mũi 1)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Lao, Viêm gan B</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">2 tháng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Quinvaxem/Pentavac (mũi 1), Rotavirus</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">DPT-VGB-Hib, Tiêu chảy</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">4 tháng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Quinvaxem/Pentavac (mũi 2)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">DPT-VGB-Hib</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">6 tháng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Quinvaxem/Pentavac (mũi 3)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">DPT-VGB-Hib</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">12 tháng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">MMR, Varicella</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Sởi-Quai bị-Rubella, Thủy đậu</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">18 tháng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Quinvaxem/Pentavac (mũi 4)</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">DPT-VGB-Hib</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">6 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">MMR (mũi 2), DT</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Sởi-Quai bị-Rubella, Bạch hầu-Uốn ván</td>
+                            </tr>
+                        </table>
+                        
+                        <h4>3. Vaccines tự nguyện khuyến cáo</h4>
+                        <ul>
+                            <li><strong>Pneumo:</strong> Phòng viêm phổi, viêm màng não do phế cầu (2-6 tháng)</li>
+                            <li><strong>Hepatitis A:</strong> Phòng viêm gan A (12-23 tháng)</li>
+                            <li><strong>Influenza:</strong> Phòng cúm mùa (từ 6 tháng, hàng năm)</li>
+                            <li><strong>Varicella:</strong> Phòng thủy đậu (12 tháng và 4-6 tuổi)</li>
+                            <li><strong>HPV:</strong> Phòng ung thư cổ tử cung (từ 9 tuổi)</li>
+                        </ul>
+                        
+                        <h4>4. Lưu ý khi tiêm chủng</h4>
+                        <ul>
+                            <li>Trẻ phải khỏe mạnh, không sốt, không ốm</li>
+                            <li>Mang theo sổ tiêm chủng và thẻ BHYT</li>
+                            <li>Theo dõi phản ứng 30 phút sau tiêm</li>
+                            <li>Có thể sốt nhẹ, đau sưng tại chỗ tiêm 1-2 ngày</li>
+                            <li>Đến ngay bệnh viện nếu có phản ứng bất thường</li>
+                        </ul>
+                    `
+                },
+                'physical-development': {
+                    title: 'Theo dõi phát triển thể chất học sinh',
+                    filename: 'phat-trien-the-chat.pdf',
+                    content: `
+                        <h4>1. Tầm quan trọng của theo dõi phát triển thể chất</h4>
+                        <p>Theo dõi phát triển thể chất giúp đánh giá tình trạng sức khỏe, dinh dưỡng và phát hiện sớm các vấn đề về tăng trưởng.</p>
+                        
+                        <h4>2. Các chỉ số cần theo dõi</h4>
+                        <p><strong>A. Chiều cao và cân nặng:</strong></p>
+                        <table style="width:100%; border-collapse: collapse; border: 1px solid #ddd;">
+                            <tr style="background: #f5f5f5;">
+                                <th style="border: 1px solid #ddd; padding: 8px;">Tuổi</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Chiều cao (cm)</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Cân nặng (kg)</th>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">6 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">108-118</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">18-23</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">7 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">113-123</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">20-26</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">8 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">118-129</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">22-30</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">9 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">123-134</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">25-34</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">10 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">128-140</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">28-38</td>
+                            </tr>
+                        </table>
+                        
+                        <p><strong>B. Chỉ số BMI (Body Mass Index):</strong></p>
+                        <ul>
+                            <li><strong>Công thức:</strong> BMI = Cân nặng (kg) / [Chiều cao (m)]²</li>
+                            <li><strong>Thiếu cân:</strong> BMI < percentile 5</li>
+                            <li><strong>Bình thường:</strong> percentile 5 ≤ BMI < percentile 85</li>
+                            <li><strong>Thừa cân:</strong> percentile 85 ≤ BMI < percentile 95</li>
+                            <li><strong>Béo phì:</strong> BMI ≥ percentile 95</li>
+                        </ul>
+                        
+                        <h4>3. Dấu hiệu cần chú ý</h4>
+                        <ul>
+                            <li>Tăng trưởng chậm so với độ tuổi</li>
+                            <li>Thay đổi đột ngột về cân nặng (tăng/giảm quá nhanh)</li>
+                            <li>Thiếu cân hoặc thừa cân kéo dài</li>
+                            <li>Rối loạn ăn uống</li>
+                            <li>Mệt mỏi thường xuyên</li>
+                        </ul>
+                        
+                        <h4>4. Biện pháp hỗ trợ phát triển</h4>
+                        <ul>
+                            <li><strong>Dinh dưỡng:</strong> Đảm bảo 4 nhóm chất, ăn đủ 3 bữa chính + 2 bữa phụ</li>
+                            <li><strong>Vận động:</strong> Ít nhất 60 phút/ngày, kết hợp nhiều hoạt động</li>
+                            <li><strong>Ngủ nghỉ:</strong> 9-11 tiếng/đêm cho trẻ 6-13 tuổi</li>
+                            <li><strong>Theo dõi:</strong> Đo đạc hàng tháng, ghi chép vào sổ theo dõi</li>
+                        </ul>
+                    `
+                },
+                'hygiene': {
+                    title: 'Giáo dục vệ sinh cá nhân cho học sinh',
+                    filename: 've-sinh-ca-nhan.pdf',
+                    content: `
+                        <h4>1. Tầm quan trọng của vệ sinh cá nhân</h4>
+                        <p>Vệ sinh cá nhân tốt giúp phòng ngừa bệnh tật, tạo thói quen sống lành mạnh và nâng cao chất lượng cuộc sống.</p>
+                        
+                        <h4>2. Vệ sinh thân thể</h4>
+                        <p><strong>A. Tắm rửa:</strong></p>
+                        <ul>
+                            <li>Tắm hàng ngày bằng nước sạch và xà phòng</li>
+                            <li>Gội đầu 2-3 lần/tuần hoặc khi tóc bẩn</li>
+                            <li>Thay quần áo sạch hàng ngày</li>
+                            <li>Cắt móng tay, móng chân định kỳ</li>
+                        </ul>
+                        
+                        <p><strong>B. Vệ sinh tay:</strong></p>
+                        <ol>
+                            <li>Làm ướt tay bằng nước sạch</li>
+                            <li>Bôi xà phòng lên tay</li>
+                            <li>Chà xát ít nhất 20 giây (hát bài "Chúc mừng sinh nhật" 2 lần)</li>
+                            <li>Rửa sạch bằng nước chảy</li>
+                            <li>Lau khô bằng khăn sạch</li>
+                        </ol>
+                        
+                        <p><strong>Các thời điểm cần rửa tay:</strong></p>
+                        <ul>
+                            <li>Trước khi ăn, sau khi đi vệ sinh</li>
+                            <li>Sau khi ho, hắt hơi, xì mũi</li>
+                            <li>Sau khi chơi, làm việc bẩn</li>
+                            <li>Trước và sau khi chăm sóc người bệnh</li>
+                        </ul>
+                        
+                        <h4>3. Vệ sinh răng miệng</h4>
+                        <ul>
+                            <li><strong>Đánh răng:</strong> 2 lần/ngày (sáng + tối), mỗi lần 2-3 phút</li>
+                            <li><strong>Kỹ thuật:</strong> Chải từ nướu xuống răng, chải cả mặt trong và ngoài</li>
+                            <li><strong>Dụng cụ:</strong> Bàn chải lông mềm, kem đánh răng có fluoride</li>
+                            <li><strong>Thay bàn chải:</strong> 3-4 tháng/lần hoặc khi lông chải bung</li>
+                            <li><strong>Hạn chế:</strong> Đồ ngọt, nước có gas, đồ ăn dính răng</li>
+                        </ul>
+                        
+                        <h4>4. Vệ sinh môi trường cá nhân</h4>
+                        <ul>
+                            <li><strong>Bàn học:</strong> Lau sạch hàng ngày, sắp xếp gọn gàng</li>
+                            <li><strong>Giường ngủ:</strong> Thay ga gối 1 tuần/lần, phơi nệm thường xuyên</li>
+                            <li><strong>Đồ dùng cá nhân:</strong> Không chia sẻ bàn chải, khăn mặt, ly uống nước</li>
+                            <li><strong>Quần áo:</strong> Giặt sạch, phơi khô, bảo quản thoáng mát</li>
+                        </ul>
+                        
+                        <h4>5. Vệ sinh thực phẩm</h4>
+                        <ul>
+                            <li>Rửa tay trước khi ăn</li>
+                            <li>Ăn thức ăn chín, uống nước sôi để nguội</li>
+                            <li>Rửa sạch rau quả trước khi ăn</li>
+                            <li>Không ăn thức ăn để lâu, hỏng</li>
+                            <li>Bảo quản thức ăn trong tủ lạnh</li>
+                        </ul>
+                    `
+                },
+                'screen-health': {
+                    title: 'Bảo vệ thị lực trong học tập trực tuyến',
+                    filename: 'bao-ve-thi-luc.pdf',
+                    content: `
+                        <h4>1. Tác hại của ánh sáng xanh và màn hình</h4>
+                        <p>Việc sử dụng thiết bị điện tử quá nhiều có thể gây ra:</p>
+                        <ul>
+                            <li>Mỏi mắt, khô mắt, chảy nước mắt</li>
+                            <li>Đau đầu, căng thẳng vùng cổ vai</li>
+                            <li>Rối loạn giấc ngủ</li>
+                            <li>Cận thị tiến triển</li>
+                            <li>Hội chứng mắt máy tính (Computer Vision Syndrome)</li>
+                        </ul>
+                        
+                        <h4>2. Quy tắc 20-20-20</h4>
+                        <p>Để bảo vệ mắt khi sử dụng máy tính/điện thoại:</p>
+                        <ul>
+                            <li><strong>Cứ 20 phút:</strong> Nghỉ ngơi và nhìn xa</li>
+                            <li><strong>Nhìn vật cách 20 feet:</strong> (khoảng 6 mét) trở lên</li>
+                            <li><strong>Trong 20 giây:</strong> Để mắt được thư giãn</li>
+                        </ul>
+                        
+                        <h4>3. Thiết lập môi trường học tập tối ưu</h4>
+                        <p><strong>A. Vị trí màn hình:</strong></p>
+                        <ul>
+                            <li>Cách mắt 50-70cm (khoảng một cánh tay)</li>
+                            <li>Đỉnh màn hình ngang tầm mắt hoặc thấp hơn</li>
+                            <li>Màn hình vuông góc với cửa sổ (tránh phản chiếu)</li>
+                            <li>Nghiêng màn hình 10-20 độ về phía sau</li>
+                        </ul>
+                        
+                        <p><strong>B. Ánh sáng môi trường:</strong></p>
+                        <ul>
+                            <li>Đủ sáng nhưng không chói mắt</li>
+                            <li>Sử dụng đèn bàn chiếu sáng từ phía sau màn hình</li>
+                            <li>Tránh ngồi ngược sáng hoặc dưới ánh sáng chói</li>
+                            <li>Điều chỉnh độ sáng màn hình phù hợp với ánh sáng xung quanh</li>
+                        </ul>
+                        
+                        <h4>4. Bài tập thể dục mắt</h4>
+                        <p><strong>Bài tập 1 - Chớp mắt:</strong></p>
+                        <ul>
+                            <li>Chớp mắt chậm và đều 10-15 lần</li>
+                            <li>Giúp làm ẩm mắt, giảm khô mắt</li>
+                        </ul>
+                        
+                        <p><strong>Bài tập 2 - Xoay nhãn cầu:</strong></p>
+                        <ul>
+                            <li>Xoay mắt theo chiều kim đồng hồ 5 vòng</li>
+                            <li>Xoay ngược chiều kim đồng hồ 5 vòng</li>
+                            <li>Nhắm mắt nghỉ 5 giây</li>
+                        </ul>
+                        
+                        <p><strong>Bài tập 3 - Nhìn xa - gần:</strong></p>
+                        <ul>
+                            <li>Giơ ngón tay cách mắt 15cm</li>
+                            <li>Nhìn ngón tay 5 giây, sau đó nhìn vật xa 5 giây</li>
+                            <li>Lặp lại 10 lần</li>
+                        </ul>
+                        
+                        <h4>5. Lời khuyên cho phụ huynh</h4>
+                        <ul>
+                            <li>Giới hạn thời gian sử dụng thiết bị: 1-2 tiếng/ngày cho trẻ 6-12 tuổi</li>
+                            <li>Khuyến khích hoạt động ngoài trời ít nhất 2 tiếng/ngày</li>
+                            <li>Kiểm tra mắt định kỳ 6 tháng/lần</li>
+                            <li>Đảm bảo giấc ngủ đủ và chất lượng</li>
+                            <li>Bổ sung vitamin A qua thực phẩm (cà rót, gấc, rau xanh)</li>
+                        </ul>
+                    `
+                },
+                'dental-health': {
+                    title: 'Chăm sóc răng miệng cho học sinh',
+                    filename: 'cham-soc-rang-mieng.pdf',
+                    content: `
+                        <h4>1. Tầm quan trọng của sức khỏe răng miệng</h4>
+                        <p>Răng miệng khỏe mạnh giúp:</p>
+                        <ul>
+                            <li>Nhai và tiêu hóa thức ăn tốt hơn</li>
+                            <li>Phát âm rõ ràng, giao tiếp tự tin</li>
+                            <li>Ngăn ngừa các bệnh về tim mạch, tiểu đường</li>
+                            <li>Tiết kiệm chi phí điều trị sau này</li>
+                        </ul>
+                        
+                        <h4>2. Cấu trúc răng và sự phát triển</h4>
+                        <p><strong>A. Răng sữa (20 chiếc):</strong></p>
+                        <ul>
+                            <li>Mọc từ 6 tháng đến 2-3 tuổi</li>
+                            <li>Bắt đầu rụng từ 6 tuổi</li>
+                            <li>Có vai trò giữ chỗ cho răng vĩnh viễn</li>
+                        </ul>
+                        
+                        <p><strong>B. Răng vĩnh viễn (32 chiếc):</strong></p>
+                        <ul>
+                            <li>Răng cửa: 6-8 tuổi</li>
+                            <li>Răng nanh: 9-12 tuổi</li>
+                            <li>Răng hàm nhỏ: 10-12 tuổi</li>
+                            <li>Răng hàm lớn: 6, 12, 18-25 tuổi</li>
+                        </ul>
+                        
+                        <h4>3. Kỹ thuật đánh răng đúng cách</h4>
+                        <p><strong>Phương pháp Bass cải tiến:</strong></p>
+                        <ol>
+                            <li>Đặt bàn chải góc 45 độ với nướu</li>
+                            <li>Chải nhẹ nhàng theo chuyển động tròn nhỏ</li>
+                            <li>Chải từ nướu xuống răng (hàm trên), từ nướu lên răng (hàm dưới)</li>
+                            <li>Chải cả mặt ngoài, mặt trong và mặt nhai</li>
+                            <li>Đánh răng 2-3 phút, 2 lần/ngày</li>
+                        </ol>
+                        
+                        <h4>4. Các bệnh răng miệng thường gặp</h4>
+                        <p><strong>A. Sâu răng:</strong></p>
+                        <ul>
+                            <li><strong>Nguyên nhân:</strong> Vi khuẩn, đường, vệ sinh kém</li>
+                            <li><strong>Triệu chứng:</strong> Đau răng, lỗ đen trên răng</li>
+                            <li><strong>Phòng ngừa:</strong> Đánh răng đúng cách, hạn chế đồ ngọt</li>
+                        </ul>
+                        
+                        <p><strong>B. Viêm nướu:</strong></p>
+                        <ul>
+                            <li><strong>Nguyên nhân:</strong> Cao răng, vệ sinh kém</li>
+                            <li><strong>Triệu chứng:</strong> Nướu đỏ, sưng, chảy máu</li>
+                            <li><strong>Điều trị:</strong> Cạo vôi răng, súc miệng nước muối</li>
+                        </ul>
+                        
+                        <h4>5. Chế độ ăn uống tốt cho răng</h4>
+                        <p><strong>Thực phẩm có lợi:</strong></p>
+                        <ul>
+                            <li><strong>Calcium:</strong> Sữa, phô mai, cá cơm, rau xanh</li>
+                            <li><strong>Phosphor:</strong> Thịt, cá, trứng</li>
+                            <li><strong>Vitamin D:</strong> Cá hồi, trứng, ánh nắng mặt trời</li>
+                            <li><strong>Vitamin C:</strong> Cam, chanh, ổi, rau xanh</li>
+                            <li><strong>Fluoride:</strong> Nước máy có fluoride, kem đánh răng</li>
+                        </ul>
+                        
+                        <p><strong>Thực phẩm nên hạn chế:</strong></p>
+                        <ul>
+                            <li>Kẹo, bánh ngọt, nước có gas</li>
+                            <li>Đồ ăn dính răng (kẹo dẻo, bánh quy)</li>
+                            <li>Thức ăn quá nóng hoặc quá lạnh</li>
+                            <li>Đồ ăn có acid cao (chanh, dấm)</li>
+                        </ul>
+                        
+                        <h4>6. Lịch kiểm tra răng định kỳ</h4>
+                        <ul>
+                            <li><strong>6 tháng/lần:</strong> Khám tổng quát, cạo vôi răng</li>
+                            <li><strong>Khi có triệu chứng:</strong> Đau răng, chảy máu nướu</li>
+                            <li><strong>Niềng răng:</strong> Từ 8-14 tuổi (nếu cần)</li>
+                            <li><strong>Trám răng:</strong> Ngay khi phát hiện sâu răng</li>
+                        </ul>
+                    `
+                },
+                'allergy-management': {
+                    title: 'Quản lý dị ứng ở học sinh',
+                    filename: 'quan-ly-di-ung.pdf',
+                    content: `
+                        <h4>1. Dị ứng là gì?</h4>
+                        <p>Dị ứng là phản ứng của hệ miễn dịch với các chất thường vô hại đối với người bình thường. Các chất gây dị ứng được gọi là allergen.</p>
+                        
+                        <h4>2. Các loại dị ứng thường gặp ở trẻ em</h4>
+                        <p><strong>A. Dị ứng thực phẩm:</strong></p>
+                        <ul>
+                            <li><strong>Thực phẩm thường gây dị ứng:</strong> Sữa, trứng, đậu phộng, hải sản, lúa mì</li>
+                            <li><strong>Triệu chứng:</strong> Phát ban, ngứa, sưng môi/mặt, khó thở, tiêu chảy</li>
+                            <li><strong>Xử lý:</strong> Tránh thực phẩm gây dị ứng, mang thuốc kháng histamine</li>
+                        </ul>
+                        
+                        <p><strong>B. Dị ứng hô hấp:</strong></p>
+                        <ul>
+                            <li><strong>Tác nhân:</strong> Phấn hoa, bụi nhà, lông thú, nấm mốc</li>
+                            <li><strong>Triệu chứng:</strong> Hắt hơi, chảy nước mũi, nghẹt mũi, ho</li>
+                            <li><strong>Xử lý:</strong> Tránh tiếp xúc, sử dụng máy lọc không khí</li>
+                        </ul>
+                        
+                        <p><strong>C. Dị ứng da:</strong></p>
+                        <ul>
+                            <li><strong>Tác nhân:</strong> Xà phòng, kem dưỡng, kim loại, vải synthetic</li>
+                            <li><strong>Triệu chứng:</strong> Phát ban, ngứa, đỏ da, nổi mề đay</li>
+                            <li><strong>Xử lý:</strong> Tránh chất gây dị ứng, sử dụng kem chống ngứa</li>
+                        </ul>
+                        
+                        <h4>3. Nhận biết phản ứng dị ứng nghiêm trọng (Anaphylaxis)</h4>
+                        <p><strong>Dấu hiệu cảnh báo:</strong></p>
+                        <ul>
+                            <li>Sưng mặt, môi, lưỡi, họng</li>
+                            <li>Khó thở, thở khò khè</li>
+                            <li>Mạch nhanh, huyết áp giảm</li>
+                            <li>Buồn nôn, nôn, tiêu chảy</li>
+                            <li>Choáng váng, mất ý thức</li>
+                        </ul>
+                        
+                        <p><strong>Xử lý khẩn cấp:</strong></p>
+                        <ol>
+                            <li>Gọi cấp cứu 115 ngay lập tức</li>
+                            <li>Sử dụng bút tiêm epinephrine (nếu có)</li>
+                            <li>Đặt người bệnh nằm ngửa, nâng chân cao</li>
+                            <li>Theo dõi hô hấp, mạch</li>
+                            <li>Không cho ăn uống gì</li>
+                        </ol>
+                        
+                        <h4>4. Quản lý dị ứng tại trường học</h4>
+                        <p><strong>A. Vai trò của nhà trường:</strong></p>
+                        <ul>
+                            <li>Thu thập thông tin dị ứng của học sinh từ phụ huynh</li>
+                            <li>Lập danh sách học sinh có dị ứng</li>
+                            <li>Đào tạo nhân viên về xử lý dị ứng</li>
+                            <li>Chuẩn bị thuốc và thiết bị cấp cứu</li>
+                            <li>Có kế hoạch khẩn cấp cho từng học sinh</li>
+                        </ul>
+                        
+                        <p><strong>B. Vai trò của phụ huynh:</strong></p>
+                        <ul>
+                            <li>Thông báo đầy đủ cho nhà trường về tình trạng dị ứng</li>
+                            <li>Cung cấp thuốc và hướng dẫn sử dụng</li>
+                            <li>Dạy con nhận biết và tránh tác nhân gây dị ứng</li>
+                            <li>Cập nhật thông tin khi có thay đổi</li>
+                        </ul>
+                        
+                        <h4>5. Hộp thuốc dị ứng cơ bản</h4>
+                        <ul>
+                            <li><strong>Thuốc kháng histamine:</strong> Loratadine, Cetirizine (dạng siro cho trẻ)</li>
+                            <li><strong>Kem bôi:</strong> Hydrocortisone 1% cho da</li>
+                            <li><strong>Bút tiêm epinephrine:</strong> Cho trường hợp nghiêm trọng</li>
+                            <li><strong>Dụng cụ khác:</strong> Nhiệt kế, băng gạc, nước muối sinh lý</li>
+                        </ul>
+                        
+                        <h4>6. Phòng ngừa dị ứng</h4>
+                        <ul>
+                            <li>Cho con bú mẹ ít nhất 6 tháng đầu</li>
+                            <li>Thêm thức ăn dặm từ từ, từng loại một</li>
+                            <li>Giữ môi trường sống sạch sẽ, thoáng mát</li>                            <li>Tránh khói thuốc, ô nhiễm không khí</li>
+                            <li>Kiểm tra dị ứng định kỳ nếu có tiền sử gia đình</li>
+                        </ul>
+                    `
+                },
+                'sports-safety': {
+                    title: 'An toàn thể thao học đường',
+                    filename: 'an-toan-the-thao.pdf',
+                    content: `
+                        <h4>1. Tầm quan trọng của an toàn thể thao</h4>
+                        <p>An toàn thể thao giúp phòng ngừa chấn thương, đảm bảo học sinh phát triển thể chất tối ưu và tạo thói quen tập luyện an toàn suốt đời.</p>
+                        
+                        <h4>2. Các nguyên tắc an toàn cơ bản</h4>
+                        <p><strong>A. Chuẩn bị trước khi tập:</strong></p>
+                        <ul>
+                            <li>Kiểm tra sức khỏe trước khi tham gia</li>
+                            <li>Mặc trang phục và giày dép phù hợp</li>
+                            <li>Khởi động kỹ lưỡng 10-15 phút</li>
+                            <li>Kiểm tra dụng cụ và không gian tập luyện</li>
+                        </ul>
+                        
+                        <p><strong>B. Trong khi tập luyện:</strong></p>
+                        <ul>
+                            <li>Tuân thủ hướng dẫn của giáo viên</li>
+                            <li>Không đẩy ép quá sức</li>
+                            <li>Nghỉ ngơi khi thấy mệt</li>
+                            <li>Uống nước đều đặn</li>
+                        </ul>
+                        
+                        <h4>3. Phòng ngừa chấn thương phổ biến</h4>
+                        <table style="width:100%; border-collapse: collapse; border: 1px solid #ddd;">
+                            <tr style="background: #f5f5f5;">
+                                <th style="border: 1px solid #ddd; padding: 8px;">Loại chấn thương</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Nguyên nhân</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Cách phòng ngừa</th>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Bong gân</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Không khởi động, chạy trên nền không bằng phẳng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Khởi động kỹ, đi giày phù hợp</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Trầy xước</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Ngã, va chạm</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Mặc đồ bảo hộ, tuân thủ quy tắc</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Chuột rút</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Mất nước, không khởi động</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Uống đủ nước, khởi động và giãn cơ</td>
+                            </tr>
+                        </table>
+                        
+                        <h4>4. Xử lý chấn thương cơ bản</h4>
+                        <p><strong>Nguyên tắc RICE:</strong></p>
+                        <ul>
+                            <li><strong>R - Rest:</strong> Nghỉ ngơi, ngừng hoạt động</li>
+                            <li><strong>I - Ice:</strong> Chườm lạnh 15-20 phút</li>
+                            <li><strong>C - Compression:</strong> Băng ép nhẹ</li>
+                            <li><strong>E - Elevation:</strong> Nâng cao vùng bị thương</li>
+                        </ul>
+                        
+                        <h4>5. Trang thiết bị an toàn</h4>
+                        <ul>
+                            <li><strong>Mũ bảo hiểm:</strong> Khi đi xe đạp, trượt patin</li>
+                            <li><strong>Bảo vệ khớp:</strong> Băng gối, bảo vệ cổ tay</li>
+                            <li><strong>Giày thể thao:</strong> Có đế chống trượt, ôm chân</li>
+                            <li><strong>Quần áo:</strong> Thoáng mát, không quá rộng</li>
+                        </ul>
+                        
+                        <h4>6. Môi trường tập luyện an toàn</h4>
+                        <ul>
+                            <li>Kiểm tra sân bãi trước khi sử dụng</li>
+                            <li>Đảm bảo đủ ánh sáng</li>
+                            <li>Loại bỏ vật cản nguy hiểm</li>
+                            <li>Có sẵn hộp sơ cứu</li>
+                            <li>Giáo viên luôn theo dõi học sinh</li>
+                        </ul>
+                    `
+                },
+                'sleep-health': {
+                    title: 'Tầm quan trọng của giấc ngủ đối với học sinh',
+                    filename: 'tam-quan-trong-giac-ngu.pdf',
+                    content: `
+                        <h4>1. Vai trò của giấc ngủ đối với trẻ em</h4>
+                        <p>Giấc ngủ đóng vai trò quan trọng trong:</p>
+                        <ul>
+                            <li>Phát triển não bộ và trí nhớ</li>
+                            <li>Tăng trưởng thể chất</li>
+                            <li>Củng cố hệ miễn dịch</li>
+                            <li>Điều hòa cảm xúc và hành vi</li>
+                            <li>Nâng cao khả năng học tập</li>
+                        </ul>
+                        
+                        <h4>2. Nhu cầu giấc ngủ theo độ tuổi</h4>
+                        <table style="width:100%; border-collapse: collapse; border: 1px solid #ddd;">
+                            <tr style="background: #f5f5f5;">
+                                <th style="border: 1px solid #ddd; padding: 8px;">Độ tuổi</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Thời gian ngủ/ngày</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">Ngủ trưa</th>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">6-7 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">10-11 tiếng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">30-60 phút</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">8-9 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">10-11 tiếng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">30 phút (nếu cần)</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">10-11 tuổi</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">9-10 tiếng</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">Không cần thiết</td>
+                            </tr>
+                        </table>
+                        
+                        <h4>3. Tác hại của thiếu ngủ</h4>
+                        <p><strong>Ảnh hưởng ngắn hạn:</strong></p>
+                        <ul>
+                            <li>Khó tập trung trong học tập</li>
+                            <li>Cáu kỉnh, thay đổi tâm trạng</li>
+                            <li>Suy giảm trí nhớ</li>
+                            <li>Dễ mắc bệnh</li>
+                        </ul>
+                        
+                        <p><strong>Ảnh hưởng dài hạn:</strong></p>
+                        <ul>
+                            <li>Chậm phát triển thể chất</li>
+                            <li>Suy giảm khả năng học tập</li>
+                            <li>Vấn đề về hành vi và cảm xúc</li>
+                            <li>Nguy cơ béo phì</li>
+                        </ul>
+                        
+                        <h4>4. Thói quen ngủ tốt cho trẻ</h4>
+                        <p><strong>A. Tạo môi trường ngủ lý tưởng:</strong></p>
+                        <ul>
+                            <li>Phòng ngủ tối, yên tĩnh, mát mẻ (18-22°C)</li>
+                            <li>Giường thoải mái, gọn gàng</li>
+                            <li>Tránh ánh sáng từ thiết bị điện tử</li>
+                            <li>Có thể sử dụng nhạc nhẹ nhàng</li>
+                        </ul>
+                        
+                        <p><strong>B. Thói quen trước khi ngủ:</strong></p>
+                        <ul>
+                            <li>Tắm rửa sạch sẽ</li>
+                            <li>Đọc sách hoặc nghe truyện</li>
+                            <li>Nói chuyện nhẹ nhàng với con</li>
+                            <li>Tránh hoạt động kích thích</li>
+                        </ul>
+                        
+                        <h4>5. Lịch ngủ khoa học</h4>
+                        <p><strong>Thời gian biểu mẫu cho học sinh tiểu học:</strong></p>
+                        <ul>
+                            <li><strong>20:30 - 21:00:</strong> Chuẩn bị ngủ (tắm, đánh răng)</li>
+                            <li><strong>21:00 - 21:30:</strong> Hoạt động thư giãn (đọc sách)</li>
+                            <li><strong>21:30:</strong> Đi ngủ</li>
+                            <li><strong>6:30 - 7:00:</strong> Thức dậy</li>
+                            <li><strong>12:30 - 13:00:</strong> Ngủ trưa (nếu cần)</li>
+                        </ul>
+                        
+                        <h4>6. Xử lý các vấn đề về giấc ngủ</h4>
+                        <p><strong>Khó ngủ:</strong></p>
+                        <ul>
+                            <li>Giảm ánh sáng 1 tiếng trước khi ngủ</li>
+                            <li>Tránh caffeine và đồ ngọt buổi tối</li>
+                            <li>Tập thể dục buổi chiều</li>
+                            <li>Tạo thói quen đi ngủ cố định</li>
+                        </ul>
+                        
+                        <p><strong>Thức giữa đêm:</strong></p>
+                        <ul>
+                            <li>Giữ phòng tối và yên tĩnh</li>
+                            <li>Không sử dụng thiết bị điện tử</li>
+                            <li>An ủi nhẹ nhàng</li>
+                            <li>Khuyến khích ngủ lại</li>
+                        </ul>
+                        
+                        <h4>7. Lời khuyên cho phụ huynh</h4>
+                        <ul>
+                            <li>Làm gương về thói quen ngủ tốt</li>
+                            <li>Duy trì lịch ngủ nhất quán, kể cả cuối tuần</li>
+                            <li>Tạo không gian ngủ riêng cho con</li>
+                            <li>Theo dõi chất lượng giấc ngủ của con</li>
+                            <li>Tham khảo bác sĩ nếu có vấn đề kéo dài</li>
+                        </ul>
+                    `
+                }
+            };
+            
+            return documents[docType] || documents['nutrition'];
+        }
+          // Function to simulate document download
+        function downloadDocument(filename) {
+            alert(`Đang tải xuống tài liệu: ${filename}\n\nTrong ứng dụng thực tế, tệp sẽ được tải xuống tự động.`);
+        }
+        
+        // Function to create blog modal
+        function createBlogModal() {
+            const blogModal = document.createElement('div');
+            blogModal.classList.add('blog-modal');
+            blogModal.id = 'blogModal';
+            blogModal.innerHTML = `
+                <div class="blog-modal-content">
+                    <div class="blog-modal-header">
+                        <h3>Blog chia sẻ kinh nghiệm</h3>
+                        <span class="close-blog-modal">&times;</span>
+                    </div>
+                    <div class="blog-tabs">
+                        <button class="blog-tab-btn active" data-tab="view">Xem bài viết</button>
+                        <button class="blog-tab-btn" data-tab="write">Viết bài mới</button>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-tab-content active" id="viewTab">
+                            <div class="blog-posts" id="blogPosts">
+                                <!-- Bài viết sẽ được hiển thị ở đây -->
+                            </div>
+                        </div>
+                        <div class="blog-tab-content" id="writeTab">
+                            <div class="blog-form">
+                                <div class="form-group">
+                                    <label for="blogTitle">Tiêu đề bài viết:</label>
+                                    <input type="text" id="blogTitle" placeholder="Nhập tiêu đề..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="blogCategory">Chủ đề:</label>
+                                    <select id="blogCategory" required>
+                                        <option value="">Chọn chủ đề</option>
+                                        <option value="nutrition">Dinh dưỡng học đường</option>
+                                        <option value="health">Sức khỏe học sinh</option>
+                                        <option value="vaccination">Tiêm chủng</option>
+                                        <option value="prevention">Phòng chống bệnh tật</option>
+                                        <option value="mental-health">Sức khỏe tâm thần</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="blogContent">Nội dung:</label>
+                                    <textarea id="blogContent" rows="8" placeholder="Chia sẻ kinh nghiệm của bạn..." required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="blogAuthor">Tên tác giả:</label>
+                                    <input type="text" id="blogAuthor" placeholder="Nhập tên của bạn..." required>
+                                </div>
+                                <button type="button" id="submitBlog" class="submit-blog-btn">Đăng bài</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(blogModal);
+            
+            // Xử lý đóng modal
+            const closeBtn = blogModal.querySelector('.close-blog-modal');
+            closeBtn.onclick = function() {
+                blogModal.style.display = 'none';
+            };
+            
+            // Đóng khi click ngoài modal
+            window.onclick = function(event) {
+                if (event.target == blogModal) {
+                    blogModal.style.display = 'none';
+                }
+            };
+            
+            // Xử lý chuyển tab
+            const tabBtns = blogModal.querySelectorAll('.blog-tab-btn');
+            const tabContents = blogModal.querySelectorAll('.blog-tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    
+                    // Xóa active class
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Thêm active class
+                    this.classList.add('active');
+                    document.getElementById(tabName + 'Tab').classList.add('active');
+                    
+                    // Load bài viết khi chuyển sang tab xem
+                    if (tabName === 'view') {
+                        renderBlogPosts();
+                    }
+                });
+            });
+            
+            // Xử lý submit blog
+            const submitBtn = blogModal.querySelector('#submitBlog');
+            submitBtn.onclick = function() {
+                const title = document.getElementById('blogTitle').value.trim();
+                const category = document.getElementById('blogCategory').value;
+                const content = document.getElementById('blogContent').value.trim();
+                const author = document.getElementById('blogAuthor').value.trim();
+                
+                if (!title || !category || !content || !author) {
+                    alert('Vui lòng điền đầy đủ thông tin!');
+                    return;
+                }
+                
+                // Tạo bài viết mới
+                const newPost = {
+                    id: Date.now(),
+                    title: title,
+                    category: category,
+                    content: content,
+                    author: author,
+                    date: new Date().toLocaleDateString('vi-VN'),
+                    likes: 0
+                };
+                
+                // Lưu vào localStorage
+                let posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+                posts.unshift(newPost);
+                localStorage.setItem('blogPosts', JSON.stringify(posts));
+                
+                // Reset form
+                document.getElementById('blogTitle').value = '';
+                document.getElementById('blogCategory').value = '';
+                document.getElementById('blogContent').value = '';
+                document.getElementById('blogAuthor').value = '';
+                
+                // Chuyển sang tab xem và load lại bài viết
+                tabBtns[0].click();
+                renderBlogPosts();
+                
+                alert('Đăng bài thành công!');
+            };
+            
+            return blogModal;
+        }
+        
+        // Function to show blog
+        function showBlog(blogType) {
+            const modal = document.getElementById('blogModal');
+            if (modal) {
+                modal.style.display = 'block';
+                renderBlogPosts();
+            }
+        }
+        
+        // Function to render blog posts
+        function renderBlogPosts() {
+            const blogPostsContainer = document.getElementById('blogPosts');
+            if (!blogPostsContainer) return;
+            
+            const posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+            
+            if (posts.length === 0) {
+                blogPostsContainer.innerHTML = `
+                    <div class="no-posts">
+                        <p>Chưa có bài viết nào. Hãy là người đầu tiên chia sẻ kinh nghiệm!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const categoryNames = {
+                'nutrition': 'Dinh dưỡng học đường',
+                'health': 'Sức khỏe học sinh',
+                'vaccination': 'Tiêm chủng',
+                'prevention': 'Phòng chống bệnh tật',
+                'mental-health': 'Sức khỏe tâm thần',
+                'other': 'Khác'
+            };
+              blogPostsContainer.innerHTML = posts.map(post => `
+                <div class="blog-post-item">
+                    <div class="blog-post-header">
+                        <h4 class="blog-post-title" onclick="showFullBlogPost(${post.id})" style="cursor: pointer; color: #667eea; text-decoration: underline;">${post.title}</h4>
+                        <div class="blog-post-meta">
+                            <span class="blog-category">${categoryNames[post.category] || post.category}</span>
+                            <span class="blog-date">${post.date}</span>
+                            <button class="delete-post-btn" onclick="deleteBlogPost(${post.id})" title="Xóa bài viết">×</button>
+                        </div>
+                    </div>
+                    <div class="blog-post-content">
+                        <p>${post.content.length > 150 ? post.content.substring(0, 150) + '...' : post.content}</p>
+                        ${post.content.length > 150 ? '<button class="read-more-btn" onclick="showFullBlogPost(' + post.id + ')">Đọc thêm</button>' : ''}
+                    </div>
+                    <div class="blog-post-footer">
+                        <span class="blog-author">Bởi: <strong>${post.author}</strong></span>
+                        <button class="like-btn" onclick="likeBlogPost(${post.id})">
+                            <span class="like-icon">👍</span> ${post.likes}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Function to delete blog post
+        function deleteBlogPost(postId) {
+            if (confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+                let posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+                posts = posts.filter(post => post.id !== postId);
+                localStorage.setItem('blogPosts', JSON.stringify(posts));
+                renderBlogPosts();
+            }
+        }
+          // Function to like blog post
+        function likeBlogPost(postId) {
+            let posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+            const postIndex = posts.findIndex(post => post.id === postId);
+            if (postIndex !== -1) {
+                posts[postIndex].likes++;
+                localStorage.setItem('blogPosts', JSON.stringify(posts));
+                renderBlogPosts();
+            }
+        }
+          // Function to initialize sample blog posts
+        function initializeSampleBlogPosts() {
+            // Kiểm tra xem đã có dữ liệu blog chưa
+            const existingPosts = localStorage.getItem('blogPosts');
+            if (!existingPosts || JSON.parse(existingPosts).length === 0) {                const samplePosts = [
+                    {
+                        id: 1640995200000, // Timestamp for Dec 31, 2021
+                        title: "Chia sẻ thực đơn dinh dưỡng cho học sinh lớp 1",
+                        category: "nutrition",
+                        content: "Là phụ huynh của bé Minh lớp 1A, mình muốn chia sẻ kinh nghiệm xây dựng thực đơn dinh dưỡng hàng ngày cho con. Mỗi ngày mình chuẩn bị cho con: Sáng: 1 ly sữa tươi + bánh mì sandwich với trứng và rau xanh. Trưa tại trường: cơm + thịt/cá + rau củ + canh. Chiều: 1 hộp sữa chua + trái cây theo mùa. Tối: cơm + món mặn + canh rau. Sau 1 tháng áp dụng, con tăng 0.5kg và cao thêm 1cm. Các bạn phụ huynh có thể tham khảo nhé!",
+                        extraInfo: {
+                            tips: [
+                                "💡 Mẹo hay: Chuẩn bị thực đơn cả tuần để tiết kiệm thời gian",
+                                "🥛 Lưu ý: Chọn sữa tươi không đường để tránh béo phì",
+                                "🍎 Thay đổi loại trái cây theo mùa để bổ sung vitamin đa dạng",
+                                "⏰ Giữ giờ giấc ăn uống đều đặn giúp tiêu hóa tốt hơn"
+                            ],
+                            nutritionFacts: "Thực đơn này cung cấp khoảng 1200-1400 calories/ngày, phù hợp với trẻ 6-7 tuổi",
+                            additionalAdvice: "Nên tham khảo ý kiến bác sĩ dinh dưỡng nếu con có dị ứng thực phẩm hoặc vấn đề sức khỏe đặc biệt."
+                        },
+                        author: "Chị Nguyễn Thị Lan",
+                        date: "31/12/2021",
+                        likes: 15
+                    },                    {
+                        id: 1672531200000, // Timestamp for Jan 1, 2023
+                        title: "Kinh nghiệm chăm sóc con khi bị cảm lạnh mùa đông",
+                        category: "health",
+                        content: "Mùa đông năm nay lạnh sớm, con mình học lớp 3B bị cảm lạnh liên tục. Mình đã áp dụng một số biện pháp hiệu quả: 1) Cho con uống nước ấm thường xuyên, đặc biệt là nước chanh mật ong. 2) Giữ ấm cổ họng bằng khăn quàng. 3) Tăng cường vitamin C qua trái cây tươi. 4) Đảm bảo con ngủ đủ 8-9 tiếng mỗi ngày. 5) Vệ sinh mũi họng bằng nước muối sinh lý. Nhờ vậy con ít bị ốm hơn và sức khỏe ổn định. Hy vọng kinh nghiệm này hữu ích cho các bậc phụ huynh!",
+                        extraInfo: {
+                            tips: [
+                                "🌡️ Đo thân nhiệt hàng ngày vào buổi sáng",
+                                "🧣 Mặc áo ấm đa lớp để dễ điều chỉnh",
+                                "🍵 Pha trà gừng mật ong giúp kháng khuẩn tự nhiên",
+                                "🏠 Giữ không khí trong nhà ẩm ướt bằng máy tạo ẩm"
+                            ],
+                            symptoms: "Các dấu hiệu cần chú ý: sốt trên 38.5°C, ho kéo dài quá 1 tuần, khó thở",
+                            whenToSeeDoctor: "Đưa con đến bác sĩ ngay nếu có triệu chứng nặng hoặc không thuyên giảm sau 3-5 ngày."
+                        },
+                        author: "Anh Trần Văn Hùng",
+                        date: "01/01/2023",
+                        likes: 23
+                    },                    {
+                        id: 1704067200000, // Timestamp for Jan 1, 2024
+                        title: "Lịch tiêm chủng đầy đủ - Kinh nghiệm của gia đình tôi",
+                        category: "vaccination",
+                        content: "Con trai mình năm nay lên lớp 2, từ nhỏ mình đã rất chú ý đến việc tiêm chủng đầy đủ theo lịch. Những vaccine quan trọng đã tiêm: BCG (sơ sinh), Comboct 5 trong 1 (2-4-6 tháng), MMR (12 tháng), Varicella - thủy đậu (12 tháng), Hepatitis A (18 tháng), JE não mô cầu (2 tuổi). Mỗi lần tiêm mình đều ghi chép cẩn thận vào sổ, theo dõi phản ứng của con. May mắn con không có phản ứng phụ nào nghiêm trọng. Hiện tại con rất khỏe mạnh, ít khi ốm đau. Mình tin rằng tiêm chủng đầy đủ là nền tảng quan trọng cho sức khỏe của trẻ.",
+                        extraInfo: {
+                            tips: [
+                                "💉 Ghi chép đầy đủ ngày tiêm và loại vaccine vào sổ theo dõi",
+                                "📅 Đặt lịch nhắc trước 1 tuần để không bỏ lỡ mũi tiêm",
+                                "🏥 Chọn cơ sở y tế uy tín có đủ vaccine chất lượng",
+                                "👶 Theo dõi phản ứng sau tiêm trong 24-48h đầu"
+                            ],
+                            vaccineSchedule: "Lịch tiêm cơ bản: BCG (0-1 tháng), Comboct (2-4-6-18 tháng), MMR (12 tháng-6 tuổi), Varicella (12 tháng)",
+                            sideEffects: "Phản ứng thường gặp: sốt nhẹ, đau sưng tại chỗ tiêm, quấy khóc. Thường tự khỏi sau 1-2 ngày.",
+                            additionalAdvice: "Nên tiêm đủ cả vaccine bắt buộc và tự nguyện để bảo vệ tối đa sức khỏe con."
+                        },
+                        author: "Chị Lê Thị Mai",
+                        date: "01/01/2024",
+                        likes: 18
+                    },                    {
+                        id: 1720828800000, // Timestamp for July 12, 2024
+                        title: "Cách phòng chống tay chân miệng hiệu quả tại trường",
+                        category: "prevention",
+                        content: "Học kỳ vừa rồi, trường con mình có vài ca tay chân miệng. Mình đã áp dụng những biện pháp phòng ngừa sau và con không bị lây: 1) Rửa tay thường xuyên bằng xà phòng, đặc biệt trước khi ăn và sau khi đi vệ sinh. 2) Không cho con chia sẻ đồ ăn, nước uống với bạn. 3) Vệ sinh đồ chơi, sách vở của con hàng ngày. 4) Cho con mang gel rửa tay khô trong cặp. 5) Dạy con không chạm tay vào mặt, mũi, miệng khi chưa rửa tay. 6) Tăng cường sức đề kháng qua chế độ ăn uống và nghỉ ngơi hợp lý. Kết quả là con vẫn khỏe mạnh suốt đợt dịch!",
+                        extraInfo: {
+                            tips: [
+                                "🧼 Rửa tay ít nhất 20 giây với xà phòng kháng khuẩn",
+                                "🍽️ Không chia sẻ đồ ăn, ly, muỗng với người khác",
+                                "🧸 Vệ sinh đồ chơi bằng dung dịch khử trùng hàng ngày",
+                                "😷 Đeo khẩu trang khi có người bệnh xung quanh"
+                            ],
+                            symptoms: "Triệu chứng: Sốt, loét miệng, phát ban ở lòng bàn tay, bàn chân, mông",
+                            prevention: "Biện pháp phòng ngừa: Vệ sinh cá nhân, khử trùng đồ dùng, tránh tiếp xúc với người bệnh",
+                            additionalAdvice: "Nếu có triệu chứng nghi ngờ, cách ly ngay và đưa con đến bác sĩ để khám và điều trị kịp thời."
+                        },
+                        author: "Cô Phạm Thị Hoa",
+                        date: "12/07/2024",
+                        likes: 31
+                    },                    {
+                        id: 1735689600000, // Timestamp for Jan 1, 2025
+                        title: "Hỗ trợ tâm lý cho con trong kỳ thi cuối năm",
+                        category: "mental-health",
+                        content: "Gần đây con gái mình lớp 5 thường xuyên lo lắng vì áp lực học tập, đặc biệt là chuẩn bị thi vào lớp 6. Mình đã áp dụng một số cách để giúp con giảm stress: 1) Tạo môi trường học tập thoải mái, không áp đặt. 2) Khuyến khích con chia sẻ những lo lắng. 3) Lập kế hoạch ôn tập hợp lý, có thời gian nghỉ ngơi. 4) Tăng cường hoạt động thể chất như đi bộ, chơi cầu lông. 5) Đảm bảo con ngủ đủ giấc. 6) Tạo không khí gia đình vui vẻ, tích cực. Sau 2 tuần, con đã tự tin và vui vẻ hơn rất nhiều. Mình nghĩ sức khỏe tâm thần cũng quan trọng như sức khỏe thể chất!",
+                        extraInfo: {
+                            tips: [
+                                "🧘 Dạy con kỹ thuật thở sâu để giảm căng thẳng",
+                                "📚 Chia nhỏ bài học thành từng phần dễ học hơn",
+                                "⏰ Tạo thời gian biểu cân bằng giữa học và chơi",
+                                "💪 Khuyến khích con tham gia hoạt động thể thao yêu thích"
+                            ],
+                            stressSigns: "Dấu hiệu stress: Mất ngủ, mất cảm hứng ăn uống, cáu kỉnh, khó tập trung",
+                            relaxationTechniques: "Kỹ thuật thư giãn: Nghe nhạc, vẽ tranh, đọc sách, yoga cho trẻ em",
+                            additionalAdvice: "Nếu tình trạng căng thẳng kéo dài, nên tham khảo ý kiến tư vấn tâm lý để có hướng dẫn chuyên môn."
+                        },
+                        author: "Bác sĩ Nguyễn Văn An",
+                        date: "01/01/2025",
+                        likes: 27
+                    },                    {
+                        id: Date.now() - 86400000, // Yesterday
+                        title: "Kinh nghiệm tổ chức hoạt động thể dục cho học sinh tiểu học",
+                        category: "other",
+                        content: "Là giáo viên thể dục với 10 năm kinh nghiệm, tôi muốn chia sẻ một số hoạt động thể dục phù hợp và hấp dẫn cho học sinh tiểu học: 1) Các trò chơi vận động: đuổi bắt, nhảy dây, chơi bóng. 2) Bài tập thể dục nhịp điệu theo nhạc vui nhộn. 3) Thi đấu thể thao nhẹ nhàng: chạy tiếp sức, ném bóng vào rổ. 4) Yoga và thể dục dưỡng sinh đơn giản. 5) Hoạt động ngoài trời: leo núi nhỏ, đi bộ trong công viên. Quan trọng là tạo không khí vui vẻ, không cạnh tranh quá mức. Mục tiêu là giúp các em yêu thích vận động và có thói quen tập luyện từ nhỏ. Qua quan sát, các em tham gia đều có sức khỏe tốt và tinh thần thoải mái hơn.",
+                        extraInfo: {
+                            tips: [
+                                "🏃 Bắt đầu với các bài tập khởi động nhẹ nhàng",
+                                "🎵 Sử dụng nhạc sôi động để tạo hứng thú cho trẻ",
+                                "🏆 Tổ chức thi đấu nhỏ với phần thưởng tinh thần",
+                                "🌳 Kết hợp hoạt động ngoài trời để thay đổi không khí"
+                            ],
+                            ageGroups: "Lớp 1-2: Trò chơi vận động. Lớp 3-4: Thể thao cơ bản. Lớp 5: Thể thao đồng đội",
+                            benefits: "Lợi ích: Tăng cường sức khỏe, phát triển kỹ năng xã hội, giảm stress học tập",
+                            additionalAdvice: "Luôn đảm bảo an toàn, có dụng cụ y tế sơ cứu và điều chỉnh cường độ phù hợp với từng độ tuổi."
+                        },
+                        author: "Thầy Võ Minh Tâm",
+                        date: new Date(Date.now() - 86400000).toLocaleDateString('vi-VN'),
+                        likes: 12
+                    }
+                ];
+                
+                localStorage.setItem('blogPosts', JSON.stringify(samplePosts));
+            }
+        }
+          // Function to show full blog post
+        function showFullBlogPost(postId) {
+            const posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+            const post = posts.find(p => p.id === postId);
+            
+            if (!post) return;
+            
+            const categoryNames = {
+                'nutrition': 'Dinh dưỡng học đường',
+                'health': 'Sức khỏe học sinh',
+                'vaccination': 'Tiêm chủng',
+                'prevention': 'Phòng chống bệnh tật',
+                'mental-health': 'Sức khỏe tâm thần',
+                'other': 'Khác'
+            };
+              // Tạo modal hiển thị bài viết đầy đủ
+            const fullPostModal = document.createElement('div');
+            fullPostModal.id = 'fullPostModal';
+            
+            // Tạo nội dung thông tin bổ sung nếu có
+            let extraInfoHTML = '';
+            if (post.extraInfo) {
+                extraInfoHTML = '<div class="extra-info-section">';
+                extraInfoHTML += '<h3 class="extra-info-title">📋 Thông tin bổ sung</h3>';
+                
+                // Hiển thị tips
+                if (post.extraInfo.tips && post.extraInfo.tips.length > 0) {
+                    extraInfoHTML += '<div class="extra-info-block">';
+                    extraInfoHTML += '<h4 class="extra-info-subtitle">💡 Mẹo hữu ích:</h4>';
+                    extraInfoHTML += '<ul class="tips-list">';
+                    post.extraInfo.tips.forEach(tip => {
+                        extraInfoHTML += `<li>${tip}</li>`;
+                    });
+                    extraInfoHTML += '</ul></div>';
+                }
+                
+                // Hiển thị các thông tin khác dựa trên category
+                Object.keys(post.extraInfo).forEach(key => {
+                    if (key !== 'tips' && post.extraInfo[key]) {
+                        let title = '';
+                        let icon = '';
+                        switch(key) {
+                            case 'nutritionFacts':
+                                title = 'Thông tin dinh dưỡng';
+                                icon = '🥗';
+                                break;
+                            case 'additionalAdvice':
+                                title = 'Lời khuyên thêm';
+                                icon = '💭';
+                                break;
+                            case 'symptoms':
+                                title = 'Triệu chứng cần chú ý';
+                                icon = '🩺';
+                                break;
+                            case 'whenToSeeDoctor':
+                                title = 'Khi nào cần gặp bác sĩ';
+                                icon = '🏥';
+                                break;
+                            case 'vaccineSchedule':
+                                title = 'Lịch tiêm chủng';
+                                icon = '📅';
+                                break;
+                            case 'sideEffects':
+                                title = 'Tác dụng phụ';
+                                icon = '⚠️';
+                                break;
+                            case 'prevention':
+                                title = 'Biện pháp phòng ngừa';
+                                icon = '🛡️';
+                                break;
+                            case 'stressSigns':
+                                title = 'Dấu hiệu căng thẳng';
+                                icon = '😰';
+                                break;
+                            case 'relaxationTechniques':
+                                title = 'Kỹ thuật thư giãn';
+                                icon = '🧘';
+                                break;
+                            case 'ageGroups':
+                                title = 'Phân chia theo độ tuổi';
+                                icon = '👶';
+                                break;
+                            case 'benefits':
+                                title = 'Lợi ích';
+                                icon = '✨';
+                                break;
+                            default:
+                                title = key.charAt(0).toUpperCase() + key.slice(1);
+                                icon = '📝';
+                        }
+                        
+                        extraInfoHTML += '<div class="extra-info-block">';
+                        extraInfoHTML += `<h4 class="extra-info-subtitle">${icon} ${title}:</h4>`;
+                        extraInfoHTML += `<p class="extra-info-text">${post.extraInfo[key]}</p>`;
+                        extraInfoHTML += '</div>';
+                    }
+                });
+                
+                extraInfoHTML += '</div>';
+            }
+            
+            fullPostModal.innerHTML = `
+                <div class="full-post-modal-content">
+                    <div class="full-post-header">
+                        <h2 class="full-post-title">${post.title}</h2>
+                        <span class="full-post-close">&times;</span>
+                        <div class="full-post-meta">
+                            <span class="full-post-category">${categoryNames[post.category] || post.category}</span>
+                            <span class="full-post-date">${post.date}</span>
+                        </div>
+                    </div>
+                    <div class="full-post-body">
+                        <div class="full-post-content">
+                            <h3 class="content-title">📖 Nội dung chi tiết</h3>
+                            <p>${post.content.replace(/\n/g, '</p><p>')}</p>
+                        </div>
+                        ${extraInfoHTML}
+                    </div>
+                    <div class="full-post-footer">
+                        <div class="full-post-author">Tác giả: <strong>${post.author}</strong></div>
+                        <button class="full-post-like-btn" onclick="likeBlogPostFromModal(${post.id})">
+                            <span class="like-icon">👍</span>
+                            <span id="likeCount-full-${post.id}">${post.likes}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+              document.body.appendChild(fullPostModal);
+            
+            // Hiển thị modal
+            fullPostModal.style.display = 'block';
+            
+            // Xử lý đóng modal
+            const closeBtn = fullPostModal.querySelector('.full-post-close');
+            closeBtn.onclick = function() {
+                closeFullPostModal();
+            };
+            
+            // Đóng khi click ngoài modal
+            fullPostModal.onclick = function(event) {
+                if (event.target === fullPostModal) {
+                    closeFullPostModal();
+                }
+            };
+        }
+          // Function to close full post modal
+        function closeFullPostModal() {
+            const modal = document.getElementById('fullPostModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+          // Function to like blog post from modal
+        function likeBlogPostFromModal(postId) {
+            let posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+            const postIndex = posts.findIndex(post => post.id === postId);
+            if (postIndex !== -1) {
+                posts[postIndex].likes++;
+                localStorage.setItem('blogPosts', JSON.stringify(posts));
+                
+                // Cập nhật số like trong modal
+                const likeCountElement = document.getElementById(`likeCount-full-${postId}`);
+                if (likeCountElement) {
+                    likeCountElement.textContent = posts[postIndex].likes;
+                }
+                
+                // Cập nhật lại danh sách blog
+                renderBlogPosts();
+            }
+        }
+        
+        // CSS cho modal login
+        const style = document.createElement('style');
+        style.textContent = `
+            .login-modal {
+                display: none;
+                position: fixed;
+                z-index: 2000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.6);
+                overflow: auto;
+            }
+            .login-modal-content {
+                background: #fff;
+                border-radius: 10px;
+                margin: 15% auto;
+                padding: 25px;
+                width: 350px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                animation: modalopen 0.3s;
+            }
+            @keyframes modalopen {
+                from {opacity: 0; transform: translateY(-20px);}
+                to {opacity: 1; transform: translateY(0);}
+            }
+            .login-modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            .login-modal-header h3 {
+                color: #1976d2;
+                margin: 0;
+            }
+            .close-modal {
+                color: #777;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .close-modal:hover {
+                color: #000;
+            }
+            .login-modal .form-group {
+                margin-bottom: 15px;
+            }
+            .login-modal .form-label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+            .login-modal .form-input {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+            .login-btn-modal {
+                width: 100%;
+                background: #1976d2;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 16px;
+                cursor: pointer;
+                margin-top: 10px;
+            }
+            .login-btn-modal:hover {
+                background: #1565c0;
+            }
+            .login-footer-modal {
+                margin-top: 15px;
+                text-align: center;
+                font-size: 14px;
+            }
+            .login-footer-modal a {
+                color: #1976d2;
+                text-decoration: none;
+            }
+            .login-footer-modal a:hover {
+                text-decoration: underline;
+            }            .error-message {
+                background-color: #ffebee;
+                color: #c62828;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            
+            /* Document Modal Styles */
+            .document-modal {
+                display: none;
+                position: fixed;
+                z-index: 2001;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+                overflow: auto;
+            }
+            .document-modal-content {
+                background: #fff;
+                border-radius: 10px;
+                margin: 5% auto;
+                padding: 30px;
+                width: 90%;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+                animation: modalopen 0.3s;
+            }
+            .document-modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                border-bottom: 2px solid #e3f2fd;
+                padding-bottom: 15px;
+            }
+            .document-modal-header h3 {
+                color: #1976d2;
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            .close-document-modal {
+                color: #777;
+                font-size: 32px;
+                font-weight: bold;
+                cursor: pointer;
+                line-height: 1;
+            }
+            .close-document-modal:hover {
+                color: #000;
+            }
+            .document-content {
+                line-height: 1.6;
+                color: #333;
+            }
+            .document-content h4 {
+                color: #1976d2;
+                margin-top: 20px;
+                margin-bottom: 10px;
+            }
+            .document-content ul {
+                margin-left: 20px;
+            }
+            .document-content li {
+                margin-bottom: 8px;
+            }
+            .download-document-btn {
+                background: #1976d2;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 12px 24px;
+                font-size: 1rem;
+                cursor: pointer;
+                margin-top: 20px;
+                transition: background 0.2s;
+            }            .download-document-btn:hover {
+                background: #1565c0;
+            }
+            
+            /* Blog Modal Styles */
+            .blog-modal {
+                display: none;
+                position: fixed;
+                z-index: 1001;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0,0,0,0.5);
+            }
+            
+            .blog-modal-content {
+                background-color: #fefefe;
+                margin: 3% auto;
+                padding: 0;
+                border: none;
+                border-radius: 10px;
+                width: 90%;
+                max-width: 800px;
+                max-height: 90%;
+                overflow: hidden;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            }
+            
+            .blog-modal-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .blog-modal-header h3 {
+                margin: 0;
+                font-size: 1.5rem;
+            }
+            
+            .close-blog-modal {
+                color: white;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: color 0.3s;
+            }
+            
+            .close-blog-modal:hover {
+                color: #f1c40f;
+            }
+            
+            .blog-tabs {
+                display: flex;
+                background-color: #f8f9fa;
+                border-bottom: 1px solid #dee2e6;
+            }
+            
+            .blog-tab-btn {
+                flex: 1;
+                padding: 15px 20px;
+                border: none;
+                background: transparent;
+                cursor: pointer;
+                font-size: 16px;
+                color: #666;
+                transition: all 0.3s;
+            }
+            
+            .blog-tab-btn.active {
+                background-color: white;
+                color: #667eea;
+                border-bottom: 3px solid #667eea;
+            }
+            
+            .blog-tab-btn:hover {
+                background-color: rgba(102, 126, 234, 0.1);
+            }
+            
+            .blog-content {
+                max-height: 60vh;
+                overflow-y: auto;
+            }
+            
+            .blog-tab-content {
+                display: none;
+                padding: 20px;
+            }
+            
+            .blog-tab-content.active {
+                display: block;
+            }
+            
+            .blog-form .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .blog-form label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #333;
+            }
+            
+            .blog-form input,
+            .blog-form select,
+            .blog-form textarea {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+            }
+            
+            .blog-form input:focus,
+            .blog-form select:focus,
+            .blog-form textarea:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+            
+            .submit-blog-btn {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: transform 0.3s;
+            }
+            
+            .submit-blog-btn:hover {
+                transform: translateY(-2px);
+            }
+            
+            .blog-posts {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            
+            .blog-post-item {
+                background: white;
+                border: 1px solid #e9ecef;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 15px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                transition: transform 0.3s;
+            }
+            
+            .blog-post-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            }
+            
+            .blog-post-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 10px;
+            }
+            
+            .blog-post-header h4 {
+                margin: 0;
+                color: #333;
+                font-size: 1.1rem;
+            }
+            
+            .blog-post-meta {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .blog-category {
+                background: #667eea;
+                color: white;
+                padding: 4px 12px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: 500;
+            }
+            
+            .blog-date {
+                color: #666;
+                font-size: 12px;
+            }
+            
+            .delete-post-btn {
+                background: #dc3545;
+                color: white;
+                border: none;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .delete-post-btn:hover {
+                background: #c82333;
+            }
+            
+            .blog-post-content p {
+                color: #555;
+                line-height: 1.6;
+                margin: 10px 0;
+            }
+            
+            .blog-post-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid #e9ecef;
+            }
+            
+            .blog-author {
+                color: #666;
+                font-size: 14px;
+            }
+            
+            .like-btn {
+                background: none;
+                border: 1px solid #e9ecef;
+                padding: 5px 12px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 14px;
+                color: #666;
+                transition: all 0.3s;
+            }
+            
+            .like-btn:hover {
+                background: #f8f9fa;
+                border-color: #667eea;
+                color: #667eea;
+            }
+            
+            .like-icon {
+                margin-right: 5px;
+            }
+              .no-posts {
+                text-align: center;
+                padding: 40px 20px;
+                color: #666;
+            }
+            
+            .no-posts p {
+                font-size: 16px;
+                margin: 0;
+            }
+            
+            /* Full Post Modal Styles */
+            #fullPostModal {
+                display: none;
+                position: fixed;
+                z-index: 2000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+                overflow-y: auto;
+            }
+            
+            .full-post-modal-content {
+                background-color: #fefefe;
+                margin: 5% auto;
+                padding: 0;
+                border: none;
+                width: 90%;
+                max-width: 800px;
+                border-radius: 15px;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            }
+            
+            .full-post-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 25px;
+                border-radius: 15px 15px 0 0;
+                position: relative;
+            }
+            
+            .full-post-close {
+                position: absolute;
+                right: 20px;
+                top: 20px;
+                color: white;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.3s;
+            }
+            
+            .full-post-close:hover {
+                background-color: rgba(255,255,255,0.2);
+            }
+            
+            .full-post-title {
+                font-size: 1.8rem;
+                font-weight: 600;
+                margin: 0 40px 10px 0;
+                line-height: 1.3;
+            }
+            
+            .full-post-meta {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-top: 10px;
+            }
+            
+            .full-post-category {
+                background: rgba(255,255,255,0.2);
+                color: white;
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 500;
+            }
+            
+            .full-post-date {
+                color: rgba(255,255,255,0.9);
+                font-size: 14px;
+            }
+            
+            .full-post-body {
+                padding: 30px;
+            }
+              .full-post-content {
+                color: #333;
+                line-height: 1.8;
+                font-size: 16px;
+                margin-bottom: 25px;
+            }
+            
+            .full-post-content p {
+                margin: 0 0 15px 0;
+            }
+            
+            .content-title {
+                color: #667eea;
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #e9ecef;
+                padding-bottom: 8px;
+            }
+            
+            .extra-info-section {
+                margin-top: 30px;
+                padding: 25px;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border-radius: 12px;
+                border: 1px solid #dee2e6;
+            }
+            
+            .extra-info-title {
+                color: #495057;
+                font-size: 1.4rem;
+                margin-bottom: 20px;
+                text-align: center;
+                border-bottom: 3px solid #667eea;
+                padding-bottom: 10px;
+            }
+            
+            .extra-info-block {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .extra-info-subtitle {
+                color: #495057;
+                font-size: 1.1rem;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+            
+            .extra-info-text {
+                color: #6c757d;
+                line-height: 1.6;
+                margin: 0;
+                font-size: 15px;
+            }
+            
+            .tips-list {
+                margin: 0;
+                padding-left: 20px;
+            }
+            
+            .tips-list li {
+                color: #495057;
+                line-height: 1.6;
+                margin-bottom: 8px;
+                font-size: 15px;
+            }
+            
+            .full-post-footer {
+                padding: 20px 30px;
+                background: #f8f9fa;
+                border-radius: 0 0 15px 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-top: 1px solid #e9ecef;
+            }
+            
+            .full-post-author {
+                color: #666;
+                font-size: 15px;
+                font-weight: 500;
+            }
+            
+            .full-post-like-btn {
+                background: #667eea;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .full-post-like-btn:hover {
+                background: #5a6fd8;
+                transform: translateY(-1px);
+            }
+            
+            .read-more-btn {
+                background: #667eea;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 500;
+                margin-top: 10px;
+                transition: all 0.3s;
+            }
+            
+            .read-more-btn:hover {
+                background: #5a6fd8;
+                transform: translateY(-1px);
+            }
+            
+            .blog-post-title {
+                cursor: pointer;
+                transition: color 0.3s;
+            }
+            
+            .blog-post-title:hover {
+                color: #667eea;
+            }
+        `;
+        document.head.appendChild(style);document.addEventListener('DOMContentLoaded', function() {
+            // Tạo modal đăng nhập
+            const loginModal = createLoginModal();
+            
+            // Tạo modal tài liệu
+            createDocumentModal();
+            
+            // Tạo modal blog
+            createBlogModal();
+            
+            // Tạo dữ liệu blog mẫu nếu chưa có
+            initializeSampleBlogPosts();
+            
+            // Kiểm tra trạng thái đăng nhập từ localStorage
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
+            // Slider effect for hero
+            const sliderImgs = document.querySelectorAll('.el-slider-img');
+            let sliderIdx = 0;
+            setInterval(() => {
+                sliderImgs.forEach((img, i) => img.classList.remove('active'));
+                sliderIdx = (sliderIdx + 1) % sliderImgs.length;
+                sliderImgs[sliderIdx].classList.add('active');
+            }, 3500);            // Hiển thị menu avatar khi đã đăng nhập
+            const avatarMenu = document.getElementById('avatarMenu');
+            if (isLoggedIn) {
+                avatarMenu.innerHTML = `
+                    <div class="el-dropdown-item">Xin chào, ${localStorage.getItem('username') || 'User'}</div>
+                    <div class="el-dropdown-item el-dropdown-logout">Đăng xuất</div>
+                `;
+            } else {
+                avatarMenu.innerHTML = '';
+            }
+            // Avatar dropdown
+            const avatarBtn = document.getElementById('avatarBtn');
+            document.addEventListener('click', function (e) {
+                if (avatarBtn && avatarBtn.contains(e.target)) {
+                    if (!isLoggedIn) {
+                        loginModal.style.display = 'block';
+                        return;
+                    }
+                    avatarMenu.classList.toggle('show');
+                } else if (avatarMenu && !avatarMenu.contains(e.target)) {
+                    avatarMenu.classList.remove('show');
+                }
+            });            // Cho phép chuyển tab không cần đăng nhập
+            const tabLinks = document.querySelectorAll('.el-tab-link');
+            tabLinks.forEach((link, idx) => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!isLoggedIn) {
+                        loginModal.style.display = 'block';
+                        return;
+                    }
+                    if (idx === 0) {
+                        window.location.href = 'healthDeclaration.html';
+                    } else if (idx === 1) {
+                        window.location.href = 'sendmedicine.html';
+                    } else if (idx === 2) {
+                        window.location.href = 'recordProcess.html';
+                    } else if (idx === 3) {
+                        window.location.href = 'vaccinationManagement.html';
+                    } else if (idx === 4) {
+                        window.location.href = 'healthcheckMmanagement.html';
+                    } else if (idx === 5) {
+                        window.location.href = 'documentsBlog.html';
+                    }
+                });
+            });
+
+            // Xử lý click vào các biểu tượng tài liệu
+            const documentItems = document.querySelectorAll('.el-product-item[data-doc-type]');
+            documentItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const docType = this.getAttribute('data-doc-type');
+                    showDocument(docType);
+                });
+                
+                // Thêm hiệu ứng hover
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 8px 20px rgba(25, 118, 210, 0.15)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 1px 4px rgba(25, 118, 210, 0.08)';
+                });            });            // Documents Toggle Functionality
+            const toggleBtn = document.getElementById('documentsToggleBtn');
+            const additionalDocuments = document.getElementById('additionalDocuments');
+            const toggleBtnText = document.getElementById('toggleBtnText');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            let documentsVisible = false;
+            
+            if (toggleBtn && additionalDocuments && toggleBtnText && toggleIcon) {
+                // Make sure additional documents are set to flex display but hidden initially
+                additionalDocuments.style.display = 'flex';
+                
+                toggleBtn.addEventListener('click', function() {
+                    if (!documentsVisible) {
+                        // Show additional documents
+                        additionalDocuments.classList.add('show');
+                        toggleBtnText.textContent = 'Thu gọn tài liệu';
+                        toggleIcon.classList.add('rotate');
+                        documentsVisible = true;
+                    } else {
+                        // Hide additional documents
+                        additionalDocuments.classList.remove('show');
+                        toggleBtnText.textContent = 'Xem thêm tài liệu';
+                        toggleIcon.classList.remove('rotate');
+                        documentsVisible = false;
+                    }
+                });
+                
+                // After adding additional documents, apply event listeners to them too
+                const additionalDocumentItems = additionalDocuments.querySelectorAll('.el-product-item[data-doc-type]');
+                additionalDocumentItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const docType = this.getAttribute('data-doc-type');
+                        showDocument(docType);
+                    });
+                    
+                    // Add hover effects
+                    item.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                        this.style.boxShadow = '0 8px 20px rgba(25, 118, 210, 0.15)';
+                    });
+                    
+                    item.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 1px 4px rgba(25, 118, 210, 0.08)';
+                    });
+                });
+            }
+
+            // Xử lý click vào các mục trong blog
+            const blogItems = document.querySelectorAll('.el-why-item[data-blog-type]');
+            blogItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const blogType = this.getAttribute('data-blog-type');
+                    showBlog(blogType);
+                });
+                
+                // Thêm hiệu ứng hover
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 8px 20px rgba(25, 118, 210, 0.15)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 1px 4px rgba(25, 118, 210, 0.08)';
+                });
+            });
+            
+            // Xử lý đăng xuất
+            const logoutBtn = document.querySelector('.el-dropdown-logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('username');
+                    window.location.href = 'dashBoard.html';
+                });
+            }
+            
+            // Chat Box Functionality
+            const chatButton = document.getElementById('chatButton');
+            const chatContainer = document.getElementById('chatContainer');
+            const chatClose = document.getElementById('chatClose');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+            const chatMessages = document.getElementById('chatMessages');
+            const ctaButton = document.querySelector('.el-cta-btn');
+            
+            // Auto responses for the chat
+            const autoResponses = [
+                "Cảm ơn câu hỏi của bạn. Chuyên viên tư vấn của chúng tôi sẽ phản hồi trong ít phút.",
+                "Bạn có thể cho biết thêm về vấn đề bạn đang gặp phải không?",
+                "Chúng tôi có nhiều tài liệu về sức khỏe học đường, bạn quan tâm đến chủ đề nào cụ thể?",
+                "Để được tư vấn chi tiết hơn, vui lòng để lại số điện thoại hoặc email.",
+                "Trung tâm Y tế của chúng tôi mở cửa từ 7:30 - 17:00 các ngày trong tuần. Bạn có thể ghé thăm bất cứ lúc nào."
+            ];
+            
+            // Function to show chat box
+            function showChat() {
+                chatContainer.style.display = 'flex';
+                chatButton.style.display = 'none';
+            }
+            
+            // Function to hide chat box
+            function hideChat() {
+                chatContainer.style.display = 'none';
+                chatButton.style.display = 'flex';
+            }
+            
+            // Function to add a message to the chat
+            function addMessage(message, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(isUser ? 'user-message' : 'admin-message');
+                messageDiv.textContent = message;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Function to handle sending a message
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    chatInput.value = '';
+                    
+                    // Simulate a response after a short delay
+                    setTimeout(() => {
+                        const response = autoResponses[Math.floor(Math.random() * autoResponses.length)];
+                        addMessage(response, false);
+                    }, 1000);
+                }
+            }
+            
+            // Event listeners
+            if (chatButton) chatButton.addEventListener('click', showChat);
+            if (ctaButton) ctaButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                showChat();
+            });
+            if (chatClose) chatClose.addEventListener('click', hideChat);
+            
+            if (chatSend) chatSend.addEventListener('click', sendMessage);
+            if (chatInput) chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -48,6 +48,12 @@ public class HealthDeclarationServlet extends HttpServlet {
                 List<HealthDeclaration> declarations = healthDeclarationDAO.getHealthDeclarationsByStudentId(studentId);
                 out.print(gson.toJson(declarations));
                 
+            } else if ("getByParentId".equals(action)) {
+                int parentId = Integer.parseInt(request.getParameter("parentId"));
+                // Giả sử bạn có phương thức để lấy danh sách học sinh của phụ huynh
+                List<HealthDeclaration> declarations = healthDeclarationDAO.getHealthDeclarationsByParentId(parentId);
+                out.print(gson.toJson(declarations));
+                
             } else if ("getByStatus".equals(action)) {
                 String status = request.getParameter("status");
                 List<HealthDeclaration> declarations = healthDeclarationDAO.getHealthDeclarationsByStatus(status);
@@ -115,7 +121,7 @@ public class HealthDeclarationServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         response.setContentType("application/json");
@@ -137,36 +143,10 @@ public class HealthDeclarationServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.print("{\"error\":\"Failed to update status\"}");
                 }
-                
             } else {
-                // Update full declaration
-                int declarationId = Integer.parseInt(request.getParameter("id"));
-                HealthDeclaration declaration = healthDeclarationDAO.getHealthDeclarationById(declarationId);
-                
-                if (declaration == null) {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    out.print("{\"error\":\"Health declaration not found\"}");
-                    return;
-                }
-                
-                // Update fields
-                declaration.setDisease(request.getParameter("disease"));
-                declaration.setAllergy(request.getParameter("allergy"));
-                declaration.setMedication(request.getParameter("medication"));
-                declaration.setEmergencyContact(request.getParameter("emergencyContact"));
-                declaration.setEmergencyPhone(request.getParameter("emergencyPhone"));
-                declaration.setAdditionalInfo(request.getParameter("additionalInfo"));
-                
-                boolean success = healthDeclarationDAO.updateHealthDeclaration(declaration);
-                
-                if (success) {
-                    out.print("{\"message\":\"Health declaration updated successfully\"}");
-                } else {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.print("{\"error\":\"Failed to update health declaration\"}");
-                }
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"error\":\"Invalid action\"}");
             }
-            
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"error\":\"" + e.getMessage() + "\"}");

@@ -2,6 +2,7 @@ package pe.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -28,23 +29,52 @@ public class SystemHealthServlet extends HttpServlet {
         try {
             // Kiểm tra kết nối cơ sở dữ liệu
             boolean dbConnected = false;
+            String dbMessage = "Chưa kiểm tra";
+            
             try {
-                java.sql.Connection conn = DBUtils.getConnection();
-                dbConnected = conn != null && conn.isValid(5);
+                Connection conn = DBUtils.getConnection();
+                dbConnected = conn != null && !conn.isClosed();
+                dbMessage = dbConnected ? "Kết nối thành công" : "Kết nối thất bại";
                 if (conn != null) conn.close();
             } catch (Exception e) {
                 dbConnected = false;
+                dbMessage = "Lỗi: " + e.getMessage();
             }
             
+            // Thông tin hệ thống
+            Runtime runtime = Runtime.getRuntime();
+            long freeMemory = runtime.freeMemory() / (1024 * 1024);
+            long totalMemory = runtime.totalMemory() / (1024 * 1024);
+            
             // Trả về trạng thái hệ thống
-            out.print("{\"status\":\"ok\",\"database\":" + dbConnected + 
-                     ",\"message\":\"Hệ thống đang hoạt động\",\"timestamp\":\"" + 
-                     new java.util.Date() + "\"}");
+            out.print("{" +
+                "\"status\":\"ok\"," +
+                "\"timestamp\":\"" + new java.util.Date() + "\"," +
+                "\"server\":\"" + request.getServerName() + ":" + request.getServerPort() + "\"," +
+                "\"database\":{" +
+                    "\"connected\":" + dbConnected + "," +
+                    "\"message\":\"" + dbMessage + "\"" +
+                "}," +
+                "\"memory\":{" +
+                    "\"free\":" + freeMemory + "," +
+                    "\"total\":" + totalMemory + "," +
+                    "\"unit\":\"MB\"" +
+                "}," +
+                "\"cors\":\"enabled\"," +
+                "\"message\":\"Hệ thống đang hoạt động\"" +
+            "}");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"status\":\"error\",\"message\":\"" + e.getMessage() + "\"}");
         } finally {
             out.flush();
         }
+    }
+    
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Hỗ trợ CORS preflight request
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

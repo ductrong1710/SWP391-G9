@@ -198,4 +198,41 @@ public class HealthDeclarationDAO {
         declaration.setStatus(rs.getString("status"));
         return declaration;
     }
+
+    // Lấy danh sách khai báo sức khỏe theo ID phụ huynh
+    public List<HealthDeclaration> getHealthDeclarationsByParentId(int parentId) {
+        List<HealthDeclaration> declarations = new ArrayList<>();
+        String sql = "SELECT hd.* FROM HealthDeclarations hd " +
+                     "JOIN Students s ON hd.studentId = s.studentId " +
+                     "WHERE s.parentId = ?";
+        
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, parentId);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                HealthDeclaration declaration = new HealthDeclaration();
+                declaration.setDeclarationId(rs.getInt("declarationId"));
+                declaration.setStudentId(rs.getInt("studentId"));
+                declaration.setStudentName(rs.getString("studentName"));
+                declaration.setStudentClass(rs.getString("studentClass"));
+                declaration.setDisease(rs.getString("disease"));
+                declaration.setAllergy(rs.getString("allergy"));
+                declaration.setMedication(rs.getString("medication"));
+                declaration.setEmergencyContact(rs.getString("emergencyContact"));
+                declaration.setEmergencyPhone(rs.getString("emergencyPhone"));
+                declaration.setAdditionalInfo(rs.getString("additionalInfo"));
+                declaration.setDeclarationDate(rs.getTimestamp("declarationDate"));
+                declaration.setStatus(rs.getString("status"));
+                declarations.add(declaration);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return declarations;
+    }
 }

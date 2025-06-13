@@ -1,274 +1,620 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - School Medical Management System</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <title>Đăng nhập - EduLink Health</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
+        * {
             margin: 0;
             padding: 0;
-            height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* EduLink Theme Variables */
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --light-blue: #dbeafe;
+            --accent-orange: #f59e0b;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --card-shadow: 0 25px 50px rgba(59, 130, 246, 0.15);
+            --hover-shadow: 0 30px 60px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23pattern)"/></svg>');
+            opacity: 0.3;
+            z-index: 0;
         }
 
         .login-container {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 1000px;
+            margin: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        .login-visual {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-visual::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+
+        .visual-content {
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
-        .login-logo {
-            margin-bottom: 1.5rem;
+        .visual-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 2rem auto;
+            backdrop-filter: blur(10px);
         }
 
-        .login-logo img {
-            max-width: 100px;
-            height: auto;
+        .visual-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
 
-        .login-title {
-            color: #1976d2;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
+        .visual-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .login-form-section {
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
         }
 
         .login-form {
-            text-align: left;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
             display: block;
-            color: #333;
-            font-weight: 500;
+            color: var(--text-primary);
+            font-weight: 600;
             margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
             font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: var(--gray-50);
+            position: relative;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #1976d2;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: white;
         }
 
-        .form-footer {
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            z-index: 1;
+        }
+
+        .form-input:focus + .input-icon {
+            color: var(--secondary-blue);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.25rem;
+        }
+
+        .password-toggle:hover {
+            color: var(--secondary-blue);
+        }
+
+        .form-options {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
         }
 
         .remember-me {
             display: flex;
             align-items: center;
+            gap: 0.5rem;
         }
 
-        .remember-checkbox {
-            margin-right: 0.5rem;
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--secondary-blue);
         }
 
         .forgot-password {
-            color: #1976d2;
+            color: var(--secondary-blue);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .forgot-password:hover {
             text-decoration: underline;
         }
 
-        .login-btn {
+        .submit-btn {
             width: 100%;
-            background: #1976d2;
-            color: white;
+            padding: 1rem;
             border: none;
-            border-radius: 6px;
-            padding: 0.9rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s;
+            margin-bottom: 1.5rem;
         }
 
-        .login-btn:hover {
-            background: #1565c0;
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
 
-        .login-options {
-            margin-top: 2rem;
-            border-top: 1px solid #eee;
-            padding-top: 1.5rem;
+        .submit-btn:active {
+            transform: translateY(0);
         }
 
-        .login-options p {
-            color: #666;
-            margin-bottom: 1rem;
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .social-login {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            color: var(--text-secondary);
         }
 
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #f5f5f5;
-            transition: background 0.2s;
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gray-200);
         }
 
-        .social-btn:hover {
-            background: #e0e0e0;
+        .divider span {
+            background: white;
+            padding: 0 1rem;
         }
 
-        .social-btn img {
-            width: 20px;
-            height: 20px;
+        .auth-links {
+            text-align: center;
+            color: var(--text-secondary);
         }
 
-        .login-footer {
-            margin-top: 2rem;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .login-footer a {
-            color: #1976d2;
+        .auth-links a {
+            color: var(--secondary-blue);
             text-decoration: none;
+            font-weight: 600;
         }
 
-        .login-footer a:hover {
+        .auth-links a:hover {
             text-decoration: underline;
         }
 
-        .error-message {
-            background-color: #ffebee;
-            color: #c62828;
-            padding: 0.8rem;
-            border-radius: 6px;
-            margin-bottom: 1.2rem;
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
             display: none;
         }
 
-        @media (max-width: 460px) {
-            .login-container {
-                width: 90%;
-                padding: 1.5rem;
-            }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Back to Home */
+        .back-home {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .back-home:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-
 <body>
+    <a href="index.html" class="back-home">
+        <i class="fas fa-arrow-left"></i>
+        Về trang chủ
+    </a>
+
     <div class="login-container">
-        <div class="login-logo">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="F&S Logo">
-        </div>
-        <h1 class="login-title">Quản Lý Y Tế Học Đường F&S</h1>
-
-        <div class="error-message" id="errorMessage">
-            Thông tin đăng nhập không chính xác. Vui lòng thử lại!
-        </div>
-
-        <form class="login-form" id="loginForm">
-            <div class="form-group">
-                <label class="form-label" for="username">Tên đăng nhập</label>
-                <input type="text" class="form-input" id="username" placeholder="Nhập tên đăng nhập hoặc email" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">Mật khẩu</label>
-                <input type="password" class="form-input" id="password" placeholder="Nhập mật khẩu" required>
-            </div>
-
-            <div class="form-footer">
-                <div class="remember-me">
-                    <input type="checkbox" class="remember-checkbox" id="rememberMe">
-                    <label for="rememberMe">Ghi nhớ đăng nhập</label>
+        <!-- Visual Section -->
+        <div class="login-visual">
+            <div class="visual-content">
+                <div class="visual-icon">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-                <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                <h2 class="visual-title">EduLink Health</h2>
+                <p class="visual-subtitle">
+                    Hệ thống quản lý sức khỏe học đường thông minh, 
+                    giúp bạn theo dõi và chăm sóc sức khỏe học sinh một cách hiệu quả
+                </p>
             </div>
-
-            <button type="submit" class="login-btn">Đăng nhập</button>
-        </form>
-
-        <div class="login-options">
-            <p>Hoặc đăng nhập với</p>
-            <div class="social-login">
-                <a href="#" class="social-btn">
-                    <img src="https://cdn-icons-png.flaticon.com/512/300/300221.png" alt="Google">
-                </a>
-                <a href="#" class="social-btn">
-                    <img src="https://cdn-icons-png.flaticon.com/512/5968/5968764.png" alt="Facebook">
-                </a>
-                <a href="#" class="social-btn">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3955/3955024.png" alt="School ID">
-                </a>
-            </div>
-        </div>        <div class="login-footer">
-            <p>Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
         </div>
-    </div>    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Thêm liên kết để truy cập Dashboard mà không cần đăng nhập
-            const loginTitle = document.querySelector('.login-title');
-            const dashboardLink = document.createElement('div');
-            dashboardLink.innerHTML = '<a href="dashBoard.html" style="color: #1976d2; font-size: 0.9rem; display: inline-block; margin-bottom: 15px; text-decoration: none;">← Xem trang chính mà không cần đăng nhập</a>';
-            loginTitle.parentNode.insertBefore(dashboardLink, loginTitle.nextSibling);
+
+        <!-- Form Section -->
+        <div class="login-form-section">
+            <div class="form-header">
+                <h1 class="form-title">Đăng nhập</h1>
+                <p class="form-subtitle">Chào mừng bạn trở lại! Vui lòng đăng nhập vào tài khoản của bạn</p>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <!-- Alert Messages -->
+                <div class="alert alert-success" id="successAlert">
+                    <i class="fas fa-check-circle"></i>
+                    Đăng nhập thành công! Đang chuyển hướng...
+                </div>
+                
+                <div class="alert alert-error" id="errorAlert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMessage">Tên đăng nhập hoặc mật khẩu không chính xác</span>
+                </div>
+
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="username" class="form-label">Tên đăng nhập</label>
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            placeholder="Nhập tên đăng nhập"
+                            required
+                            autocomplete="username"
+                        >
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="password" class="form-label">Mật khẩu</label>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Nhập mật khẩu"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <i class="fas fa-lock input-icon"></i>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Options -->
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <span>Ghi nhớ đăng nhập</span>
+                    </label>
+                    <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="submitText">Đăng nhập</span>
+                    <div class="loading" id="loadingSpinner" style="display: none;"></div>
+                </button>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <span>hoặc</span>
+                </div>
+
+                <!-- Auth Links -->
+                <div class="auth-links">
+                    Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Password toggle functionality
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
             
-            const loginForm = document.getElementById('loginForm');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Show alert message
+        function showAlert(type, message) {
+            const alert = document.getElementById(type + 'Alert');
             const errorMessage = document.getElementById('errorMessage');
             
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                  // Mô phỏng xác thực (demo purposes only)
-                // Trong thực tế, bạn sẽ gửi request đến server để xác thực
-                if (username === 'user' && password === 'password') {
-                    // Lưu trạng thái đăng nhập vào localStorage
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('username', username);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-                    // Chuyển hướng đến trang dashboard
-                    window.location.href = 'dashBoard.html';
-                } else {
-                    // Hiển thị thông báo lỗi
-                    errorMessage.style.display = 'block';
-                    setTimeout(() => {
-                        errorMessage.style.display = 'none';
-                    }, 3000);
-                }
+            // Hide all alerts first
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.display = 'none';
             });
+            
+            if (type === 'error' && message) {
+                errorMessage.textContent = message;
+            }
+            
+            alert.style.display = 'block';
+            
+            // Auto hide after 5 seconds for error messages
+            if (type === 'error') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            // Get form data
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Basic validation
+            if (!username || !password) {
+                showAlert('error', 'Vui lòng nhập đầy đủ thông tin đăng nhập');
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitText.style.display = 'none';
+            loadingSpinner.style.display = 'inline-block';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Simple authentication (in real app, this would be server-side)
+                if ((username === 'admin' && password === 'admin') || 
+                    (username === 'teacher' && password === 'teacher') ||
+                    (username === 'health' && password === 'health123')) {
+                    
+                    // Save user session
+                    const userData = {
+                        username: username,
+                        loginTime: new Date().toISOString(),
+                        rememberMe: rememberMe
+                    };
+                    
+                    localStorage.setItem('eduLinkUser', JSON.stringify(userData));
+                    
+                    // Show success message
+                    showAlert('success');
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'dashBoard.html';
+                    }, 2000);
+                    
+                } else {
+                    // Show error message
+                    showAlert('error', 'Tên đăng nhập hoặc mật khẩu không chính xác');
+                    
+                    // Reset loading state
+                    submitBtn.disabled = false;
+                    submitText.style.display = 'inline';
+                    loadingSpinner.style.display = 'none';
+                }
+            }, 1500); // Simulate network delay
         });
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('eduLinkUser');
+            if (user) {
+                try {
+                    const userData = JSON.parse(user);
+                    if (userData.rememberMe) {
+                        // Auto redirect to dashboard
+                        window.location.href = 'dashBoard.html';
+                        return;
+                    }
+                } catch (e) {
+                    // Clear invalid data
+                    localStorage.removeItem('eduLinkUser');
+                }
+            }
+            
+            // Focus on username field
+            document.getElementById('username').focus();
+        });
+
+        // Enter key handling
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Demo credentials hint
+        console.log('Demo credentials:');
+        console.log('Username: admin, Password: admin');
+        console.log('Username: teacher, Password: teacher');
+        console.log('Username: health, Password: health123');
     </script>
 </body>
-
 </html>

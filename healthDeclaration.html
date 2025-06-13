@@ -1,165 +1,907 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khai báo hồ sơ sức khỏe học sinh</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <title>Khai báo sức khỏe - EduLink Health</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background: #f4f8fb;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
         }
 
-        .el-main {
-            max-width: 600px;
-            margin: 2rem auto;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            padding: 2rem;
+        /* EduLink Theme Variables */
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --light-blue: #dbeafe;
+            --accent-orange: #f59e0b;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --warning-yellow: #f59e0b;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --card-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+            --hover-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
         }
 
-        .el-section-title {
+        /* Header */
+        .header {
+            background: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .logo-text {
             font-size: 1.6rem;
-            color: #1976d2;
-            margin-bottom: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
             text-align: center;
         }
 
-        .health-form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .health-form-label {
-            display: block;
-            color: #333;
-            font-weight: 500;
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
             margin-bottom: 0.5rem;
         }
 
-        .health-form-input,
-        .health-form-select,
-        .health-form-textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-
-        .health-form-input:focus,
-        .health-form-select:focus,
-        .health-form-textarea:focus {
-            outline: none;
-            border-color: #1976d2;
-        }
-
-        .health-form-btn {
-            width: 100%;
-            background: #1976d2;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.9rem;
+        .page-subtitle {
+            color: var(--text-secondary);
             font-size: 1.1rem;
+        }
+
+        /* Content Layout */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .main-panel {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .side-panel {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .panel-content {
+            padding: 2rem;
+        }
+
+        /* Form Styles */
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .required {
+            color: var(--danger-red);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Checkbox and Radio Styles */
+        .checkbox-group,
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            transition: all 0.3s;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 1rem;
         }
 
-        .health-form-btn:hover {
-            background: #1565c0;
+        .checkbox-item:hover,
+        .radio-item:hover {
+            border-color: var(--secondary-blue);
+            background: var(--light-blue);
         }
 
-        .success-message,
-        .error-message {
-            display: none;
+        .checkbox-item input,
+        .radio-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--secondary-blue);
+        }
+
+        .checkbox-item.checked,
+        .radio-item.checked {
+            border-color: var(--secondary-blue);
+            background: var(--light-blue);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--text-primary);
+        }
+
+        .btn-warning {
+            background: var(--warning-yellow);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        /* Health Status Indicator */
+        .health-status {
             padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1.2rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 600;
         }
 
-        .success-message {
-            background-color: #e8f5e9;
-            color: #2e7d32;
+        .status-good {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
         }
 
-        .error-message {
-            background-color: #ffebee;
-            color: #c62828;
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .status-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Temperature Scale */
+        .temperature-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* Quick Guide */
+        .quick-guide {
+            background: var(--light-blue);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-guide h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .guide-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .guide-item i {
+            color: var(--secondary-blue);
         }
     </style>
 </head>
-
 <body>
-    <main class="el-main">
-        <h2 class="el-section-title">Khai báo hồ sơ sức khỏe học sinh</h2>
-        <div class="success-message" id="successMessage">Khai báo thành công!</div>
-        <div class="error-message" id="errorMessage">Có lỗi xảy ra, vui lòng kiểm tra lại thông tin!</div>
-        <!-- ...existing code... -->
-        <form id="healthForm">
-            <div class="health-form-group">
-                <label class="health-form-label" for="disease">Bệnh nền (nếu có)</label>
-                <input type="text" class="health-form-input" id="disease" placeholder="Không có thì để trống">
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <span class="logo-text">EduLink Health</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="dashBoard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="healthDeclaration.html" class="nav-link active">
+                    <i class="fas fa-file-medical"></i> Khai báo sức khỏe
+                </a>
+                <a href="vaccinationManagement.html" class="nav-link">
+                    <i class="fas fa-syringe"></i> Tiêm chủng
+                </a>
+                <a href="login.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
             </div>
-            <div class="health-form-group">
-                <label class="health-form-label" for="allergy">Dị ứng (nếu có)</label>
-                <input type="text" class="health-form-input" id="allergy" placeholder="Không có thì để trống">
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-file-medical"></i>
+                Khai báo sức khỏe hàng ngày
+            </h1>
+            <p class="page-subtitle">Theo dõi và quản lý tình trạng sức khỏe học sinh một cách chi tiết và chính xác</p>
+        </div>
+
+        <!-- Content Layout -->
+        <div class="content-layout">
+            <!-- Main Panel -->
+            <div class="main-panel">
+                <div class="panel-header">
+                    <i class="fas fa-clipboard-check"></i>
+                    Form khai báo sức khỏe
+                </div>
+                <div class="panel-content">
+                    <!-- Alert Messages -->
+                    <div class="alert alert-success" id="successAlert">
+                        <i class="fas fa-check-circle"></i>
+                        Khai báo sức khỏe đã được ghi nhận thành công!
+                    </div>
+
+                    <div class="alert alert-warning" id="warningAlert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="warningMessage">Phát hiện triệu chứng bất thường, vui lòng liên hệ y tế trường!</span>
+                    </div>
+
+                    <!-- Health Status Indicator -->
+                    <div class="health-status status-good" id="healthStatus">
+                        <i class="fas fa-heart"></i>
+                        Tình trạng sức khỏe: Bình thường
+                    </div>
+
+                    <form id="healthDeclarationForm">
+                        <!-- Student Information -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-user"></i>
+                                Thông tin học sinh
+                            </h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="studentId" class="form-label">Mã học sinh <span class="required">*</span></label>
+                                    <input type="text" id="studentId" name="studentId" class="form-input" 
+                                           placeholder="Nhập mã học sinh" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentName" class="form-label">Họ và tên <span class="required">*</span></label>
+                                    <input type="text" id="studentName" name="studentName" class="form-input" 
+                                           placeholder="Nhập họ và tên" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="studentClass" class="form-label">Lớp <span class="required">*</span></label>
+                                    <select id="studentClass" name="studentClass" class="form-select" required>
+                                        <option value="">Chọn lớp</option>
+                                        <option value="10A1">10A1</option>
+                                        <option value="10A2">10A2</option>
+                                        <option value="10B1">10B1</option>
+                                        <option value="11A1">11A1</option>
+                                        <option value="11A2">11A2</option>
+                                        <option value="11B1">11B1</option>
+                                        <option value="12A1">12A1</option>
+                                        <option value="12A2">12A2</option>
+                                        <option value="12B1">12B1</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="declarationDate" class="form-label">Ngày khai báo <span class="required">*</span></label>
+                                    <input type="date" id="declarationDate" name="declarationDate" class="form-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Health Measurements -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-thermometer-half"></i>
+                                Chỉ số sức khỏe
+                            </h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="temperature" class="form-label">Nhiệt độ cơ thể (°C) <span class="required">*</span></label>
+                                    <input type="number" id="temperature" name="temperature" class="form-input" 
+                                           placeholder="VD: 36.5" step="0.1" min="35" max="42" required>
+                                    <div class="temperature-scale">
+                                        <span>35°C</span>
+                                        <span style="color: var(--success-green);">36-37°C (Bình thường)</span>
+                                        <span>42°C</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heartRate" class="form-label">Nhịp tim (lần/phút)</label>
+                                    <input type="number" id="heartRate" name="heartRate" class="form-input" 
+                                           placeholder="VD: 80" min="50" max="150">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="bloodPressure" class="form-label">Huyết áp (mmHg)</label>
+                                    <input type="text" id="bloodPressure" name="bloodPressure" class="form-input" 
+                                           placeholder="VD: 120/80" pattern="[0-9]{2,3}/[0-9]{2,3}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="weight" class="form-label">Cân nặng (kg)</label>
+                                    <input type="number" id="weight" name="weight" class="form-input" 
+                                           placeholder="VD: 50" step="0.1" min="20" max="150">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Symptoms Check -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-stethoscope"></i>
+                                Triệu chứng và tình trạng sức khỏe
+                            </h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Bạn có gặp phải các triệu chứng sau không?</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="symptoms" value="fever">
+                                        <span>Sốt, ớn lạnh</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="symptoms" value="cough">
+                                        <span>Ho, khó thở</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="symptoms" value="headache">
+                                        <span>Đau đầu, chóng mặt</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="symptoms" value="fatigue">
+                                        <span>Mệt mỏi, yếu sức</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="symptoms" value="nausea">
+                                        <span>Buồn nôn, nôn mửa</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" name="symptoms" value="stomach_pain">
+                                        <span>Đau bụng, tiêu chảy</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sleepQuality" class="form-label">Chất lượng giấc ngủ đêm qua</label>
+                                <div class="radio-group">
+                                    <label class="radio-item">
+                                        <input type="radio" name="sleepQuality" value="very_good">
+                                        <span>Rất tốt (8+ giờ)</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" name="sleepQuality" value="good">
+                                        <span>Tốt (6-8 giờ)</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" name="sleepQuality" value="fair">
+                                        <span>Bình thường (4-6 giờ)</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" name="sleepQuality" value="poor">
+                                        <span>Kém (< 4 giờ)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="appetiteLevel" class="form-label">Mức độ ăn uống</label>
+                                <select id="appetiteLevel" name="appetiteLevel" class="form-select">
+                                    <option value="">Chọn mức độ</option>
+                                    <option value="excellent">Rất tốt - Ăn ngon miệng</option>
+                                    <option value="good">Tốt - Ăn bình thường</option>
+                                    <option value="fair">Bình thường - Ăn ít hơn</option>
+                                    <option value="poor">Kém - Chán ăn</option>
+                                    <option value="very_poor">Rất kém - Không muốn ăn</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-notes-medical"></i>
+                                Thông tin bổ sung
+                            </h3>
+                            
+                            <div class="form-group">
+                                <label for="medications" class="form-label">Thuốc đang sử dụng (nếu có)</label>
+                                <textarea id="medications" name="medications" class="form-textarea" 
+                                          placeholder="Ghi rõ tên thuốc, liều lượng và mục đích sử dụng"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="additionalNotes" class="form-label">Ghi chú thêm</label>
+                                <textarea id="additionalNotes" name="additionalNotes" class="form-textarea" 
+                                          placeholder="Mô tả thêm về tình trạng sức khỏe hoặc các vấn đề khác"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-item" style="justify-content: flex-start;">
+                                    <input type="checkbox" id="parentalConsent" name="parentalConsent" required>
+                                    <span>Tôi xác nhận thông tin khai báo là chính xác và đồng ý để trường theo dõi sức khỏe</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Gửi khai báo
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-undo"></i> Làm lại
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="health-form-group">
-                <label class="health-form-label" for="height">Chiều cao (cm)</label>
-                <input type="number" class="health-form-input" id="height" min="0">
+
+            <!-- Side Panel -->
+            <div class="side-panel">
+                <div class="quick-guide">
+                    <h4><i class="fas fa-info-circle"></i> Hướng dẫn khai báo</h4>
+                    <div class="guide-item">
+                        <i class="fas fa-check"></i>
+                        <span>Điền đầy đủ thông tin bắt buộc</span>
+                    </div>
+                    <div class="guide-item">
+                        <i class="fas fa-check"></i>
+                        <span>Đo nhiệt độ chính xác trước khi khai báo</span>
+                    </div>
+                    <div class="guide-item">
+                        <i class="fas fa-check"></i>
+                        <span>Báo cáo trung thực các triệu chứng</span>
+                    </div>
+                    <div class="guide-item">
+                        <i class="fas fa-check"></i>
+                        <span>Thông báo ngay nếu có triệu chứng bất thường</span>
+                    </div>
+                </div>
+
+                <div style="background: var(--gray-50); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Lưu ý quan trọng
+                    </h4>
+                    <ul style="list-style: none; padding: 0; font-size: 0.9rem; line-height: 1.6;">
+                        <li style="margin-bottom: 0.5rem;">• Nhiệt độ ≥ 37.5°C: Cần theo dõi đặc biệt</li>
+                        <li style="margin-bottom: 0.5rem;">• Có triệu chứng ho, khó thở: Liên hệ y tế ngay</li>
+                        <li style="margin-bottom: 0.5rem;">• Đau bụng dữ dội: Cần hỗ trợ y tế</li>
+                        <li>• Chóng mặt, ngất xỉu: Báo cáo khẩn cấp</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, var(--success-green), #059669); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <h4 style="margin-bottom: 1rem;">
+                        <i class="fas fa-phone"></i> Liên hệ khẩn cấp
+                    </h4>
+                    <p style="margin-bottom: 0.5rem; font-weight: 600;">Y tế trường: 024-xxxx-xxxx</p>
+                    <p style="font-size: 0.9rem;">Hotline 24/7: 1900-xxxx</p>
+                </div>
             </div>
-            <div class="health-form-group">
-                <label class="health-form-label" for="weight">Cân nặng (kg)</label>
-                <input type="number" class="health-form-input" id="weight" min="0">
-            </div>
-            <div class="health-form-group">
-                <label class="health-form-label" for="note">Ghi chú thêm</label>
-                <textarea class="health-form-textarea" id="note" rows="3"></textarea>
-            </div>
-            <button type="submit" class="health-form-btn">Gửi khai báo</button>
-        </form>
-        <!-- ...existing code... -->
+        </div>
     </main>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const healthForm = document.getElementById('healthForm');
-            const successMessage = document.getElementById('successMessage');
-            const errorMessage = document.getElementById('errorMessage');
-            healthForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                // Lấy dữ liệu từ form
-                const data = {
-                    disease: document.getElementById('disease').value.trim(),
-                    allergy: document.getElementById('allergy').value.trim(),
-                    height: document.getElementById('height').value,
-                    weight: document.getElementById('weight').value,
-                    note: document.getElementById('note').value.trim()
-                };
-                try {
-                    // Lưu vào localStorage (demo)
-                    let healthList = JSON.parse(localStorage.getItem('healthDeclarations') || '[]');
-                    healthList.push(data);
-                    localStorage.setItem('healthDeclarations', JSON.stringify(healthList));
-                    successMessage.style.display = 'block';
-                    healthForm.reset();
-                    setTimeout(() => { successMessage.style.display = 'none'; }, 3000);
-                } catch (err) {
-                    errorMessage.textContent = 'Có lỗi xảy ra, vui lòng thử lại!';
-                    errorMessage.style.display = 'block';
-                    setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+        // Set current date as default
+        document.getElementById('declarationDate').valueAsDate = new Date();
+
+        // Health data storage
+        let healthDeclarations = JSON.parse(localStorage.getItem('healthDeclarations') || '[]');
+
+        // Temperature monitoring
+        document.getElementById('temperature').addEventListener('input', function() {
+            updateHealthStatus();
+        });
+
+        // Symptoms monitoring
+        document.querySelectorAll('input[name="symptoms"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateHealthStatus();
+                // Update checkbox visual state
+                const item = this.closest('.checkbox-item');
+                if (this.checked) {
+                    item.classList.add('checked');
+                } else {
+                    item.classList.remove('checked');
                 }
             });
         });
+
+        // Radio button visual updates
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Remove checked class from all items in the same group
+                document.querySelectorAll(`input[name="${this.name}"]`).forEach(r => {
+                    r.closest('.radio-item').classList.remove('checked');
+                });
+                // Add checked class to selected item
+                this.closest('.radio-item').classList.add('checked');
+            });
+        });
+
+        // Health status assessment
+        function updateHealthStatus() {
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const symptoms = Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(cb => cb.value);
+            const statusDiv = document.getElementById('healthStatus');
+            const warningAlert = document.getElementById('warningAlert');
+            const warningMessage = document.getElementById('warningMessage');
+
+            let status = 'good';
+            let message = 'Tình trạng sức khỏe: Bình thường';
+            let warnings = [];
+
+            // Temperature check
+            if (temperature >= 37.5) {
+                status = 'danger';
+                message = 'Cảnh báo: Sốt cao - Cần theo dõi đặc biệt';
+                warnings.push('Nhiệt độ cao (≥37.5°C)');
+            } else if (temperature >= 37.0) {
+                status = 'warning';
+                message = 'Chú ý: Nhiệt độ hơi cao - Cần theo dõi';
+                warnings.push('Nhiệt độ hơi cao');
+            }
+
+            // Symptoms check
+            const criticalSymptoms = ['fever', 'cough', 'stomach_pain'];
+            const hasCriticalSymptoms = symptoms.some(s => criticalSymptoms.includes(s));
+            
+            if (hasCriticalSymptoms) {
+                if (status === 'good') status = 'warning';
+                if (symptoms.includes('fever')) warnings.push('Sốt, ớn lạnh');
+                if (symptoms.includes('cough')) warnings.push('Ho, khó thở');
+                if (symptoms.includes('stomach_pain')) warnings.push('Đau bụng');
+                
+                if (status !== 'danger') {
+                    message = 'Chú ý: Có triệu chứng cần theo dõi';
+                }
+            }
+
+            // Update status display
+            statusDiv.className = `health-status status-${status}`;
+            statusDiv.innerHTML = `<i class="fas fa-heart"></i> ${message}`;
+
+            // Show warnings if any
+            if (warnings.length > 0) {
+                warningMessage.textContent = `Phát hiện: ${warnings.join(', ')}. Vui lòng liên hệ y tế trường!`;
+                warningAlert.style.display = 'block';
+            } else {
+                warningAlert.style.display = 'none';
+            }
+        }
+
+        // Form submission
+        document.getElementById('healthDeclarationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const symptoms = Array.from(document.querySelectorAll('input[name="symptoms"]:checked')).map(cb => cb.value);
+            
+            const declaration = {
+                id: Date.now(),
+                studentId: formData.get('studentId'),
+                studentName: formData.get('studentName'),
+                studentClass: formData.get('studentClass'),
+                declarationDate: formData.get('declarationDate'),
+                temperature: parseFloat(formData.get('temperature')),
+                heartRate: formData.get('heartRate') ? parseInt(formData.get('heartRate')) : null,
+                bloodPressure: formData.get('bloodPressure'),
+                weight: formData.get('weight') ? parseFloat(formData.get('weight')) : null,
+                symptoms: symptoms,
+                sleepQuality: formData.get('sleepQuality'),
+                appetiteLevel: formData.get('appetiteLevel'),
+                medications: formData.get('medications'),
+                additionalNotes: formData.get('additionalNotes'),
+                createdAt: new Date().toISOString()
+            };
+
+            // Validate required fields
+            if (!declaration.studentId || !declaration.studentName || !declaration.studentClass || !declaration.temperature) {
+                alert('Vui lòng điền đầy đủ các thông tin bắt buộc!');
+                return;
+            }
+
+            // Save declaration
+            healthDeclarations.unshift(declaration);
+            localStorage.setItem('healthDeclarations', JSON.stringify(healthDeclarations));
+
+            // Show success message
+            document.getElementById('successAlert').style.display = 'block';
+            document.getElementById('warningAlert').style.display = 'none';
+
+            // Reset form
+            e.target.reset();
+            document.getElementById('declarationDate').valueAsDate = new Date();
+            
+            // Reset visual states
+            document.querySelectorAll('.checkbox-item, .radio-item').forEach(item => {
+                item.classList.remove('checked');
+            });
+
+            // Reset health status
+            const statusDiv = document.getElementById('healthStatus');
+            statusDiv.className = 'health-status status-good';
+            statusDiv.innerHTML = '<i class="fas fa-heart"></i> Tình trạng sức khỏe: Bình thường';
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Auto hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('successAlert').style.display = 'none';
+            }, 5000);
+        });
+
+        // Form reset handler
+        document.querySelector('button[type="reset"]').addEventListener('click', function() {
+            setTimeout(() => {
+                document.getElementById('declarationDate').valueAsDate = new Date();
+                document.querySelectorAll('.checkbox-item, .radio-item').forEach(item => {
+                    item.classList.remove('checked');
+                });
+                
+                const statusDiv = document.getElementById('healthStatus');
+                statusDiv.className = 'health-status status-good';
+                statusDiv.innerHTML = '<i class="fas fa-heart"></i> Tình trạng sức khỏe: Bình thường';
+                
+                document.getElementById('warningAlert').style.display = 'none';
+                document.getElementById('successAlert').style.display = 'none';
+            }, 10);
+        });
+
+        // Auto-fill student name based on ID (demo feature)
+        document.getElementById('studentId').addEventListener('blur', function() {
+            const studentId = this.value.trim();
+            const nameField = document.getElementById('studentName');
+            
+            // Demo data mapping
+            const studentNames = {
+                'HS001': 'Nguyễn Văn An',
+                'HS002': 'Trần Thị Bình',
+                'HS003': 'Lê Minh Châu',
+                'HS004': 'Phạm Thị Dương',
+                'HS005': 'Hoàng Văn Em'
+            };
+            
+            if (studentNames[studentId] && !nameField.value) {
+                nameField.value = studentNames[studentId];
+            }
+        });
+
+        // Blood pressure format validation
+        document.getElementById('bloodPressure').addEventListener('input', function() {
+            let value = this.value.replace(/[^\d\/]/g, '');
+            if (value.includes('/')) {
+                const parts = value.split('/');
+                if (parts.length === 2) {
+                    value = parts[0] + '/' + parts[1];
+                }
+            }
+            this.value = value;
+        });
     </script>
 </body>
-
 </html>

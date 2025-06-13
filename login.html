@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - EduLink Health</title>
+    <title>Đăng nhập - HealthConnect System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -24,7 +24,7 @@
             line-height: 1.6;
         }
 
-        /* EduLink Theme Variables */
+        /* HealthConnect Theme Variables */
         :root {
             --primary-blue: #1e3a8a;
             --secondary-blue: #3b82f6;
@@ -377,7 +377,7 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-home">
+    <a href="dashBoard.html" class="back-home">
         <i class="fas fa-arrow-left"></i>
         Về trang chủ
     </a>
@@ -389,7 +389,7 @@
                 <div class="visual-icon">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
-                <h2 class="visual-title">EduLink Health</h2>
+                <h2 class="visual-title">HealthConnect</h2>
                 <p class="visual-subtitle">
                     Hệ thống quản lý sức khỏe học đường thông minh, 
                     giúp bạn theo dõi và chăm sóc sức khỏe học sinh một cách hiệu quả
@@ -560,7 +560,7 @@
                         rememberMe: rememberMe
                     };
                     
-                    localStorage.setItem('eduLinkUser', JSON.stringify(userData));
+                    localStorage.setItem('healthConnectUser', JSON.stringify(userData));
                     
                     // Show success message
                     showAlert('success');
@@ -584,7 +584,7 @@
 
         // Check if user is already logged in
         document.addEventListener('DOMContentLoaded', function() {
-            const user = localStorage.getItem('eduLinkUser');
+            const user = localStorage.getItem('healthConnectUser');
             if (user) {
                 try {
                     const userData = JSON.parse(user);
@@ -595,7 +595,7 @@
                     }
                 } catch (e) {
                     // Clear invalid data
-                    localStorage.removeItem('eduLinkUser');
+                    localStorage.removeItem('healthConnectUser');
                 }
             }
             

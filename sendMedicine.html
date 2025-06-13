@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gửi thuốc cho trường - EduLink Health</title>
+    <title>Gửi thuốc cho trường - HealthConnect System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
             line-height: 1.6;
         }
 
-        /* EduLink Theme Variables */
+        /* HealthConnect Theme Variables */
         :root {
             --primary-blue: #1e3a8a;
             --secondary-blue: #3b82f6;
@@ -96,11 +96,58 @@
             padding: 0.5rem 1rem;
             border-radius: 8px;
             transition: all 0.3s;
-        }
-
-        .nav-link:hover, .nav-link.active {
+        }        .nav-link:hover, .nav-link.active {
             color: var(--secondary-blue);
             background: var(--light-blue);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--light-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 2px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-name {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc3545;
+            transform: translateY(-1px);
         }
 
         /* Main Content */
@@ -310,15 +357,14 @@
         }
     </style>
 </head>
-<body>
-    <!-- Header -->
+<body>    <!-- Header -->
     <header class="header">
         <nav class="nav">
-            <a href="index.html" class="logo">
+            <a href="dashBoard.html" class="logo">
                 <div class="logo-icon">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
-                <span class="logo-text">EduLink Health</span>
+                <span class="logo-text">HealthConnect</span>
             </a>
             
             <div class="nav-links">
@@ -331,9 +377,22 @@
                 <a href="sendMedicine.html" class="nav-link active">
                     <i class="fas fa-pills"></i> Quản lý thuốc
                 </a>
-                <a href="login.html" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                <a href="documentsBlog.html" class="nav-link">
+                    <i class="fas fa-book"></i> Tài liệu
                 </a>
+            </div>
+            
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">
+                        A
+                    </div>
+                    <span class="user-name" id="userName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Đăng xuất
+                </button>
             </div>
         </nav>
     </header>
@@ -521,9 +580,57 @@
         </div>
     </main>
 
-    <script>
-        // Set default date to today
+    <script>        // Set default date to today
         document.getElementById('requestDate').valueAsDate = new Date();
+
+        // Authentication functions
+        function createSampleUser() {
+            const sampleUser = {
+                username: 'admin',
+                role: 'administrator',
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem('healthConnectUser', JSON.stringify(sampleUser));
+        }
+
+        function checkAuth() {
+            const user = localStorage.getItem('healthConnectUser');
+            if (!user) {
+                createSampleUser();
+                updateUserUI('admin');
+                return;
+            }
+            
+            try {
+                const userData = JSON.parse(user);
+                updateUserUI(userData.username);
+            } catch (e) {
+                createSampleUser();
+                updateUserUI('admin');
+            }
+        }
+
+        function updateUserUI(username) {
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            
+            if (userAvatar && userName) {
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+                userName.textContent = username === 'admin' ? 'Administrator' : username;
+            }
+        }
+
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                localStorage.removeItem('healthConnectUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
 
         // Form submission
         document.getElementById('medicineForm').addEventListener('submit', function(e) {

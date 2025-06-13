@@ -20,14 +20,128 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-        }
-
-        .container {
+        }        .container {
             max-width: 1200px;
             margin: 0 auto;
         }
 
+        /* Header Navigation */
         .header {
+            background: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            margin-bottom: 2rem;
+            border-radius: 0;
+        }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .logo-text {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #dbeafe;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 2px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-name {
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc3545;
+            transform: translateY(-1px);
+        }
+
+        /* Page Header */
+        .page-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 16px;
@@ -37,30 +151,24 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
+        .page-header-content {
+            text-align: center;
         }
 
-        .header-title {
+        .page-title {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
-        }
-
-        .header-title i {
-            font-size: 32px;
-            color: #1e3a8a;
-        }
-
-        .header-title h1 {
             font-size: 28px;
             font-weight: 700;
             color: #1e3a8a;
             line-height: 1.2;
+        }
+
+        .page-title i {
+            font-size: 32px;
+            color: #1e3a8a;
         }
 
         .back-btn {
@@ -339,18 +447,54 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
-                <div class="header-title">
-                    <i class="fas fa-syringe"></i>
-                    <h1>Quản lý tiêm chủng học sinh</h1>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="dashBoard.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-                <a href="dashBoard.html" class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                    Quay lại Dashboard
+                <span class="logo-text">HealthConnect</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="dashBoard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
+                <a href="healthDeclaration.html" class="nav-link">
+                    <i class="fas fa-file-medical"></i> Khai báo
+                </a>
+                <a href="vaccinationManagement.html" class="nav-link active">
+                    <i class="fas fa-syringe"></i> Tiêm chủng
+                </a>
+                <a href="documentsBlog.html" class="nav-link">
+                    <i class="fas fa-book"></i> Tài liệu
+                </a>
+            </div>
+            
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">
+                        A
+                    </div>
+                    <span class="user-name" id="userName">Admin</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Đăng xuất
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-syringe"></i>
+                    Quản lý tiêm chủng học sinh
+                </h1>
             </div>
         </div>
 
@@ -637,13 +781,60 @@
             const recentVaccines = vaccineList.filter(vaccine => {
                 const vaccineDate = new Date(vaccine.date);
                 return vaccineDate >= thirtyDaysAgo;
-            }).length;
-
-            // Update UI
+            }).length;        // Update UI
             document.getElementById('totalVaccines').textContent = totalVaccines;
             document.getElementById('thisMonth').textContent = thisMonth;
             document.getElementById('recentVaccines').textContent = recentVaccines;
         }
+
+        // Authentication functions
+        function createSampleUser() {
+            const sampleUser = {
+                username: 'admin',
+                role: 'administrator',
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem('healthConnectUser', JSON.stringify(sampleUser));
+        }
+
+        function checkAuth() {
+            const user = localStorage.getItem('healthConnectUser');
+            if (!user) {
+                createSampleUser();
+                updateUserUI('admin');
+                return;
+            }
+            
+            try {
+                const userData = JSON.parse(user);
+                updateUserUI(userData.username);
+            } catch (e) {
+                createSampleUser();
+                updateUserUI('admin');
+            }
+        }
+
+        function updateUserUI(username) {
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            
+            if (userAvatar && userName) {
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+                userName.textContent = username === 'admin' ? 'Administrator' : username;
+            }
+        }
+
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                localStorage.removeItem('healthConnectUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Initialize authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
     </script>
 </body>
 </html>

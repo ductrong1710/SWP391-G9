@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký - EduLink Health</title>
+    <title>Đăng ký - HealthConnect System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -24,7 +24,7 @@
             line-height: 1.6;
         }
 
-        /* EduLink Theme Variables */
+        /* HealthConnect Theme Variables */
         :root {
             --primary-blue: #1e3a8a;
             --secondary-blue: #3b82f6;
@@ -370,7 +370,7 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-home">
+    <a href="dashBoard.html" class="back-home">
         <i class="fas fa-arrow-left"></i>
         Về trang chủ
     </a>
@@ -569,7 +569,7 @@
                     <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
                     <label for="agreeTerms">
                         Tôi đồng ý với <a href="#" target="_blank">Điều khoản sử dụng</a> 
-                        và <a href="#" target="_blank">Chính sách bảo mật</a> của EduLink Health
+                        và <a href="#" target="_blank">Chính sách bảo mật</a> của HealthConnect
                     </label>
                 </div>
 
@@ -751,7 +751,7 @@
                 };
                 
                 // Save to localStorage (in real app, this would be server-side)
-                let users = JSON.parse(localStorage.getItem('eduLinkUsers') || '[]');
+                let users = JSON.parse(localStorage.getItem('healthConnectUsers') || '[]');
                 
                 // Check if username or email already exists
                 const existingUser = users.find(user => 
@@ -769,7 +769,7 @@
                 
                 // Add new user
                 users.push(userData);
-                localStorage.setItem('eduLinkUsers', JSON.stringify(users));
+                localStorage.setItem('healthConnectUsers', JSON.stringify(users));
                 
                 // Show success message
                 showAlert('success');

@@ -531,46 +531,37 @@
         }
     </style>
 </head>
-<body>
-    <!-- Header Navigation -->
+<body>    <!-- Header Navigation -->
     <header class="header">
         <nav class="nav">
             <a href="dashBoard.html" class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-heartbeat"></i>
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
                 <span class="logo-text">HealthConnect</span>
             </a>
             
             <div class="nav-links">
                 <a href="dashBoard.html" class="nav-link">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Dashboard
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
                 <a href="healthDeclaration.html" class="nav-link">
-                    <i class="fas fa-file-medical"></i>
-                    Khai báo sức khỏe
+                    <i class="fas fa-file-medical"></i> Khai báo
                 </a>
                 <a href="vaccinationManagement.html" class="nav-link">
-                    <i class="fas fa-syringe"></i>
-                    Quản lý tiêm chủng
-                </a>
-                <a href="healthCheckManagement.html" class="nav-link">
-                    <i class="fas fa-stethoscope"></i>
-                    Khám sức khỏe
+                    <i class="fas fa-syringe"></i> Tiêm chủng
                 </a>
                 <a href="documentsBlog.html" class="nav-link active">
-                    <i class="fas fa-book-medical"></i>
-                    Tài liệu & Blog
+                    <i class="fas fa-book"></i> Tài liệu
                 </a>
             </div>
-
+            
             <div class="user-menu">
                 <div class="user-info">
-                    <div class="user-avatar">
-                        <span id="userInitials">HC</span>
+                    <div class="user-avatar" id="userAvatar">
+                        A
                     </div>
-                    <span class="user-name" id="userName">HealthConnect User</span>
+                    <span class="user-name" id="userName">Admin</span>
                 </div>
                 <button class="logout-btn" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
@@ -914,29 +905,27 @@
                 return false;
             }
             return user;
-        }
-
-        function updateUserUI() {
+        }        function updateUserUI() {
             const user = checkAuth();
             if (user) {
                 const userNameElement = document.getElementById('userName');
-                const userInitialsElement = document.getElementById('userInitials');
+                const userAvatarElement = document.getElementById('userAvatar');
                 
                 if (userNameElement) {
                     userNameElement.textContent = user.fullName || user.username;
                 }
                 
-                if (userInitialsElement) {
+                if (userAvatarElement) {
                     const initials = (user.fullName || user.username)
                         .split(' ')
                         .map(word => word.charAt(0))
                         .join('')
                         .toUpperCase()
                         .substring(0, 2);
-                    userInitialsElement.textContent = initials;
+                    userAvatarElement.textContent = initials;
                 }
             }
-        }        function logout() {
+        }function logout() {
             if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                 localStorage.removeItem('healthConnectUser');
                 window.location.href = 'login.html';

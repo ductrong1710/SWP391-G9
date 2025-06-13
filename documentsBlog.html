@@ -23,34 +23,31 @@
         }        .container {
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        /* Header Navigation */
-        .header {
-            background: #ffffff;
-            padding: 1rem 0;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
+        }        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
             top: 0;
+            height: 100vh;
+            width: 280px;
+            background: #ffffff;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
             z-index: 1000;
-            margin-bottom: 2rem;
-            border-radius: 0;
-        }
-        
-        .nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            overflow-y: auto;
         }
         
-        .logo {
+        .sidebar-header {
+            padding: 2rem 1.5rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+          .logo {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             text-decoration: none;
+            margin-bottom: 1rem;
         }
         
         .logo-icon {
@@ -71,29 +68,69 @@
             color: #1e3a8a;
         }
 
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .nav-links {
             display: flex;
-            gap: 2rem;
-            align-items: center;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
         .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             color: #6b7280;
             text-decoration: none;
             font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
             transition: all 0.3s;
+            border-left: 3px solid transparent;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover {
             color: #3b82f6;
             background: #dbeafe;
+            border-left-color: #3b82f6;
         }
 
-        .user-menu {
+        .nav-link.active {
+            /* No highlight for active links */
+            background: none;
+            color: inherit;
+            font-weight: normal;
+            box-shadow: none;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }        .user-menu {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 1rem;
         }
 
@@ -102,9 +139,29 @@
             align-items: center;
             gap: 0.75rem;
             background: #dbeafe;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
+            padding: 0.75rem;
+            border-radius: 12px;
             border: 2px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .user-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
         }
 
         .user-avatar {
@@ -119,25 +176,28 @@
             font-weight: 600;
         }
 
-        .user-name {
-            color: #1e3a8a;
-            font-weight: 600;
-        }
-
         .logout-btn {
             background: #ef4444;
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
             transition: all 0.3s;
-        }
-
-        .logout-btn:hover {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }.logout-btn:hover {
             background: #dc3545;
             transform: translateY(-1px);
+        }
+
+        /* Main container with sidebar offset */
+        .main-container {
+            margin-left: 280px;
+            min-height: 100vh;
         }
 
         /* Page Header */
@@ -531,47 +591,75 @@
         }
     </style>
 </head>
-<body>    <!-- Header Navigation -->
-    <header class="header">
-        <nav class="nav">
+<body>    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
             <a href="dashBoard.html" class="logo">
                 <div class="logo-icon">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
                 <span class="logo-text">HealthConnect</span>
             </a>
-            
-            <div class="nav-links">
-                <a href="dashBoard.html" class="nav-link">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="healthDeclaration.html" class="nav-link">
-                    <i class="fas fa-file-medical"></i> Khai báo
-                </a>
-                <a href="vaccinationManagement.html" class="nav-link">
-                    <i class="fas fa-syringe"></i> Tiêm chủng
-                </a>
-                <a href="documentsBlog.html" class="nav-link active">
-                    <i class="fas fa-book"></i> Tài liệu
-                </a>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Menu chính</div>
+                <div class="nav-links">
+                    <a href="dashBoard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="healthDeclaration.html" class="nav-link">
+                        <i class="fas fa-file-medical"></i>
+                        <span>Khai báo sức khỏe</span>
+                    </a>
+                    <a href="vaccinationManagement.html" class="nav-link">
+                        <i class="fas fa-syringe"></i>
+                        <span>Quản lý tiêm chủng</span>
+                    </a>
+                    <a href="healthCheckManagement.html" class="nav-link">
+                        <i class="fas fa-stethoscope"></i>
+                        <span>Khám sức khỏe</span>
+                    </a>
+                </div>
             </div>
-            
+            <div class="nav-section">
+                <div class="nav-section-title">Quản lý</div>
+                <div class="nav-links">
+                    <a href="sendMedicine.html" class="nav-link">
+                        <i class="fas fa-pills"></i>
+                        <span>Quản lý thuốc</span>
+                    </a>
+                    <a href="recordProcess.html" class="nav-link">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Quy trình hồ sơ</span>
+                    </a>
+                    <a href="documentsBlog.html" class="nav-link">
+                        <i class="fas fa-book"></i>
+                        <span>Tài liệu & Blog</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-footer">
             <div class="user-menu">
                 <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">
-                        A
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Quản trị viên</div>
                     </div>
-                    <span class="user-name" id="userName">Admin</span>
                 </div>
                 <button class="logout-btn" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
                     Đăng xuất
                 </button>
             </div>
-        </nav>
-    </header>
+        </div>
+    </aside>
 
-    <div class="container">
+    <div class="main-container">
+        <div class="container">
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-content">
@@ -752,10 +840,11 @@
             <div class="blog-posts" id="blogPosts">
                 <!-- Blog posts will be rendered here -->
             </div>
-        </div>
+        </div>        </div>
+    </div>
     </div>
 
-    <script>        // Initialize page
+    <script>// Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             createSampleUser();
             updateUserUI();

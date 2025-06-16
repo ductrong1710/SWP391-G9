@@ -85,24 +85,18 @@
             font-size: 1.6rem;
             font-weight: 700;
             color: var(--primary-blue);
-        }
-
-        .nav-links {
+        }        .header .nav-links {
             display: flex;
             gap: 2rem;
             align-items: center;
-        }
-
-        .nav-link {
+        }.header .nav-link {
             color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
             padding: 0.5rem 1rem;
             border-radius: 8px;
             transition: all 0.3s;
-        }
-
-        .nav-link:hover, .nav-link.active {
+        }.header .nav-link:hover, .header .nav-link.active {
             color: var(--secondary-blue);
             background: var(--light-blue);
         }
@@ -152,26 +146,23 @@
         }        .logout-btn:hover {
             background: #dc3545;
             transform: translateY(-1px);
-        }
-
-        /* Sidebar Navigation */
+        }        /* Sidebar Navigation */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
             height: 100vh;
             width: 280px;
-            background: #ffffff;
+            background: var(--white);
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
         }
-        
-        .sidebar-header {
+          .sidebar-header {
             padding: 2rem 1.5rem 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--gray-200);
         }
         
         .sidebar-nav {
@@ -181,13 +172,11 @@
 
         .nav-section {
             margin-bottom: 2rem;
-        }
-
-        .nav-section-title {
+        }        .nav-section-title {
             padding: 0 1.5rem 0.5rem;
             font-size: 0.75rem;
             font-weight: 600;
-            color: #6b7280;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -196,55 +185,46 @@
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
-        }
-
-        .nav-link {
+        }        .sidebar .nav-link {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            color: #6b7280;
+            color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
             padding: 0.75rem 1.5rem;
             border-radius: 0;
             transition: all 0.3s;
             border-left: 3px solid transparent;
-        }
-
-        .nav-link:hover {
-            color: #3b82f6;
-            background: #dbeafe;
-            border-left-color: #3b82f6;
-        }
-
-        .nav-link.active {
-            color: #3b82f6;
-            background: #dbeafe;
-            border-left-color: #3b82f6;
-            font-weight: 600;
-        }
-
-        .nav-link i {
+        }        .sidebar .nav-link:hover {
+            color: var(--secondary-blue);
+            background: var(--light-blue);
+            border-left-color: var(--secondary-blue);
+        }        .sidebar .nav-link.active {
+            /* No highlight for active links */
+            background: none;
+            color: inherit;
+            font-weight: normal;
+            box-shadow: none;
+        }        .sidebar .nav-link i {
             width: 20px;
             text-align: center;
             font-size: 1.1rem;
-        }
-
-        .sidebar-footer {
+        }        .sidebar-footer {
             padding: 1.5rem;
-            border-top: 1px solid #e5e7eb;
-        }        .user-menu {
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .user-menu {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-        }
-
-        .user-info {
+        }        .user-info {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            background: #dbeafe;
-            padding: 0.75rem;
+            background: var(--light-blue);
+            padding: 1rem;
             border-radius: 12px;
             border: 2px solid rgba(59, 130, 246, 0.1);
         }
@@ -252,10 +232,8 @@
         .user-details {
             flex: 1;
             min-width: 0;
-        }
-
-        .user-name {
-            color: #1e3a8a;
+        }        .user-name {
+            color: var(--primary-blue);
             font-weight: 600;
             font-size: 0.9rem;
             white-space: nowrap;
@@ -264,25 +242,26 @@
         }
 
         .user-role {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 0.75rem;
             margin-top: 0.25rem;
         }
 
         .user-avatar {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
+            font-size: 1.1rem;
         }
 
         .logout-btn {
-            background: #ef4444;
+            background: var(--danger-red);
             color: white;
             border: none;
             padding: 0.75rem 1rem;
@@ -290,6 +269,7 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.3s;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1030,11 +1010,21 @@
                 localStorage.removeItem('healthConnectUser');
                 window.location.href = 'login.html';
             }
-        }
-
-        // Initialize authentication on page load
+        }        // Initialize authentication on page load
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
+        });
+        
+        // Highlight current page trong sidebar
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop() || 'dashBoard.html';
+            const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+            sidebarLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
 </body>

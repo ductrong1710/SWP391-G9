@@ -1,0 +1,64 @@
+using Businessobjects.Data;
+using Businessobjects.Models;
+using Microsoft.EntityFrameworkCore;
+using Repositories.Interfaces;
+
+namespace Repositories.Implements
+{
+    public class RoleRepository : IRoleRepository
+    {
+        private readonly ApplicationDbContext _context;
+
+        public RoleRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IEnumerable<Role>> GetAllRolesAsync()
+        {
+            return await _context.Roles.ToListAsync();
+        }
+
+        public async Task<Role?> GetRoleByIdAsync(int id)
+        {
+            return await _context.Roles.FindAsync(id);
+        }
+
+        public async Task<Role?> GetRoleByTypeAsync(string roleType)
+        {
+            return await _context.Roles.FirstOrDefaultAsync(r => r.RoleType.ToLower() == roleType.ToLower());
+        }
+
+        public async Task CreateRoleAsync(Role role)
+        {
+            await _context.Roles.AddAsync(role);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateRoleAsync(Role role)
+        {
+            _context.Entry(role).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteRoleAsync(int id)
+        {
+            var role = await GetRoleByIdAsync(id);
+            if (role != null)
+            {
+                _context.Roles.Remove(role);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> RoleExistsAsync(int id)
+        {
+            return await _context.Roles.AnyAsync(r => r.RoleId == id);
+        }
+
+        public async Task<bool> RoleTypeExistsAsync(string roleType)
+        {
+            return await _context.Roles.AnyAsync(r => r.RoleType.ToLower() == roleType.ToLower());
+        }
+    }
+}

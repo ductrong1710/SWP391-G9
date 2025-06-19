@@ -20,9 +20,8 @@ import DocumentsBlog from './pages/DocumentsBlog';
 
 function App() {
   const location = useLocation();
-  
-  // Define routes where Navbar and Footer should be hidden
-  const noNavbarRoutes = ['/login', '/register'];
+    // Define routes where Navbar and Footer should be hidden
+  const noNavbarRoutes = ['/login', '/register', '/dashboard'];
   const showNavbar = !noNavbarRoutes.includes(location.pathname);
   
   return (

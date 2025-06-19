@@ -29,12 +29,6 @@ const Sidebar = () => {
       </div>
       
       <div className="sidebar-menu">
-        <Link to="/" className={`menu-item ${isActive('/')}`}>
-          <div className="menu-icon">
-            <i className="fas fa-home"></i>
-          </div>
-          {!collapsed && <span className="menu-text">Trang chủ</span>}
-        </Link>
         
         <Link to="/dashboard" className={`menu-item ${isActive('/dashboard')}`}>
           <div className="menu-icon">

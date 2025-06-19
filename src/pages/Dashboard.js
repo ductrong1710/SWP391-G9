@@ -1,19 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Sidebar from '../components/Sidebar';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const { isAuthenticated, loading, user, logout } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalStudents: 2456,
-    todayCheckups: 127,
-    healthAlerts: 3,
-    monthlyDeclarations: 8567,
-    vaccinationRate: 94
-  });
   
   // Kiểm tra xác thực trực tiếp trong component
   useEffect(() => {
@@ -28,35 +20,6 @@ const Dashboard = () => {
     }
   }, [isAuthenticated, loading, navigate]);
   
-  // Cập nhật thống kê mỗi 30 giây
-  useEffect(() => {
-    const updateStats = () => {
-      setStats({
-        totalStudents: Math.floor(Math.random() * 500) + 2000,
-        todayCheckups: Math.floor(Math.random() * 200) + 50,
-        healthAlerts: Math.floor(Math.random() * 20) + 1,
-        monthlyDeclarations: Math.floor(Math.random() * 2000) + 7000,
-        vaccinationRate: Math.floor(Math.random() * 10) + 90
-      });
-    };
-    
-    const interval = setInterval(updateStats, 30000);
-    return () => clearInterval(interval);
-  }, []);
-  
-  // Xử lý đăng xuất
-  const handleLogout = () => {
-    if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-      logout();
-      navigate('/login');
-    }
-  };
-  
-  // Hàm điều hướng
-  const navigateTo = (path) => {
-    navigate(path);
-  };
-  
   // Nếu đang loading hoặc chưa đăng nhập, hiển thị thông báo loading
   if (loading || !isAuthenticated) {
     return (
@@ -65,196 +28,271 @@ const Dashboard = () => {
       </div>
     );
   }
+  
   return (
-    <div className="dashboard-layout">
-      {/* Sử dụng component Sidebar */}
-      <Sidebar />
+    <div className="dashboard-page">
+      <section className="dashboard-hero">
+        <div className="dashboard-hero-overlay"></div>
+        <div className="dashboard-hero-content">
+          <h1 className="dashboard-hero-title">Tổng quan y tế</h1>
+          <p className="dashboard-hero-desc">
+            Quản lý thông tin sức khỏe cá nhân và theo dõi các hoạt động y tế của bạn
+          </p>
+        </div>
+      </section>
 
-      {/* Main Container */}
-      <div className="main-container">
-        <main className="main-content">
-          {/* Hero Section */}
-          <section className="hero-section">
-            <div className="hero-content">
-              <h1 className="hero-title">
-                Chào mừng đến với HealthConnect
-              </h1>
-              <p className="hero-subtitle">
-                Hệ thống quản lý sức khỏe học đường thông minh và hiệu quả
-              </p>
-              
-              <div className="hero-stats">
-                <div className="hero-stat">
-                  <div className="hero-stat-value">{stats.totalStudents.toLocaleString()}</div>
-                  <div className="hero-stat-label">Học sinh đang theo dõi</div>
+      <section className="dashboard-section">
+        <div className="dashboard-container">
+          <h2 className="section-title">Thông tin sức khỏe hiện tại</h2>
+          
+          <div className="dashboard-grid">
+            <div className="service-card health-status">
+              <div className="service-icon">
+                <i className="fas fa-heartbeat"></i>
+              </div>
+              <h3>Tình trạng sức khỏe</h3>
+              <div className="status-indicator good">Tốt</div>
+              <p>Cập nhật lần cuối: 19/06/2025</p>
+            </div>
+              <div className="service-card upcoming">
+              <div className="service-icon">
+                <i className="fas fa-calendar-check"></i>
+              </div>
+              <h3>Khám sức khỏe định kỳ</h3>              <div className="health-check-info">
+                <div className="next-appointment">
+                  <span className="info-label">Lịch khám sắp tới:</span>
+                  <span className="info-value">22/06/2025</span>
                 </div>
-                <div className="hero-stat">
-                  <div className="hero-stat-value">{stats.todayCheckups.toLocaleString()}</div>
-                  <div className="hero-stat-label">Khai báo hôm nay</div>
+                <div className="checkup-details">
+                  <span className="info-label">Địa điểm:</span>
+                  <span className="info-value">Phòng Y tế - Tòa nhà B</span>
                 </div>
-                <div className="hero-stat">
-                  <div className="hero-stat-value">{stats.healthAlerts.toLocaleString()}</div>
-                  <div className="hero-stat-label">Cảnh báo sức khỏe</div>
+                <div className="checkup-doctor">
+                  <span className="info-label">Bác sĩ phụ trách:</span>
+                  <span className="info-value">BS. Nguyễn Văn A</span>
+                </div>
+                <div className="checkup-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{width: "75%"}}></div>
+                  </div>
+                  <div className="progress-text">3/4 lần khám trong năm</div>
                 </div>
               </div>
             </div>
-          </section>
-
-          {/* Quick Actions */}
-          <section className="quick-actions">
-            <h2 className="section-title">Các chức năng chính</h2>
             
-            <div className="actions-grid">
-              <div className="action-card" onClick={() => navigateTo('/health-declaration')}>
-                <div className="action-icon">
-                  <i className="fas fa-file-medical"></i>
-                </div>
-                <h3 className="action-title">Khai báo sức khỏe</h3>
-                <p className="action-description">Theo dõi và quản lý tình trạng sức khỏe học sinh hàng ngày một cách chi tiết và chính xác</p>
+            <div className="service-card vaccinations">
+              <div className="service-icon">
+                <i className="fas fa-syringe"></i>
               </div>
-              
-              <div className="action-card" onClick={() => navigateTo('/vaccination-management')}>
-                <div className="action-icon">
-                  <i className="fas fa-syringe"></i>
-                </div>
-                <h3 className="action-title">Quản lý tiêm chủng</h3>
-                <p className="action-description">Lập lịch và theo dõi tiến độ tiêm vaccine cho học sinh, đảm bảo an toàn sức khỏe</p>
+              <h3>Tiêm chủng</h3>
+              <div className="vac-status">
+                <span className="vac-complete">6</span>
+                <span className="vac-total">/ 8</span> mũi tiêm hoàn thành
               </div>
-              
-              <div className="action-card" onClick={() => navigateTo('/send-medicine')}>
-                <div className="action-icon">
-                  <i className="fas fa-pills"></i>
-                </div>
-                <h3 className="action-title">Quản lý thuốc</h3>
-                <p className="action-description">Phân phối và theo dõi việc sử dụng thuốc an toàn cho học sinh trong trường học</p>
-              </div>
-              
-              <div className="action-card" onClick={() => navigateTo('/health-check-management')}>
-                <div className="action-icon">
-                  <i className="fas fa-stethoscope"></i>
-                </div>
-                <h3 className="action-title">Khám sức khỏe</h3>
-                <p className="action-description">Lên lịch và quản lý các buổi khám sức khỏe định kỳ cho học sinh</p>
-              </div>
-              
-              <div className="action-card" onClick={() => navigateTo('/record-process')}>
-                <div className="action-icon">
-                  <i className="fas fa-clipboard-list"></i>
-                </div>
-                <h3 className="action-title">Quy trình hồ sơ</h3>
-                <p className="action-description">Ghi nhận và xử lý các trường hợp y tế đặc biệt, quản lý hồ sơ sức khỏe</p>
-              </div>
-              
-              <div className="action-card" onClick={() => navigateTo('/documents-blog')}>
-                <div className="action-icon">
-                  <i className="fas fa-book-medical"></i>
-                </div>
-                <h3 className="action-title">Tài liệu & Blog</h3>
-                <p className="action-description">Tài liệu y tế và chia sẻ kinh nghiệm chăm sóc sức khỏe học đường</p>
-              </div>
+              <div className="vac-next">Mũi tiếp theo: 15/07/2025</div>
             </div>
-          </section>
-
-          {/* Statistics */}
-          <section className="stats-section">
-            <h2 className="section-title">Thống kê tổng quan</h2>
             
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-users"></i>
-                </div>
-                <div className="stat-value">{stats.totalStudents.toLocaleString()}</div>
-                <div className="stat-label">Tổng học sinh</div>
-                <div className="stat-change stat-increase">+15% so với tháng trước</div>
+            <div className="service-card medications">
+              <div className="service-icon">
+                <i className="fas fa-pills"></i>
               </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-file-medical-alt"></i>
+              <h3>Thuốc đang dùng</h3>
+              <ul className="med-list">
+                <li>Vitamin C (1 viên/ngày)</li>
+                <li>Paracetamol (khi cần)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section className="dashboard-section">
+        <div className="dashboard-container">
+          <h2 className="section-title">Tóm tắt sức khỏe</h2>
+          
+          <div className="health-summary-container">
+            <div className="summary-grid">
+              <div className="summary-item">
+                <div className="summary-icon">
+                  <i className="fas fa-ruler-vertical"></i>
                 </div>
-                <div className="stat-value">{stats.monthlyDeclarations.toLocaleString()}</div>
-                <div className="stat-label">Khai báo tháng này</div>
-                <div className="stat-change stat-increase">+8% so với tháng trước</div>
+                <div className="summary-label">Chiều cao</div>
+                <div className="summary-value">168 cm</div>
               </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-check-circle"></i>
+              <div className="summary-item">
+                <div className="summary-icon">
+                  <i className="fas fa-weight"></i>
                 </div>
-                <div className="stat-value">{stats.vaccinationRate}%</div>
-                <div className="stat-label">Tỷ lệ tiêm chủng</div>
-                <div className="stat-change stat-increase">+3% so với quý trước</div>
+                <div className="summary-label">Cân nặng</div>
+                <div className="summary-value">60 kg</div>
               </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-exclamation-triangle"></i>
+              <div className="summary-item">
+                <div className="summary-icon">
+                  <i className="fas fa-calculator"></i>
                 </div>
-                <div className="stat-value">{stats.healthAlerts}</div>
-                <div className="stat-label">Cảnh báo sức khỏe</div>
-                <div className="stat-change stat-decrease">-25% so với tuần trước</div>
+                <div className="summary-label">BMI</div>
+                <div className="summary-value">21.3</div>
+              </div>
+              <div className="summary-item">
+                <div className="summary-icon">
+                  <i className="fas fa-tint"></i>
+                </div>
+                <div className="summary-label">Nhóm máu</div>
+                <div className="summary-value">O+</div>
               </div>
             </div>
-          </section>
-
-          {/* Recent Activity */}
-          <section className="activity-section">
-            <h2 className="section-title">Hoạt động gần đây</h2>
-            
-            <div className="activity-feed">
+          </div>
+        </div>
+      </section>
+      
+      <section className="dashboard-section">
+        <div className="dashboard-container">
+          <h2 className="section-title">Hoạt động gần đây</h2>
+          
+          <div className="recent-activities-container">
+            <div className="activity-list">
               <div className="activity-item">
-                <div className="activity-icon">
-                  <i className="fas fa-file-medical"></i>
+                <div className="activity-date">15/06/2025</div>
+                <div className="activity-desc">Cập nhật khai báo y tế</div>
+              </div>
+              <div className="activity-item">
+                <div className="activity-date">10/06/2025</div>
+                <div className="activity-desc">Hoàn thành khám sức khỏe định kỳ</div>
+              </div>
+              <div className="activity-item">
+                <div className="activity-date">05/06/2025</div>
+                <div className="activity-desc">Nhận thuốc Vitamin C</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+        <section className="dashboard-section">
+        <div className="dashboard-container">
+          <h2 className="section-title">Lịch sử khám sức khỏe định kỳ</h2>
+          
+          <div className="health-checkup-history">
+            <div className="history-timeline">
+              <div className="timeline-item completed">
+                <div className="timeline-date">
+                  <span className="date-day">10</span>
+                  <span className="date-month">Tháng 3</span>
                 </div>
-                <div className="activity-content">
-                  <div className="activity-title">Khai báo sức khỏe mới từ lớp 10A1 - THPT Nguyễn Du</div>
-                  <div className="activity-time">5 phút trước</div>
+                <div className="timeline-content">
+                  <h4>Khám sức khỏe Quý I</h4>
+                  <div className="timeline-details">
+                    <p><strong>Bác sĩ:</strong> BS. Lê Thị B</p>
+                    <p><strong>Kết quả:</strong> <span className="status good">Tốt</span></p>
+                    <p><strong>Ghi chú:</strong> Sức khỏe ổn định, cần bổ sung vitamin D</p>
+                  </div>
+                  <button className="btn-view-details">Xem chi tiết</button>
                 </div>
               </div>
               
-              <div className="activity-item">
-                <div className="activity-icon">
-                  <i className="fas fa-syringe"></i>
+              <div className="timeline-item completed">
+                <div className="timeline-date">
+                  <span className="date-day">15</span>
+                  <span className="date-month">Tháng 6</span>
                 </div>
-                <div className="activity-content">
-                  <div className="activity-title">Hoàn thành tiêm vaccine cho 45 học sinh lớp 11B2</div>
-                  <div className="activity-time">30 phút trước</div>
-                </div>
-              </div>
-              
-              <div className="activity-item">
-                <div className="activity-icon">
-                  <i className="fas fa-pills"></i>
-                </div>
-                <div className="activity-content">
-                  <div className="activity-title">Phân phối thuốc cảm cúm cho học sinh THCS Lê Lợi</div>
-                  <div className="activity-time">1 giờ trước</div>
+                <div className="timeline-content">
+                  <h4>Khám sức khỏe Quý II</h4>
+                  <div className="timeline-details">
+                    <p><strong>Bác sĩ:</strong> BS. Nguyễn Văn A</p>
+                    <p><strong>Kết quả:</strong> <span className="status good">Tốt</span></p>
+                    <p><strong>Ghi chú:</strong> Sức khỏe ổn định</p>
+                  </div>
+                  <button className="btn-view-details">Xem chi tiết</button>
                 </div>
               </div>
               
-              <div className="activity-item">
-                <div className="activity-icon">
-                  <i className="fas fa-stethoscope"></i>
+              <div className="timeline-item upcoming">
+                <div className="timeline-date">
+                  <span className="date-day">22</span>
+                  <span className="date-month">Tháng 6</span>
                 </div>
-                <div className="activity-content">
-                  <div className="activity-title">Khám sức khỏe định kỳ cho học sinh lớp 12C1 - THPT Trần Hưng Đạo</div>
-                  <div className="activity-time">2 giờ trước</div>
+                <div className="timeline-content">
+                  <h4>Khám sức khỏe bổ sung</h4>
+                  <div className="timeline-details">
+                    <p><strong>Bác sĩ:</strong> BS. Nguyễn Văn A</p>
+                    <p><strong>Địa điểm:</strong> Phòng Y tế - Tòa nhà B</p>
+                    <p><strong>Thời gian:</strong> 9:00 - 11:00</p>
+                  </div>
+                  <button className="btn-reschedule">Đổi lịch hẹn</button>
                 </div>
               </div>
               
-              <div className="activity-item">
-                <div className="activity-icon">
-                  <i className="fas fa-book"></i>
+              <div className="timeline-item">
+                <div className="timeline-date">
+                  <span className="date-day">10</span>
+                  <span className="date-month">Tháng 9</span>
                 </div>
-                <div className="activity-content">
-                  <div className="activity-title">Cập nhật tài liệu hướng dẫn chăm sóc sức khỏe mùa đông</div>                  <div className="activity-time">3 giờ trước</div>
+                <div className="timeline-content">
+                  <h4>Khám sức khỏe Quý III</h4>
+                  <div className="timeline-details">
+                    <p><strong>Bác sĩ:</strong> BS. Trần C</p>
+                    <p><strong>Địa điểm:</strong> Phòng Y tế - Tòa nhà B</p>
+                    <p><strong>Thời gian:</strong> 14:00 - 16:00</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="timeline-item">
+                <div className="timeline-date">
+                  <span className="date-day">12</span>
+                  <span className="date-month">Tháng 12</span>
+                </div>
+                <div className="timeline-content">
+                  <h4>Khám sức khỏe Quý IV</h4>
+                  <div className="timeline-details">
+                    <p><strong>Chưa có lịch hẹn</strong></p>
+                  </div>
+                  <button className="btn-schedule">Đặt lịch hẹn</button>
                 </div>
               </div>
             </div>
-          </section>
-        </main>
-      </div>
+          </div>
+        </div>
+      </section>
+      
+      <section className="dashboard-section">
+        <div className="dashboard-container">
+          <h2 className="section-title">Kết quả khám sức khỏe</h2>
+          
+          <div className="health-check-results">
+            <div className="result-card">
+              <div className="result-header">
+                <h3>Khám sức khỏe định kỳ - Quý II</h3>
+                <div className="result-date">15/06/2025</div>
+              </div>
+              <div className="result-content">
+                <div className="result-item">
+                  <span className="item-label">Tình trạng sức khỏe:</span>
+                  <span className="item-value good">Tốt</span>
+                </div>
+                <div className="result-item">
+                  <span className="item-label">Nhịp tim:</span>
+                  <span className="item-value">72 bpm</span>
+                </div>
+                <div className="result-item">
+                  <span className="item-label">Huyết áp:</span>
+                  <span className="item-value">120/80 mmHg</span>
+                </div>
+                <div className="result-item">
+                  <span className="item-label">Cholesterol:</span>
+                  <span className="item-value">180 mg/dL</span>
+                </div>
+                <div className="result-item">
+                  <span className="item-label">Glucose:</span>
+                  <span className="item-value">90 mg/dL</span>
+                </div>
+              </div>
+              <div className="result-footer">
+                <button className="btn-download-report">Tải báo cáo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

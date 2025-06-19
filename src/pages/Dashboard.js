@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Sidebar from '../components/Sidebar';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -63,12 +62,8 @@ const Dashboard = () => {
         <div className="loading-spinner"></div>
       </div>
     );
-  }
-  return (
+  }  return (
     <div className="dashboard-layout">
-      {/* Sử dụng component Sidebar */}
-      <Sidebar />
-
       {/* Main Container */}
       <div className="main-container">
         <main className="main-content">

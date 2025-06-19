@@ -29,7 +29,6 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
             {/* Các route không sử dụng ProtectedRoute */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/health-declaration" element={<HealthDeclaration />} />

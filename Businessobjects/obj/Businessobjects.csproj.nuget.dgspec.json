@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ASUS\\Documents\\prn212\\BackEnd\\Businessobjects\\Businessobjects.csproj": {}
+    "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ASUS\\Documents\\prn212\\BackEnd\\Businessobjects\\Businessobjects.csproj": {
+    "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ASUS\\Documents\\prn212\\BackEnd\\Businessobjects\\Businessobjects.csproj",
+        "projectUniqueName": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj",
         "projectName": "Businessobjects",
-        "projectPath": "C:\\Users\\ASUS\\Documents\\prn212\\BackEnd\\Businessobjects\\Businessobjects.csproj",
+        "projectPath": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ASUS\\Documents\\prn212\\BackEnd\\Businessobjects\\obj\\",
+        "outputPath": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Businessobjects\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

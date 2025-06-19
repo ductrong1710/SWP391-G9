@@ -107,7 +107,7 @@ const Navbar = () => {
           className={activeSection === 'features' ? 'active' : ''} 
           onClick={(e) => { e.preventDefault(); scrollToSection('features'); }}
         >
-          Tính năng
+          Tin tức y tế
         </a>
         <a 
           href="#contact" 

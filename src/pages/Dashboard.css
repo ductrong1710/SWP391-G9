@@ -123,10 +123,6 @@ body {
   font-weight: 500;
 }
 
-.primary-btn:hover {
-  background: var(--primary-blue);
-}
-
 /* Quick Actions Grid */
 .quick-actions {
   margin-bottom: 3rem;
@@ -383,6 +379,90 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.day:hover {
+  background: var(--gray-100);
+}
+
+.day.other-month {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.day.today {
+  background: var(--light-blue);
+  color: var(--secondary-blue);
+  font-weight: 600;
+}
+
+.day.has-event {
+  position: relative;
+}
+
+.day.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-orange);
+}
+
+/* Activity Feed */
+.activity-feed {
+  margin-top: 2rem;
+}
+
+.activity-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.icon-appointment {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--secondary-blue);
+}
+
+.icon-record {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--accent-orange);
+}
+
+.icon-notification {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-green);
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-text {
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.activity-time {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
 }
 
 /* Dashboard Page Styles */

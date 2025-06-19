@@ -1,8 +1,22 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { user, isAuthenticated, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const toggleUserMenu = () => {
+    setShowUserMenu(!showUserMenu);
+  };
+
   return (
     <nav className="header">
       <Link to="/" className="logo">
@@ -25,9 +39,38 @@ const Navbar = () => {
       
       <div className="header-actions">
         <button className="request-btn">Yêu cầu tư vấn</button>
-        <Link to="/login" className="login-link">
-          <i className="fas fa-user-circle"></i> Đăng nhập
-        </Link>
+        
+        {isAuthenticated ? (
+          <div className="user-account">
+            <button className="user-button" onClick={toggleUserMenu}>
+              <div className="user-avatar">
+                <img src={user.avatar || "/assets/default-avatar.png"} alt="Avatar" />
+              </div>
+              <span className="user-name">{user.name}</span>
+              <i className={`fas fa-chevron-${showUserMenu ? 'up' : 'down'}`}></i>
+            </button>
+            
+            {showUserMenu && (
+              <div className="user-dropdown">
+                <Link to="/profile" className="dropdown-item">
+                  <i className="fas fa-user"></i> Thông tin cá nhân
+                </Link>
+                <Link to="/settings" className="dropdown-item">
+                  <i className="fas fa-cog"></i> Cài đặt tài khoản
+                </Link>
+                <div className="dropdown-divider"></div>
+                <button onClick={handleLogout} className="dropdown-item logout-item">
+                  <i className="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link to="/login" className="login-link">
+            <i className="fas fa-user-circle"></i> Đăng nhập
+          </Link>
+        )}
+        
         <button className="search-btn">
           <i className="fas fa-search"></i>
         </button>

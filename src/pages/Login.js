@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 const Login = () => {
@@ -8,7 +9,22 @@ const Login = () => {
     password: ''
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isAuthenticated } = useAuth();
+  
+  // Lấy trang redirect từ state
+  const from = location.state?.from?.pathname || '/';
+  console.log("Login - Redirect path:", from);
+  
+  // Nếu đã đăng nhập, chuyển hướng đến trang đích
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("Already authenticated, redirecting to:", from);
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,12 +32,39 @@ const Login = () => {
       ...prev,
       [name]: value
     }));
+    // Clear error when user types
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Redirect to dashboard
-    navigate('/dashboard');
+    console.log("Login form submitted");
+    
+    // Simple validation for demo (username: admin, password: 123456)
+    if (credentials.username === 'admin' && credentials.password === '123456') {
+      // Reset error if it exists
+      setError('');
+      
+      // Login with user data
+      const userData = {
+        id: 1,
+        username: 'admin',
+        name: 'Quản trị viên',
+        role: 'admin',
+        avatar: '/assets/avatar.png'
+      };
+      
+      console.log("Login credentials correct, calling login");
+      // Call login from AuthContext
+      login(userData);
+      
+      // Chuyển hướng sẽ được xử lý bởi useEffect
+      console.log("Login successful, useEffect will handle redirect to:", from);
+    } else {
+      // Show error message
+      console.log("Login failed: incorrect credentials");
+      setError('Tên đăng nhập hoặc mật khẩu không đúng.');
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -74,6 +117,7 @@ const Login = () => {
               </button>
             </div>
           </div>
+          {error && <div className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
           <Link to="/forgot-password" className="forgot-link">Quên tên đăng nhập hoặc mật khẩu?</Link>
           <button type="submit" className="submit-btn">Đăng nhập</button>
           <Link to="/register" className="create-link">Chưa có tài khoản? Tạo tài khoản ngay.</Link>

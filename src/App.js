@@ -4,6 +4,7 @@ import './App.css';
 import './assets/styles/global.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
 
 // Import pages
 import Home from './pages/Home';
@@ -19,24 +20,29 @@ import DocumentsBlog from './pages/DocumentsBlog';
 
 function App() {
   return (
-    <div className="App">
-      <Navbar />
-      <main className="content-container">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/health-declaration" element={<HealthDeclaration />} />
-          <Route path="/health-check-management" element={<HealthCheckManagement />} />
-          <Route path="/vaccination-management" element={<VaccinationManagement />} />
-          <Route path="/send-medicine" element={<SendMedicine />} />
-          <Route path="/record-process" element={<RecordProcess />} />
-          <Route path="/documents-blog" element={<DocumentsBlog />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <Navbar />
+        <main className="content-container">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* Các route không sử dụng ProtectedRoute */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/health-declaration" element={<HealthDeclaration />} />
+            <Route path="/health-check-management" element={<HealthCheckManagement />} />
+            <Route path="/vaccination-management" element={<VaccinationManagement />} />
+            <Route path="/send-medicine" element={<SendMedicine />} />
+            <Route path="/record-process" element={<RecordProcess />} />
+            <Route path="/documents-blog" element={<DocumentsBlog />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 }
 

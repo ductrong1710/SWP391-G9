@@ -1,0 +1,811 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import './VaccinationManagement.css';
+
+const VaccinationManagement = () => {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  
+  const [vaccinations, setVaccinations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedVaccination, setSelectedVaccination] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [showBatchForm, setShowBatchForm] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    patientName: '',
+    patientId: '',
+    class: '',
+    vaccineType: '',
+    dateScheduled: new Date().toISOString().split('T')[0],
+    location: 'Phòng Y t? Tru?ng',
+    notes: ''
+  });
+
+  // State cho các b? l?c
+  const [filters, setFilters] = useState({
+    grade: '',
+    className: '',
+    status: ''
+  });
+
+  // State cho danh sách l?p dã ch?n d? d?t l?ch hàng lo?t
+  const defaultBatchFormData = {
+    className: '',
+    vaccineType: '',
+    dateScheduled: new Date().toISOString().split('T')[0],
+    location: 'Phòng Y t? Tru?ng',
+    notes: ''
+  };
+  const [batchFormData, setBatchFormData] = useState(defaultBatchFormData);
+  
+  // State cho h?c sinh trong l?p (s? d?ng cho d?t l?ch hàng lo?t)
+  const [classStudents, setClassStudents] = useState([]);
+  
+  // State d? theo dõi các h?c sinh du?c ch?n trong l?ch hàng lo?t
+  const [selectedStudents, setSelectedStudents] = useState([]);
+
+  // Mock data for vaccinations
+  const mockVaccinations = [
+    {
+      id: 1,
+      patientName: 'Nguy?n Van A',
+      patientId: 'SV2022001',
+      class: '12A1',
+      vaccineType: 'V?c-xin COVID-19',
+      dateScheduled: '2025-06-25',
+      status: 'Ðã lên l?ch',
+      location: 'Phòng Y t? Tru?ng',
+      notes: 'H?c sinh có ti?n s? d? ?ng nh? v?i v?c-xin.'
+    },
+    {
+      id: 2,
+      patientName: 'Tr?n Th? B',
+      patientId: 'SV2022045',
+      class: '11A2',
+      vaccineType: 'V?c-xin cúm mùa',
+      dateScheduled: '2025-07-10',
+      status: 'Ðã lên l?ch',
+      location: 'Phòng Y t? Tru?ng',
+      notes: 'Tiêm phòng cúm d?nh k? hàng nam.'
+    },
+    {
+      id: 3,
+      patientName: 'Lê Minh C',
+      patientId: 'SV2022078',
+      class: '10A3',
+      vaccineType: 'V?c-xin viêm gan B',
+      dateScheduled: '2025-06-05',
+      status: 'Ðã tiêm',
+      location: 'Phòng Y t? Tru?ng',
+      notes: 'Li?u d?u tiên trong lo?t ba li?u.'
+    },
+    {
+      id: 4,
+      patientName: 'Ph?m Th? D',
+      patientId: 'SV2022012',
+      class: '10A1',
+      vaccineType: 'V?c-xin u?n ván',
+      dateScheduled: '2025-05-20',
+      status: 'Ðã tiêm',
+      location: 'Phòng Y t? Tru?ng',
+      notes: 'Tiêm nh?c d?nh k? 10 nam.'
+    },
+    {
+      id: 5,
+      patientName: 'Hoàng Van E',
+      patientId: 'SV2022034',
+      class: '10A1',
+      vaccineType: 'V?c-xin s?i-quai b?-rubella (MMR)',
+      dateScheduled: '2025-06-15',
+      status: 'Ðã lên l?ch',
+      location: 'Phòng Y t? Tru?ng',
+      notes: 'Tiêm nh?c l?i.'
+    }
+  ];
+
+  // Mock data for class students
+  const mockClassStudents = {
+    '10A1': [
+      { id: 'SV2022012', name: 'Ph?m Th? D' },
+      { id: 'SV2022034', name: 'Hoàng Van E' },
+      { id: 'SV2022056', name: 'Nguy?n Th? F' },
+      { id: 'SV2022078', name: 'Ð? Van M' },
+      { id: 'SV2022090', name: 'Tr?n Th? N' },
+    ],
+    '10A2': [
+      { id: 'SV2022013', name: 'Lê Van P' },
+      { id: 'SV2022035', name: 'Nguy?n Th? Q' },
+      { id: 'SV2022057', name: 'Hoàng Van R' },
+      { id: 'SV2022079', name: 'Ph?m Th? S' },
+      { id: 'SV2022091', name: 'Vu Van T' },
+    ],
+    '11A1': [
+      { id: 'SV2022067', name: 'Vu Van G' },
+      { id: 'SV2022023', name: 'Tr?n Th? H' },
+      { id: 'SV2022015', name: 'Hoàng Van Z' },
+      { id: 'SV2022037', name: 'Nguy?n Th? AA' },
+      { id: 'SV2022059', name: 'Lê Van BB' },
+    ]
+  };
+
+  // Ki?m tra xác th?c
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/login', { 
+        state: { 
+          from: { pathname: '/vaccination-management' },
+          manualLogin: true 
+        } 
+      });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+  // Load mock data
+  useEffect(() => {
+    setTimeout(() => {
+      setVaccinations(mockVaccinations);
+      setLoading(false);
+    }, 1000);
+  }, [mockVaccinations]);
+
+  // L?c vaccinations  const getFilteredVaccinations = () => {
+    return vaccinations.filter(vaccination => {
+      // L?c theo kh?i (ví d?: '10', '11', '12')
+      if (filters.grade && !vaccination.class.startsWith(filters.grade)) {
+        return false;
+      }
+      
+      // L?c theo l?p c? th?
+      if (filters.className && vaccination.class !== filters.className) {
+        return false;
+      }
+      
+      // L?c theo tr?ng thái
+      if (filters.status && vaccination.status !== filters.status) {
+        return false;
+      }
+      
+      return true;
+    });
+  };
+
+  // Handler for new vaccination (individual)
+  const handleNewVaccination = () => {
+    setActiveTab('individual');
+    setShowForm(true);
+  };
+
+  // Handlers
+  const handleViewDetails = (vaccination) => {
+    setSelectedVaccination(vaccination);
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedVaccination(null);
+  };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmitForm = (e) => {
+    e.preventDefault();
+    // Trong ?ng d?ng th?c t?, g?i d? li?u d?n API
+    // Hi?n t?i, ch? dóng form
+    setShowForm(false);
+    alert('Ðã lên l?ch tiêm ch?ng thành công!');
+  };
+
+  const handleBatchSchedule = () => {
+    setClassStudents([]);
+    setSelectedStudents([]);
+    setBatchFormData(defaultBatchFormData);
+    setShowBatchForm(true);
+  };
+
+  const handleCancelBatchForm = () => {
+    setShowBatchForm(false);
+  };
+
+  const handleBatchInputChange = (e) => {
+    const { id, value } = e.target;
+    setBatchFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+
+    // N?u thay d?i l?p, t?i danh sách h?c sinh
+    if (id === 'className' && value) {
+      setClassStudents(mockClassStudents[value] || []);
+      setSelectedStudents([]);
+    }
+  };
+
+  const handleSelectAllStudents = () => {
+    if (selectedStudents.length === classStudents.length) {
+      // N?u dã ch?n t?t c?, b? ch?n t?t c?
+      setSelectedStudents([]);
+    } else {
+      // N?u chua ch?n t?t c?, ch?n t?t c?
+      setSelectedStudents(classStudents.map(student => student.id));
+    }
+  };
+
+  const handleSelectStudent = (studentId) => {
+    if (selectedStudents.includes(studentId)) {
+      setSelectedStudents(prev => prev.filter(id => id !== studentId));
+    } else {
+      setSelectedStudents(prev => [...prev, studentId]);
+    }
+  };
+
+  const handleSubmitBatchForm = (e) => {
+    e.preventDefault();
+    if (selectedStudents.length === 0) {
+      alert('Vui lòng ch?n ít nh?t m?t h?c sinh d? lên l?ch tiêm ch?ng!');
+      return;
+    }
+    // Trong ?ng d?ng th?c t?, g?i d? li?u d?n API
+    // Hi?n t?i, ch? dóng form
+    setShowBatchForm(false);
+    alert(`Ðã lên l?ch tiêm ch?ng cho ${selectedStudents.length} h?c sinh l?p ${batchFormData.className}!`);
+  };
+
+  const handleApplyFilters = () => {
+    setVaccinations(getFilteredVaccinations());
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      grade: '',
+      className: '',
+      status: ''
+    });
+    setVaccinations(mockVaccinations);
+  };
+
+  const handleExportToExcel = () => {
+    alert('Tính nang xu?t Excel dang du?c phát tri?n!');
+  };
+
+  const handleImportFromExcel = () => {
+    alert('Tính nang nh?p t? Excel dang du?c phát tri?n!');
+  };
+
+  return (
+    <div className="vaccination-management-container">
+      <div className="container py-4">
+        {/* Header */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h1>Qu?n lý tiêm ch?ng h?c du?ng</h1>
+          <div>
+            <button className="btn btn-success me-2" onClick={handleBatchSchedule}>
+              <i className="fas fa-users me-2"></i>T?o l?ch tiêm theo l?p
+            </button>
+            <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+              <i className="fas fa-plus-circle me-2"></i>T?o l?ch tiêm cá nhân
+            </button>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="row mb-4">
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">T?ng s? h?c sinh</h5>
+                <p className="card-number">{vaccinations.length}</p>
+                <p className="card-text">Ðã dang ký tiêm</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">Ðã tiêm</h5>
+                <p className="card-number">{vaccinations.filter(v => v.status === 'Ðã tiêm').length}</p>
+                <p className="card-text">H?c sinh</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">Ch? tiêm</h5>
+                <p className="card-number">{vaccinations.filter(v => v.status === 'Ðã lên l?ch').length}</p>
+                <p className="card-text">H?c sinh</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">Ð?t tiêm</h5>
+                <p className="card-number">02</p>
+                <p className="card-text">H?c k? 2, 2024-2025</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Card */}
+        <div className="card mb-4">
+          <div className="card-body">
+            <h5 className="card-title mb-3">L?c danh sách tiêm ch?ng</h5>
+            <div className="row">
+              <div className="col-md-3 mb-2">
+                <select 
+                  id="grade" 
+                  className="form-select"
+                  value={filters.grade}
+                  onChange={(e) => setFilters({...filters, grade: e.target.value})}
+                >
+                  <option value="">Ch?n kh?i</option>
+                  <option value="10">Kh?i 10</option>
+                  <option value="11">Kh?i 11</option>
+                  <option value="12">Kh?i 12</option>
+                </select>
+              </div>
+              <div className="col-md-3 mb-2">
+                <select 
+                  id="className" 
+                  className="form-select"
+                  value={filters.className}
+                  onChange={(e) => setFilters({...filters, className: e.target.value})}
+                >
+                  <option value="">Ch?n l?p</option>
+                  <option value="10A1">10A1</option>
+                  <option value="10A2">10A2</option>
+                  <option value="10A3">10A3</option>
+                  <option value="11A1">11A1</option>
+                  <option value="11A2">11A2</option>
+                  <option value="12A1">12A1</option>
+                  <option value="12A2">12A2</option>
+                </select>
+              </div>
+              <div className="col-md-3 mb-2">
+                <select 
+                  id="status" 
+                  className="form-select"
+                  value={filters.status}
+                  onChange={(e) => setFilters({...filters, status: e.target.value})}
+                >
+                  <option value="">Tr?ng thái</option>
+                  <option value="Ðã lên l?ch">Ch? tiêm</option>
+                  <option value="Ðã tiêm">Ðã tiêm</option>
+                </select>
+              </div>
+              <div className="col-md-3 mb-2">
+                <div className="d-flex">
+                  <button className="btn btn-primary flex-grow-1 me-2" onClick={handleApplyFilters}>
+                    <i className="fas fa-search me-2"></i>L?c
+                  </button>
+                  <button className="btn btn-secondary" onClick={handleResetFilters}>
+                    <i className="fas fa-redo"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Export/Import Buttons */}
+        <div className="d-flex justify-content-end mb-3 btn-export-import">
+          <button className="btn btn-outline-success me-2" onClick={handleExportToExcel}>
+            <i className="fas fa-file-excel me-2"></i>Xu?t Excel
+          </button>
+          <button className="btn btn-outline-primary" onClick={handleImportFromExcel}>
+            <i className="fas fa-file-import me-2"></i>Nh?p danh sách
+          </button>
+        </div>
+
+        {/* Main Table */}
+        {loading ? (
+          <div className="text-center my-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Ðang t?i...</span>
+            </div>
+            <p className="mt-3">Ðang t?i d? li?u tiêm ch?ng...</p>
+          </div>
+        ) : (
+          <div className="card">
+            <div className="card-body">
+              <div className="table-responsive">
+                <table className="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Mã h?c sinh</th>
+                      <th>H? tên</th>
+                      <th>L?p</th>
+                      <th>Lo?i v?c-xin</th>
+                      <th>Ngày tiêm</th>
+                      <th>Ð?a di?m</th>
+                      <th>Tr?ng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vaccinations.length > 0 ? (
+                      vaccinations.map((vaccination) => (
+                        <tr key={vaccination.id}>
+                          <td>{vaccination.id}</td>
+                          <td>{vaccination.patientId}</td>
+                          <td>{vaccination.patientName}</td>
+                          <td>{vaccination.class}</td>
+                          <td>{vaccination.vaccineType}</td>
+                          <td>{vaccination.dateScheduled}</td>
+                          <td>{vaccination.location}</td>
+                          <td>
+                            <span className={`badge ${
+                              vaccination.status === 'Ðã tiêm' 
+                                ? 'bg-success' 
+                                : 'bg-primary'
+                            }`}>
+                              {vaccination.status}
+                            </span>
+                          </td>
+                          <td>
+                            <button 
+                              className="btn btn-sm btn-info me-2"
+                              onClick={() => handleViewDetails(vaccination)}
+                            >
+                              <i className="fas fa-eye me-1"></i>Xem
+                            </button>
+                            <button className="btn btn-sm btn-secondary">
+                              <i className="fas fa-edit me-1"></i>S?a
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="9" className="text-center py-3">
+                          <p className="mb-0 text-muted">Không có d? li?u tiêm ch?ng nào phù h?p v?i di?u ki?n l?c</p>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Vaccination Details Modal */}
+        {selectedVaccination && (
+          <div className="modal show d-block" tabIndex="-1">
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Chi ti?t l?ch tiêm ch?ng</h5>
+                  <button type="button" className="btn-close" onClick={handleCloseDetails}></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <strong>Mã h?c sinh:</strong> {selectedVaccination.patientId}
+                  </div>
+                  <div className="mb-3">
+                    <strong>H? tên:</strong> {selectedVaccination.patientName}
+                  </div>
+                  <div className="mb-3">
+                    <strong>L?p:</strong> {selectedVaccination.class}
+                  </div>
+                  <div className="mb-3">
+                    <strong>Lo?i v?c-xin:</strong> {selectedVaccination.vaccineType}
+                  </div>
+                  <div className="mb-3">
+                    <strong>Ngày tiêm:</strong> {selectedVaccination.dateScheduled}
+                  </div>
+                  <div className="mb-3">
+                    <strong>Ð?a di?m:</strong> {selectedVaccination.location}
+                  </div>
+                  <div className="mb-3">
+                    <strong>Tr?ng thái:</strong> <span className={`badge ${
+                      selectedVaccination.status === 'Ðã tiêm' 
+                        ? 'bg-success' 
+                        : 'bg-primary'
+                    }`}>{selectedVaccination.status}</span>
+                  </div>
+                  <div className="mb-3">
+                    <strong>Ghi chú:</strong> {selectedVaccination.notes}
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseDetails}>Ðóng</button>
+                  {selectedVaccination.status !== 'Ðã tiêm' && (
+                    <button type="button" className="btn btn-primary">Ðánh d?u dã tiêm</button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="modal-backdrop fade show"></div>
+          </div>
+        )}
+
+        {/* Individual Vaccination Form Modal */}
+        {showForm && (
+          <div className="modal show d-block" tabIndex="-1">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">T?o l?ch tiêm ch?ng m?i</h5>
+                  <button type="button" className="btn-close" onClick={handleCancelForm}></button>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={handleSubmitForm} className="individual-form">
+                    <div className="row">
+                      <div className="col-md-4 mb-3">
+                        <label htmlFor="patientId" className="form-label">Mã h?c sinh</label>
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          id="patientId" 
+                          value={formData.patientId}
+                          onChange={handleInputChange}
+                          required 
+                        />
+                      </div>
+                      <div className="col-md-4 mb-3">
+                        <label htmlFor="patientName" className="form-label">H? tên h?c sinh</label>
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          id="patientName" 
+                          value={formData.patientName}
+                          onChange={handleInputChange}
+                          required 
+                        />
+                      </div>
+                      <div className="col-md-4 mb-3">
+                        <label htmlFor="class" className="form-label">L?p</label>
+                        <select 
+                          className="form-select" 
+                          id="class" 
+                          value={formData.class}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="">Ch?n l?p</option>
+                          <option value="10A1">10A1</option>
+                          <option value="10A2">10A2</option>
+                          <option value="10A3">10A3</option>
+                          <option value="11A1">11A1</option>
+                          <option value="11A2">11A2</option>
+                          <option value="12A1">12A1</option>
+                          <option value="12A2">12A2</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="row">
+                      <div className="col-md-6 mb-3">
+                        <label htmlFor="vaccineType" className="form-label">Lo?i v?c-xin</label>
+                        <select 
+                          className="form-select" 
+                          id="vaccineType" 
+                          value={formData.vaccineType}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="">Ch?n lo?i v?c-xin</option>
+                          <option value="V?c-xin COVID-19">V?c-xin COVID-19</option>
+                          <option value="V?c-xin cúm mùa">V?c-xin cúm mùa</option>
+                          <option value="V?c-xin viêm gan B">V?c-xin viêm gan B</option>
+                          <option value="V?c-xin u?n ván">V?c-xin u?n ván</option>
+                          <option value="V?c-xin s?i-quai b?-rubella (MMR)">V?c-xin s?i-quai b?-rubella (MMR)</option>
+                        </select>
+                      </div>
+                      <div className="col-md-6 mb-3">
+                        <label htmlFor="dateScheduled" className="form-label">Ngày tiêm</label>
+                        <input 
+                          type="date" 
+                          className="form-control" 
+                          id="dateScheduled" 
+                          value={formData.dateScheduled}
+                          onChange={handleInputChange}
+                          required 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="row">
+                      <div className="col-md-6 mb-3">
+                        <label htmlFor="location" className="form-label">Ð?a di?m tiêm</label>
+                        <select 
+                          className="form-select" 
+                          id="location" 
+                          value={formData.location}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="Phòng Y t? Tru?ng">Phòng Y t? Tru?ng</option>
+                          <option value="Trung tâm Y t? Qu?n">Trung tâm Y t? Qu?n</option>
+                          <option value="B?nh vi?n Ða khoa T?nh">B?nh vi?n Ða khoa T?nh</option>
+                        </select>
+                      </div>
+                      <div className="col-md-6 mb-3">
+                        <label htmlFor="notes" className="form-label">Ghi chú</label>
+                        <textarea 
+                          className="form-control" 
+                          id="notes" 
+                          rows="2"
+                          value={formData.notes}
+                          onChange={handleInputChange}
+                        ></textarea>
+                      </div>
+                    </div>
+                    
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-secondary" onClick={handleCancelForm}>H?y</button>
+                      <button type="submit" className="btn btn-primary">Luu l?ch tiêm</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div className="modal-backdrop fade show"></div>
+          </div>
+        )}
+
+        {/* Batch Vaccination Form Modal */}
+        {showBatchForm && (
+          <div className="modal show d-block" tabIndex="-1">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">T?o l?ch tiêm ch?ng theo l?p</h5>
+                  <button type="button" className="btn-close" onClick={handleCancelBatchForm}></button>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={handleSubmitBatchForm} className="batch-form">
+                    <div className="row mb-3">
+                      <div className="col-md-4">
+                        <label htmlFor="className" className="form-label">Ch?n l?p</label>
+                        <select 
+                          className="form-select" 
+                          id="className" 
+                          value={batchFormData.className}
+                          onChange={handleBatchInputChange}
+                          required
+                        >
+                          <option value="">Ch?n l?p</option>
+                          <option value="10A1">10A1</option>
+                          <option value="10A2">10A2</option>
+                          <option value="11A1">11A1</option>
+                        </select>
+                      </div>
+                      <div className="col-md-4">
+                        <label htmlFor="vaccineType" className="form-label">Lo?i v?c-xin</label>
+                        <select 
+                          className="form-select" 
+                          id="vaccineType" 
+                          value={batchFormData.vaccineType}
+                          onChange={handleBatchInputChange}
+                          required
+                        >
+                          <option value="">Ch?n lo?i v?c-xin</option>
+                          <option value="V?c-xin COVID-19">V?c-xin COVID-19</option>
+                          <option value="V?c-xin cúm mùa">V?c-xin cúm mùa</option>
+                          <option value="V?c-xin viêm gan B">V?c-xin viêm gan B</option>
+                          <option value="V?c-xin u?n ván">V?c-xin u?n ván</option>
+                          <option value="V?c-xin s?i-quai b?-rubella (MMR)">V?c-xin s?i-quai b?-rubella (MMR)</option>
+                        </select>
+                      </div>
+                      <div className="col-md-4">
+                        <label htmlFor="dateScheduled" className="form-label">Ngày tiêm</label>
+                        <input 
+                          type="date" 
+                          className="form-control" 
+                          id="dateScheduled" 
+                          value={batchFormData.dateScheduled}
+                          onChange={handleBatchInputChange}
+                          required 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <label htmlFor="location" className="form-label">Ð?a di?m tiêm</label>
+                        <select 
+                          className="form-select" 
+                          id="location" 
+                          value={batchFormData.location}
+                          onChange={handleBatchInputChange}
+                          required
+                        >
+                          <option value="Phòng Y t? Tru?ng">Phòng Y t? Tru?ng</option>
+                          <option value="Trung tâm Y t? Qu?n">Trung tâm Y t? Qu?n</option>
+                          <option value="B?nh vi?n Ða khoa T?nh">B?nh vi?n Ða khoa T?nh</option>
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="notes" className="form-label">Ghi chú</label>
+                        <textarea 
+                          className="form-control" 
+                          id="notes" 
+                          rows="2"
+                          value={batchFormData.notes}
+                          onChange={handleBatchInputChange}
+                        ></textarea>
+                      </div>
+                    </div>                    {classStudents.length > 0 && (
+                      <div className="student-selection mt-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h6 className="mb-0">Danh sách h?c sinh</h6>
+                          <div className="form-check">
+                            <input 
+                              className="form-check-input" 
+                              type="checkbox" 
+                              id="selectAll" 
+                              checked={selectedStudents.length === classStudents.length}
+                              onChange={handleSelectAllStudents}
+                            />
+                              Chon tat ca
+                              Ch?n t?t c?
+                            </label>
+                          </div>
+                        </div>
+                        <div className="table-responsive">
+                          <table className="table table-sm table-bordered">
+                            <thead>
+                              <tr>
+                                <th style={{ width: '50px' }}></th>
+                                <th>Mã h?c sinh</th>
+                                <th>H? tên</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {classStudents.map(student => (
+                                <tr key={student.id}>
+                                  <td className="text-center">
+                                    <input 
+                                      type="checkbox" 
+                                      className="form-check-input" 
+                                      checked={selectedStudents.includes(student.id)}
+                                      onChange={() => handleSelectStudent(student.id)}
+                                    />
+                                  </td>
+                                  <td>{student.id}</td>
+                                  <td>{student.name}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-secondary" onClick={handleCancelBatchForm}>H?y</button>
+                      <button 
+                        type="submit" 
+                        className="btn btn-primary"
+                        disabled={!batchFormData.className || classStudents.length === 0 || selectedStudents.length === 0}
+                      >
+                        Luu l?ch tiêm
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div className="modal-backdrop fade show"></div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default VaccinationManagement;

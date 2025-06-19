@@ -125,7 +125,50 @@
 .header .search-btn {
   background: none;
   border: none;
-  color: #222;  font-size: 1.2rem;
+  color: #222;  
+  font-size: 1.2rem;
   cursor: pointer;
   margin-left: 8px;
+}
+
+/* New styles for user menu and logout */
+.header .user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header .user-greeting {
+  color: #222;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.header .user-greeting i {
+  font-size: 1.1rem;
+  color: #005eb8;
+}
+
+.header .logout-btn {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.header .logout-btn:hover {
+  color: #b71c1c;
+  background: rgba(211, 47, 47, 0.1);
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import './assets/styles/global.css';
 import Navbar from './components/Navbar';
@@ -19,11 +19,17 @@ import RecordProcess from './pages/RecordProcess';
 import DocumentsBlog from './pages/DocumentsBlog';
 
 function App() {
+  const location = useLocation();
+  
+  // Define routes where Navbar and Footer should be hidden
+  const noNavbarRoutes = ['/login', '/register'];
+  const showNavbar = !noNavbarRoutes.includes(location.pathname);
+  
   return (
     <AuthProvider>
       <div className="App">
-        <Navbar />
-        <main className="content-container">
+        {showNavbar && <Navbar />}
+        <main className={`content-container ${!showNavbar ? 'full-height' : ''}`}>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
@@ -39,7 +45,7 @@ function App() {
             <Route path="/documents-blog" element={<DocumentsBlog />} />
           </Routes>
         </main>
-        <Footer />
+        {showNavbar && <Footer />}
       </div>
     </AuthProvider>
   );

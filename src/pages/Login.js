@@ -12,11 +12,16 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, authError } = useAuth();
   
   // Lấy trang redirect từ state
   const from = location.state?.from?.pathname || '/';
   console.log("Login - Redirect path:", from);
+  
+  // Handle back button click
+  const handleBack = () => {
+    navigate('/');
+  };
   
   // Nếu đã đăng nhập, chuyển hướng đến trang đích
   useEffect(() => {
@@ -25,6 +30,26 @@ const Login = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);
+
+  // Display auth errors from context
+  useEffect(() => {
+    if (authError) {
+      setError(authError);
+    }
+  }, [authError]);
+  
+  // Force clear localStorage if the user is on login page
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceLogin = urlParams.get('force');
+    
+    if (forceLogin === 'true') {
+      localStorage.removeItem('user');
+      console.log("Force login parameter detected - cleared localStorage");
+      // Remove the query parameter to prevent endless loops
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,10 +81,14 @@ const Login = () => {
       
       console.log("Login credentials correct, calling login");
       // Call login from AuthContext
-      login(userData);
+      const loginSuccess = login(userData);
       
-      // Chuyển hướng sẽ được xử lý bởi useEffect
-      console.log("Login successful, useEffect will handle redirect to:", from);
+      if (loginSuccess) {
+        // Chuyển hướng sẽ được xử lý bởi useEffect
+        console.log("Login successful, useEffect will handle redirect to:", from);
+      } else {
+        setError('Đăng nhập thất bại. Vui lòng thử lại.');
+      }
     } else {
       // Show error message
       console.log("Login failed: incorrect credentials");
@@ -73,6 +102,10 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      <button onClick={handleBack} className="back-button">
+        <i className="fas fa-arrow-left"></i> Quay lại
+      </button>
+      
       <div className="left-panel">
         <div className="logo">
           <img src="/assets/healthconnect-logo.svg" alt="Logo" style={{ height: '72px', marginBottom: '16px' }} />

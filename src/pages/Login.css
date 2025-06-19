@@ -10,6 +10,36 @@ body {
   display: flex;
   min-height: 100vh;
   overflow: hidden;
+  position: relative; /* Added for absolute positioning of back button */
+}
+
+/* New back button styles */
+.back-button {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 10;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.back-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #005eb8;
+}
+
+.back-button i {
+  font-size: 1.1rem;
 }
 
 .left-panel {
@@ -52,7 +82,7 @@ body {
   font-weight: 700;
   text-align: center;
   margin-bottom: 8px;
-  margin-top: 32px;
+  margin-top: 80px; /* Increased to make room for back button */
 }
 
 .portal-desc {

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
   const isHomePage = location.pathname === '/';
+  const { isAuthenticated, user, logout } = useAuth();
   
   // Handle smooth scroll when clicking on nav links
   const scrollToSection = (sectionId) => {
@@ -23,6 +26,12 @@ const Navbar = () => {
       // If not on home page, navigate to home page with hash
       window.location.href = `/#${sectionId}`;
     }
+  };
+  
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
   
   // Track scroll position to update active section
@@ -120,9 +129,22 @@ const Navbar = () => {
       
       <div className="header-actions">
         <button className="request-btn">Yêu cầu tư vấn</button>
-        <Link to="/login" className="login-link">
-          <i className="fas fa-user-circle"></i> Đăng nhập
-        </Link>
+        
+        {isAuthenticated ? (
+          <div className="user-menu">
+            <span className="user-greeting">
+              <i className="fas fa-user-circle"></i> {user?.name || 'Người dùng'}
+            </span>
+            <button onClick={handleLogout} className="logout-btn">
+              <i className="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+          </div>
+        ) : (
+          <a href="/login" className="login-link">
+            <i className="fas fa-user-circle"></i> Đăng nhập
+          </a>
+        )}
+        
         <button className="search-btn">
           <i className="fas fa-search"></i>
         </button>

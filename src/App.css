@@ -8,3 +8,10 @@
   flex: 1;
   padding: 20px;
 }
+
+/* When navbar is hidden, ensure content takes full height */
+.content-container.full-height {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+}

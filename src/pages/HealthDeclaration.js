@@ -367,13 +367,23 @@ const HealthDeclaration = () => {
 
   return (
     <div className="main-container">
-      <main className="main-content">
-        {/* Page Header */}
-        <div className="page-header">          <h1 className="page-title">
+      <main className="main-content">        {/* Page Header */}
+        <div className="page-header">
+          <h1 className="page-title">
             <i className="fas fa-file-medical me-2"></i>
             Khai báo sức khỏe hàng ngày
           </h1>
           <p className="page-subtitle">Theo dõi và quản lý tình trạng sức khỏe học sinh một cách chi tiết và chính xác</p>
+          
+          {/* Action Buttons */}
+          <div className="form-actions">
+            <button className="action-button btn-excel" onClick={() => alert('Xuất Excel')}>
+              <i className="fas fa-file-excel"></i> Xuất Excel
+            </button>
+            <button className="action-button btn-import" onClick={() => alert('Nhập danh sách')}>
+              <i className="fas fa-file-import"></i> Nhập danh sách
+            </button>
+          </div>
         </div>
 
         {/* Content Layout */}

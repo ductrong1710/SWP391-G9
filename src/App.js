@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import './assets/styles/global.css';
@@ -19,7 +19,10 @@ import SendMedicine from './pages/SendMedicine';
 import RecordProcess from './pages/RecordProcess';
 import DocumentsBlog from './pages/DocumentsBlog';
 
-function App() {  const location = useLocation();
+function App() {
+  const location = useLocation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
   // Define routes where Sidebar should be shown
   const sidebarRoutes = [
     '/dashboard',
@@ -38,25 +41,58 @@ function App() {  const location = useLocation();
   const showNavbar = !noNavbarRoutes.includes(location.pathname);
   const showSidebar = sidebarRoutes.includes(location.pathname);
   
-  return (
-    <AuthProvider>      <div className="App">
-        {showNavbar && <Navbar />}
-        <div className={`app-container ${showSidebar ? 'with-sidebar' : ''}`}>
-          {showSidebar && <Sidebar />}
-          <main className={`content-container ${!showNavbar ? 'full-height' : ''} ${showSidebar ? 'content-with-sidebar' : ''}`}>
+  // Handle sidebar toggle from Sidebar component
+  const handleSidebarToggle = (isCollapsed) => {
+    setSidebarCollapsed(isCollapsed);
+  };
+    return (
+    <AuthProvider>
+      <div className="App">
+        {showNavbar && <Navbar />}        <div className={`app-container ${showSidebar ? 'with-sidebar' : ''}`}>
+          {showSidebar && <Sidebar onSidebarToggle={handleSidebarToggle} />}
+          <main className={`content-container ${!showNavbar ? 'full-height' : ''} ${showSidebar ? 'content-with-sidebar' : ''} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              {/* Các route không sử dụng ProtectedRoute */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/health-declaration" element={<HealthDeclaration />} />
-              <Route path="/health-check-management" element={<HealthCheckManagement />} />
-              <Route path="/vaccination-management" element={<VaccinationManagement />} />
-              <Route path="/send-medicine" element={<SendMedicine />} />
-              <Route path="/record-process" element={<RecordProcess />} />
-              <Route path="/documents-blog" element={<DocumentsBlog />} />
+              
+              {/* Các route có sidebar */}
+              <Route path="/dashboard" element={
+                <div className="page-wrapper">
+                  <Dashboard />
+                </div>
+              } />
+              <Route path="/health-declaration" element={
+                <div className="page-wrapper">
+                  <HealthDeclaration />
+                </div>
+              } />
+              <Route path="/health-check-management" element={
+                <div className="page-wrapper">
+                  <HealthCheckManagement />
+                </div>
+              } />
+              <Route path="/vaccination-management" element={
+                <div className="page-wrapper">
+                  <VaccinationManagement />
+                </div>
+              } />
+              <Route path="/send-medicine" element={
+                <div className="page-wrapper">
+                  <SendMedicine />
+                </div>
+              } />
+              <Route path="/record-process" element={
+                <div className="page-wrapper">
+                  <RecordProcess />
+                </div>
+              } />
+              <Route path="/documents-blog" element={
+                <div className="page-wrapper">
+                  <DocumentsBlog />
+                </div>
+              } />
             </Routes>
           </main>
         </div>

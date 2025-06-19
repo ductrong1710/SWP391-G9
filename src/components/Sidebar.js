@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Modal from './Modal';
 import './Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ onSidebarToggle }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -12,9 +12,24 @@ const Sidebar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const toggleSidebar = () => {
-    setCollapsed(!collapsed);
+    const newCollapsedState = !collapsed;
+    setCollapsed(newCollapsedState);
+    if (onSidebarToggle) {
+      onSidebarToggle(newCollapsedState);
+    }
   };
-
+  // Update parent component on mount with initial state
+  useEffect(() => {
+    if (onSidebarToggle) {
+      onSidebarToggle(collapsed);
+    }
+    
+  // For web only, no mobile-specific code
+    return () => {
+      // Cleanup if needed
+    };
+  }, [collapsed, onSidebarToggle]);
+  
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';
   };

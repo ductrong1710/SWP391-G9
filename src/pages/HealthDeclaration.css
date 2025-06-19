@@ -39,6 +39,7 @@
   box-shadow: var(--card-shadow);
   margin-bottom: 2rem;
   text-align: center;
+  position: relative;
 }
 
 .page-title {
@@ -574,6 +575,42 @@ textarea.form-control:disabled {
 .health-declaration-form .form-check-label {
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+/* Action buttons styling */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  gap: 12px;
+}
+
+/* Keep this consistent with App.css but specific to this page */
+.form-actions .action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+}
+
+/* Excel Export Button - Green */
+.form-actions .btn-excel {
+  background-color: #1D6F42; /* Excel green */
+  color: white;
+}
+
+/* Import List Button - Blue */
+.form-actions .btn-import {
+  background-color: #2563EB; /* Bright blue */
+  color: white;
 }
 
 /* Animation for form elements */

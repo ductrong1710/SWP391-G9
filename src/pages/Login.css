@@ -251,3 +251,30 @@ body {
 @media (max-width: 500px) {
   .login-form { padding: 24px 8px; }
 }
+
+/* Test account styles */
+.test-accounts {
+  margin-top: 15px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.test-account-btn {
+  background-color: #f0f5ff;
+  border: 1px solid #d4e2ff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #2563eb;
+}
+
+.test-account-btn:hover {
+  background-color: #e0ebff;
+  border-color: #93b3ff;
+}
+
+.test-account-btn:active {
+  background-color: #d1e0ff;
+}

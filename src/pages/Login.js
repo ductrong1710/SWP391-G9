@@ -8,14 +8,13 @@ const Login = () => {
     username: '',
     password: ''
   });
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [error, setError] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);  const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated, authError } = useAuth();
   
-  // Lấy trang redirect từ state
-  const from = location.state?.from?.pathname || '/';
+  // Lấy trang redirect từ state hoặc mặc định là dashboard
+  const from = location.state?.from?.pathname || '/dashboard';
   console.log("Login - Redirect path:", from);
   
   // Handle back button click
@@ -60,28 +59,64 @@ const Login = () => {
     // Clear error when user types
     if (error) setError('');
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Login form submitted");
     
-    // Simple validation for demo (username: admin, password: 123456)
-    if (credentials.username === 'admin' && credentials.password === '123456') {
+    // Define test accounts with different roles
+    const testAccounts = {
+      'admin': {
+        password: '123456',
+        userData: {
+          id: 1,
+          username: 'admin',
+          name: 'Quản trị viên',
+          role: 'admin',
+          avatar: '/assets/avatar.png'
+        }
+      },
+      'doctor': {
+        password: '123456',
+        userData: {
+          id: 2,
+          username: 'doctor',
+          name: 'Bác sĩ',
+          role: 'doctor',
+          avatar: '/assets/doctor-avatar.png'
+        }
+      },
+      'teacher': {
+        password: '123456',
+        userData: {
+          id: 3,
+          username: 'teacher',
+          name: 'Giáo viên',
+          role: 'teacher',
+          avatar: '/assets/teacher-avatar.png'
+        }
+      },
+      'student': {
+        password: '123456',
+        userData: {
+          id: 4,
+          username: 'student',
+          name: 'Học sinh',
+          role: 'student',
+          avatar: '/assets/student-avatar.png'
+        }
+      }
+    };
+    
+    // Check if entered credentials match any test account
+    const account = testAccounts[credentials.username];
+    
+    if (account && credentials.password === account.password) {
       // Reset error if it exists
       setError('');
       
-      // Login with user data
-      const userData = {
-        id: 1,
-        username: 'admin',
-        name: 'Quản trị viên',
-        role: 'admin',
-        avatar: '/assets/avatar.png'
-      };
-      
       console.log("Login credentials correct, calling login");
-      // Call login from AuthContext
-      const loginSuccess = login(userData);
+      // Call login from AuthContext with the appropriate user data
+      const loginSuccess = login(account.userData);
       
       if (loginSuccess) {
         // Chuyển hướng sẽ được xử lý bởi useEffect
@@ -151,9 +186,47 @@ const Login = () => {
             </div>
           </div>
           {error && <div className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
-          <Link to="/forgot-password" className="forgot-link">Quên tên đăng nhập hoặc mật khẩu?</Link>
-          <button type="submit" className="submit-btn">Đăng nhập</button>
+          <Link to="/forgot-password" className="forgot-link">Quên tên đăng nhập hoặc mật khẩu?</Link>          <button type="submit" className="submit-btn">Đăng nhập</button>
           <Link to="/register" className="create-link">Chưa có tài khoản? Tạo tài khoản ngay.</Link>
+          
+          {/* Test Accounts Section */}
+          <div className="test-accounts">
+            <p style={{ textAlign: 'center', marginTop: '15px', fontWeight: 'bold' }}>Tài khoản thử nghiệm:</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginTop: '10px' }}>
+              <button 
+                type="button" 
+                className="test-account-btn" 
+                onClick={() => setCredentials({ username: 'admin', password: '123456' })}
+              >
+                Admin
+              </button>
+              <button 
+                type="button" 
+                className="test-account-btn" 
+                onClick={() => setCredentials({ username: 'doctor', password: '123456' })}
+              >
+                Bác sĩ
+              </button>
+              <button 
+                type="button" 
+                className="test-account-btn" 
+                onClick={() => setCredentials({ username: 'teacher', password: '123456' })}
+              >
+                Giáo viên
+              </button>
+              <button 
+                type="button" 
+                className="test-account-btn" 
+                onClick={() => setCredentials({ username: 'student', password: '123456' })}
+              >
+                Học sinh
+              </button>
+            </div>
+            <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '10px', color: '#666' }}>
+              Mật khẩu cho tất cả tài khoản: 123456
+            </p>
+          </div>
+          
           <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.95rem', color: '#555' }}>
             Hỗ trợ trực tuyến có thể được tìm thấy trong <Link to="/help" className="support-link">Trợ giúp tài khoản</Link>.
           </div>

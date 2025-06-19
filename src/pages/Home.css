@@ -337,22 +337,3 @@
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
-
-/* Mobile responsiveness */
-@media (max-width: 992px) {
-  .intro-section {
-    flex-direction: column;
-  }
-  
-  .hero-title {
-    font-size: 2.2rem;
-  }
-  
-  .services-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .news-grid {
-    grid-template-columns: 1fr;
-  }
-}

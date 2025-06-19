@@ -1,0 +1,138 @@
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+}
+
+.header .logo-img {
+  width: 48px;
+  height: 48px;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header .logo-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #222;
+  letter-spacing: 0.1px;
+}
+
+.header .main-nav {
+  display: flex;
+  gap: 40px;
+}
+
+.header .main-nav a {
+  color: #222;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.08rem;
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  transition: border 0.2s;
+}
+
+.header .main-nav a:hover {
+  border-bottom: 2px solid #005eb8;
+}
+
+.header .header-actions {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.header .request-btn {
+  background: none;
+  border: 1.5px solid #005eb8;
+  color: #005eb8;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.header .request-btn:hover {
+  background: #005eb8;
+  color: #fff;
+}
+
+.header .login-link {
+  color: #222;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header .login-link i {
+  font-size: 1.1rem;
+}
+
+.header .search-btn {
+  background: none;
+  border: none;
+  color: #222;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 1200px) {
+  .header .main-nav {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 15px 20px;
+  }
+  
+  .header .main-nav {
+    order: 3;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+  }
+  
+  .header .main-nav a {
+    font-size: 0.9rem;
+  }
+  
+  .header .header-actions {
+    gap: 10px;
+  }
+  
+  .header .request-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}

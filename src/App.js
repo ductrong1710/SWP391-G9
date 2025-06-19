@@ -1,0 +1,43 @@
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import './App.css';
+import './assets/styles/global.css';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+// Import pages
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import HealthDeclaration from './pages/HealthDeclaration';
+import HealthCheckManagement from './pages/HealthCheckManagement';
+import VaccinationManagement from './pages/VaccinationManagement';
+import SendMedicine from './pages/SendMedicine';
+import RecordProcess from './pages/RecordProcess';
+import DocumentsBlog from './pages/DocumentsBlog';
+
+function App() {
+  return (
+    <div className="App">
+      <Navbar />
+      <main className="content-container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/health-declaration" element={<HealthDeclaration />} />
+          <Route path="/health-check-management" element={<HealthCheckManagement />} />
+          <Route path="/vaccination-management" element={<VaccinationManagement />} />
+          <Route path="/send-medicine" element={<SendMedicine />} />
+          <Route path="/record-process" element={<RecordProcess />} />
+          <Route path="/documents-blog" element={<DocumentsBlog />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default App;

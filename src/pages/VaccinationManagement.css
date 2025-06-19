@@ -1,0 +1,45 @@
+.vaccination-management-container {
+  padding: 20px 0;
+}
+
+.vaccination-management-container h1 {
+  color: #333;
+  font-weight: 600;
+}
+
+.vaccination-management-container .card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+  color: #495057;
+  background-color: transparent;
+  border-color: transparent;
+  cursor: pointer;
+}
+
+.nav-tabs .nav-link.active {
+  color: #007bff;
+  background-color: #fff;
+  border-color: #dee2e6 #dee2e6 #fff;
+  font-weight: 500;
+}
+
+/* Modal backdrop styling */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Table hover effect */
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Badge styling */
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
+}

@@ -26,7 +26,7 @@
   padding: 0;
   margin: 0;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-light-purple, #f0f2fd); /* Using CSS variable with fallback */
   overflow-x: hidden;
 }
 
@@ -35,7 +35,7 @@
   margin-left: 260px; /* Phù hợp với width của sidebar mở rộng */
   width: calc(100% - 260px);
   padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-light-purple, #f0f2fd); /* Using CSS variable with fallback */
   transition: all 0.3s ease;
   min-height: 100vh;
   overflow-x: hidden;

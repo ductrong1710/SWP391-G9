@@ -6,7 +6,6 @@
 
 .app-container {
   display: flex;
-  flex: 1;
 }
 
 .app-container.with-sidebar {
@@ -33,8 +32,8 @@
 
 /* Adjust content when sidebar is present */
 .content-with-sidebar {
-  margin-left: 270px; /* Increased margin to prevent overlap */
-  width: calc(100% - 270px);
+  margin-left: 260px; /* Phù hợp với width của sidebar mở rộng */
+  width: calc(100% - 260px);
   padding: 2rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   transition: all 0.3s ease;
@@ -44,8 +43,8 @@
 
 /* Content container for sidebar pages */
 .content-container.content-with-sidebar.sidebar-collapsed {
-  margin-left: 90px; /* Increased margin to prevent overlap */
-  width: calc(100% - 90px);
+  margin-left: 80px; /* Phù hợp với width của sidebar thu nhỏ */
+  width: calc(100% - 80px);
   transition: all 0.3s ease;
 }
 
@@ -198,9 +197,8 @@
 
 @media (max-width: 992px) {
   .content-with-sidebar {
-    margin-left: 90px; /* Increased margin to prevent overlap */
-    width: calc(100% - 90px);
-    padding: 1.5rem;
+    margin-left: 80px;
+    width: calc(100% - 80px);
   }
 }
 

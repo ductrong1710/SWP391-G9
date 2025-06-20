@@ -32,20 +32,16 @@
 
 /* Adjust content when sidebar is present */
 .content-with-sidebar {
-  margin-left: 260px; /* Phù hợp với width của sidebar mở rộng */
-  width: calc(100% - 260px);
   padding: 2rem;
   background: var(--bg-light-purple, #f0f2fd); /* Using CSS variable with fallback */
-  transition: all 0.3s ease;
+  transition: none;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
 /* Content container for sidebar pages */
 .content-container.content-with-sidebar.sidebar-collapsed {
-  margin-left: 80px; /* Phù hợp với width của sidebar thu nhỏ */
-  width: calc(100% - 80px);
-  transition: all 0.3s ease;
+  transition: none;
 }
 
 /* Styled content container for sidebar pages */

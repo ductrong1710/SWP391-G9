@@ -50,7 +50,7 @@ function App() {
       <div className="App">
         {showNavbar && <Navbar />}        <div className={`app-container ${showSidebar ? 'with-sidebar' : ''}`}>
           {showSidebar && <Sidebar onSidebarToggle={handleSidebarToggle} />}
-          <main className={`content-container ${!showNavbar ? 'full-height' : ''} ${showSidebar ? 'content-with-sidebar' : ''} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+          <main className={`content-container${!showNavbar ? ' full-height' : ''}`}>
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<Home />} />

@@ -48,9 +48,27 @@ const Sidebar = ({ onSidebarToggle }) => {
     setShowLogoutModal(false);
   };
 
+  // Sidebar tự động mở rộng khi hover
+  const handleMouseEnter = () => {
+    setCollapsed(false);
+    if (onSidebarToggle) {
+      onSidebarToggle(false);
+    }
+  };
+  const handleMouseLeave = () => {
+    setCollapsed(true);
+    if (onSidebarToggle) {
+      onSidebarToggle(true);
+    }
+  };
+
   return (
     <>
-      <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+      <div
+        className={`sidebar ${collapsed ? 'collapsed' : ''}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="sidebar-header">
           <Link to="/dashboard" className="sidebar-logo">
             <div className="logo-img">
@@ -58,9 +76,6 @@ const Sidebar = ({ onSidebarToggle }) => {
             </div>
             {!collapsed && <div className="logo-text">HEALTH CONNECT</div>}
           </Link>
-          <button className="toggle-btn" onClick={toggleSidebar}>
-            <i className={`fas fa-chevron-${collapsed ? 'right' : 'left'}`}></i>
-          </button>
         </div>
         
         <div className="sidebar-menu">

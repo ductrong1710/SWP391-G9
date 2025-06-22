@@ -9,6 +9,7 @@ const Login = () => {
     password: ''
   });
   const [passwordVisible, setPasswordVisible] = useState(false);  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated, authError } = useAuth();
@@ -61,74 +62,20 @@ const Login = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login form submitted");
+    setError('');
+    setIsLoading(true);
+    console.log("Login form submitted - Calling API");
     
-    // Define test accounts with different roles
-    const testAccounts = {
-      'admin': {
-        password: '123456',
-        userData: {
-          id: 1,
-          username: 'admin',
-          name: 'Quản trị viên',
-          role: 'admin',
-          avatar: '/assets/avatar.png'
-        }
-      },
-      'doctor': {
-        password: '123456',
-        userData: {
-          id: 2,
-          username: 'doctor',
-          name: 'Bác sĩ',
-          role: 'doctor',
-          avatar: '/assets/doctor-avatar.png'
-        }
-      },
-      'teacher': {
-        password: '123456',
-        userData: {
-          id: 3,
-          username: 'teacher',
-          name: 'Giáo viên',
-          role: 'teacher',
-          avatar: '/assets/teacher-avatar.png'
-        }
-      },
-      'student': {
-        password: '123456',
-        userData: {
-          id: 4,
-          username: 'student',
-          name: 'Học sinh',
-          role: 'student',
-          avatar: '/assets/student-avatar.png'
-        }
-      }
-    };
+    const loginSuccess = await login(credentials.username, credentials.password);
     
-    // Check if entered credentials match any test account
-    const account = testAccounts[credentials.username];
-    
-    if (account && credentials.password === account.password) {
-      // Reset error if it exists
-      setError('');
-      
-      console.log("Login credentials correct, calling login");
-      // Call login from AuthContext with the appropriate user data
-      const loginSuccess = login(account.userData);
-      
-      if (loginSuccess) {
-        // Chuyển hướng sẽ được xử lý bởi useEffect
-        console.log("Login successful, useEffect will handle redirect to:", from);
-      } else {
-        setError('Đăng nhập thất bại. Vui lòng thử lại.');
-      }
+    if (loginSuccess) {
+      // Chuyển hướng sẽ được xử lý tự động
+      console.log("Login API call successful");
     } else {
-      // Show error message
-      console.log("Login failed: incorrect credentials");
-      setError('Tên đăng nhập hoặc mật khẩu không đúng.');
+      // Lỗi đã được set trong AuthContext và sẽ hiển thị
+      console.log("Login API call failed");
     }
+    setIsLoading(false);
   };
 
   const togglePasswordVisibility = () => {

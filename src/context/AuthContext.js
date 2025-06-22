@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import apiClient from '../services/apiClient';
 
 const AuthContext = createContext();
 
@@ -13,24 +14,28 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Kiểm tra xem người dùng đã đăng nhập chưa (từ localStorage)
     const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
     
-    if (storedUser) {
+    if (storedUser && token) {
       try {
         const parsedUser = JSON.parse(storedUser);
         
         // Validate the user object to ensure it has required fields
-        if (parsedUser && parsedUser.id && parsedUser.username) {
+        if (parsedUser && parsedUser.userId && parsedUser.username) {
           setUser(parsedUser);
           setIsAuthenticated(true);
+          apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         } else {
           // Invalid user data - clear it
           console.log("Invalid user data found in localStorage, clearing...");
           localStorage.removeItem('user');
+          localStorage.removeItem('token');
         }
       } catch (error) {
         // Handle JSON parse error - clear invalid data
         console.error("Error parsing user data from localStorage:", error);
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
         setAuthError("Error loading saved login. Please log in again.");
       }
     }
@@ -39,26 +44,40 @@ export const AuthProvider = ({ children }) => {
     console.log("AuthContext initialized, isAuthenticated:", isAuthenticated);
   }, []);
 
-  const login = (userData) => {
-    // Validate user data before saving
-    if (!userData || !userData.id || !userData.username) {
-      console.error("Invalid user data provided to login:", userData);
-      setAuthError("Invalid login data");
+  const login = async (username, password) => {
+    setAuthError(null);
+    setLoading(true);
+    try {
+      const response = await apiClient.post('/Auth/login', { username, password });
+      const userData = response.data;
+
+      // Trong thực tế, backend nên trả về token. Ở đây ta dùng tạm dummy token.
+      const token = "dummy-jwt-token";
+
+      setUser(userData);
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', token);
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      setLoading(false);
+      return true;
+    } catch (error) {
+      console.error("Login API call failed:", error.response ? error.response.data : error.message);
+      const errorMessage = error.response?.data?.title || error.response?.data || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+      setAuthError(errorMessage);
+      setIsAuthenticated(false);
+      setLoading(false);
       return false;
     }
-    
-    setUser(userData);
-    setIsAuthenticated(true);
-    setAuthError(null);
-    localStorage.setItem('user', JSON.stringify(userData));
-    console.log("User logged in:", userData);
-    return true;
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    delete apiClient.defaults.headers.common['Authorization'];
     console.log("User logged out");
   };
 

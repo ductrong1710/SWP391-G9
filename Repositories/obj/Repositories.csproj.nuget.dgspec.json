@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Repositories\\Repositories.csproj": {}
+    "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj": {}
   },
   "projects": {
-    "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj": {
+    "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj",
+        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj",
         "projectName": "Businessobjects",
-        "projectPath": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj",
+        "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj",
         "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Businessobjects\\obj\\",
+        "outputPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -85,14 +85,14 @@
         }
       }
     },
-    "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Repositories\\Repositories.csproj": {
+    "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Repositories\\Repositories.csproj",
+        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
         "projectName": "Repositories",
-        "projectPath": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Repositories\\Repositories.csproj",
+        "projectPath": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
         "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Repositories\\obj\\",
+        "outputPath": "D:\\LEARNING\\Code\\backend\\Repositories\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -113,8 +113,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj"
+              "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
+                "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
               }
             }
           }
@@ -134,14 +134,6 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "dependencies": {
-            "Microsoft.EntityFrameworkCore.Design": {
-              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[9.0.6, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",

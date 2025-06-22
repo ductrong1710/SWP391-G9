@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "i+Sf932vWGk=",
+  "dgSpecHash": "2HJx9woer0w=",
   "success": true,
-  "projectFilePath": "D:\\LEARNING\\Code\\SWP391-G9-BackEnd\\BackEnd\\BackEnd.csproj",
+  "projectFilePath": "D:\\LEARNING\\Code\\backend\\BackEnd\\BackEnd.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ductr\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\ductr\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

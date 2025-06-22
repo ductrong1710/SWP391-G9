@@ -53,21 +53,5 @@ namespace Services.implements
 
             await _userRepository.DeleteUserAsync(id);
         }
-
-        public async Task<User?> AuthenticateAsync(string username, string password)
-        {
-            // Demo: kiểm tra user mẫu, thực tế nên kiểm tra trong database và mã hóa mật khẩu
-            if (username == "admin" && password == "123456")
-            {
-                return new User
-                {
-                    UserId = Guid.NewGuid(),
-                    Username = "admin",
-                    Password = "123456",
-                    Role = "admin"
-                };
-            }
-            return null;
-        }
     }
 }

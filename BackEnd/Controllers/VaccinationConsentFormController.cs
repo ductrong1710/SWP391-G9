@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -26,16 +27,13 @@ namespace BackEnd.Controllers
 
         // GET: api/VaccinationConsentForm/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<VaccinationConsentForm>> GetConsentForm(string id)
+        public async Task<ActionResult<VaccinationConsentForm>> GetVaccinationConsentForm(string id)
         {
             var form = await _consentFormService.GetVaccinationConsentFormByIdAsync(id);
-
             if (form == null)
-            {
                 return NotFound();
-            }
 
-            return form;
+            return Ok(form);
         }
 
         // GET: api/VaccinationConsentForm/plan/5
@@ -59,13 +57,10 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<VaccinationConsentForm>> GetConsentFormByPlanAndStudent(string planId, string studentId)
         {
             var form = await _consentFormService.GetConsentFormByPlanAndStudentAsync(planId, studentId);
-
             if (form == null)
-            {
                 return NotFound();
-            }
 
-            return form;
+            return Ok(form);
         }
 
         // POST: api/VaccinationConsentForm
@@ -75,7 +70,7 @@ namespace BackEnd.Controllers
             try
             {
                 var createdForm = await _consentFormService.CreateVaccinationConsentFormAsync(form);
-                return CreatedAtAction(nameof(GetConsentForm), new { id = createdForm.ID }, createdForm);
+                return CreatedAtAction(nameof(GetVaccinationConsentForm), new { id = createdForm.ID }, createdForm);
             }
             catch (KeyNotFoundException ex)
             {
@@ -91,23 +86,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateConsentForm(string id, VaccinationConsentForm form)
         {
-            try
-            {
-                await _consentFormService.UpdateVaccinationConsentFormAsync(id, form);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException)
-            {
+            if (id != form.ID)
                 return BadRequest();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
 
+            await _consentFormService.UpdateVaccinationConsentFormAsync(id, form);
             return NoContent();
         }
 
@@ -115,19 +97,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConsentForm(string id)
         {
-            try
-            {
-                await _consentFormService.DeleteVaccinationConsentFormAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
-
+            await _consentFormService.DeleteVaccinationConsentFormAsync(id);
             return NoContent();
         }
     }

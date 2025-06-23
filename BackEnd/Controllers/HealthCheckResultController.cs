@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -29,27 +30,21 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<HealthCheckResult>> GetHealthCheckResult(string id)
         {
             var result = await _resultService.GetHealthCheckResultByIdAsync(id);
-
             if (result == null)
-            {
                 return NotFound();
-            }
 
-            return result;
+            return Ok(result);
         }
 
         // GET: api/HealthCheckResult/consent/5
-        [HttpGet("consent/{consentID}")]
-        public async Task<ActionResult<HealthCheckResult>> GetHealthCheckResultByConsent(string consentID)
+        [HttpGet("consent/{consentId}")]
+        public async Task<ActionResult<HealthCheckResult>> GetHealthCheckResultByConsent(string consentId)
         {
-            var result = await _resultService.GetHealthCheckResultByConsentIdAsync(consentID);
-
+            var result = await _resultService.GetHealthCheckResultByConsentIdAsync(consentId);
             if (result == null)
-            {
                 return NotFound();
-            }
 
-            return result;
+            return Ok(result);
         }
 
         // GET: api/HealthCheckResult/checker/DrSmith
@@ -108,23 +103,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHealthCheckResult(string id, HealthCheckResult result)
         {
-            try
-            {
-                await _resultService.UpdateHealthCheckResultAsync(id, result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException)
-            {
+            if (id != result.ID)
                 return BadRequest();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
 
+            await _resultService.UpdateHealthCheckResultAsync(id, result);
             return NoContent();
         }
 
@@ -132,15 +114,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHealthCheckResult(string id)
         {
-            try
-            {
-                await _resultService.DeleteHealthCheckResultAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _resultService.DeleteHealthCheckResultAsync(id);
             return NoContent();
         }
     }

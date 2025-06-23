@@ -1,6 +1,7 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces;
+using Services.interfaces;
+using Services.Interfaces; // Add this using directive
 
 namespace Services.implements
 {
@@ -23,9 +24,9 @@ namespace Services.implements
             return await _profileRepository.GetProfileByIdAsync(id);
         }
 
-        public async Task<Profile?> GetProfileByUserIdAsync(string userID)
+        public async Task<Profile?> GetProfileByUserIdAsync(string userId)
         {
-            return await _profileRepository.GetProfileByUserIdAsync(userID);
+            return await _profileRepository.GetProfileByUserIdAsync(userId);
         }
 
         public async Task<Profile> CreateProfileAsync(Profile profile)

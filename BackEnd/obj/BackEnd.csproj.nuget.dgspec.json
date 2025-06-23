@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\LEARNING\\Code\\backend\\BackEnd\\BackEnd.csproj": {}
+    "D:\\LEARNING\\Code\\backend\\SWP391-G9\\BackEnd\\BackEnd.csproj": {}
   },
   "projects": {
-    "D:\\LEARNING\\Code\\backend\\BackEnd\\BackEnd.csproj": {
+    "D:\\LEARNING\\Code\\backend\\SWP391-G9\\BackEnd\\BackEnd.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\BackEnd\\BackEnd.csproj",
+        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\BackEnd\\BackEnd.csproj",
         "projectName": "BackEnd",
-        "projectPath": "D:\\LEARNING\\Code\\backend\\BackEnd\\BackEnd.csproj",
+        "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\BackEnd\\BackEnd.csproj",
         "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\backend\\BackEnd\\obj\\",
+        "outputPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\BackEnd\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -32,11 +32,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
+              "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj": {
+                "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj"
               },
-              "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj"
+              "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\Services.csproj": {
+                "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\Services.csproj"
               }
             }
           }
@@ -101,14 +101,14 @@
         }
       }
     },
-    "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
+    "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj",
+        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj",
         "projectName": "Businessobjects",
-        "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj",
+        "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj",
         "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\obj\\",
+        "outputPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -182,14 +182,14 @@
         }
       }
     },
-    "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj": {
+    "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
+        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj",
         "projectName": "Repositories",
-        "projectPath": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
+        "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj",
         "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\backend\\Repositories\\obj\\",
+        "outputPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -210,8 +210,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
+              "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj": {
+                "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj"
               }
             }
           }
@@ -251,14 +251,14 @@
         }
       }
     },
-    "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj": {
+    "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\Services.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj",
+        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\Services.csproj",
         "projectName": "Services",
-        "projectPath": "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj",
+        "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\Services.csproj",
         "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\backend\\Services\\obj\\",
+        "outputPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -279,11 +279,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
+              "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj": {
+                "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj"
               },
-              "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj"
+              "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj": {
+                "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj"
               }
             }
           }

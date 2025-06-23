@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -33,10 +34,10 @@ namespace BackEnd.Controllers
             return Ok(form);
         }
 
-        [HttpGet("student/{studentID}")]
-        public async Task<ActionResult<IEnumerable<MedicationSubmissionForm>>> GetFormsByStudentId(string studentID)
+        [HttpGet("student/{studentId}")]
+        public async Task<ActionResult<IEnumerable<MedicationSubmissionForm>>> GetFormsByStudent(string studentId)
         {
-            var forms = await _service.GetFormsByStudentIdAsync(studentID);
+            var forms = await _service.GetFormsByStudentIdAsync(studentId);
             return Ok(forms);
         }
 
@@ -50,34 +51,17 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateForm(string id, MedicationSubmissionForm form)
         {
-            try
-            {
-                await _service.UpdateFormAsync(id, form);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != form.ID)
                 return BadRequest();
-            }
 
+            await _service.UpdateFormAsync(id, form);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteForm(string id)
         {
-            try
-            {
-                await _service.DeleteFormAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _service.DeleteFormAsync(id);
             return NoContent();
         }
     }

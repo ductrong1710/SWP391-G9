@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -29,27 +30,21 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<Profile>> GetProfile(string id)
         {
             var profile = await _profileService.GetProfileByIdAsync(id);
-
             if (profile == null)
-            {
                 return NotFound();
-            }
 
-            return profile;
+            return Ok(profile);
         }
 
         // GET: api/Profile/user/5
-        [HttpGet("user/{userID}")]
-        public async Task<ActionResult<Profile>> GetProfileByUserId(string userID)
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<Profile>> GetProfileByUser(string userId)
         {
-            var profile = await _profileService.GetProfileByUserIdAsync(userID);
-
+            var profile = await _profileService.GetProfileByUserIdAsync(userId);
             if (profile == null)
-            {
                 return NotFound();
-            }
 
-            return profile;
+            return Ok(profile);
         }
 
         // POST: api/Profile
@@ -64,19 +59,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProfile(string id, Profile profile)
         {
-            try
-            {
-                await _profileService.UpdateProfileAsync(id, profile);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != profile.ProfileID)
                 return BadRequest();
-            }
 
+            await _profileService.UpdateProfileAsync(id, profile);
             return NoContent();
         }
 
@@ -84,15 +70,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProfile(string id)
         {
-            try
-            {
-                await _profileService.DeleteProfileAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _profileService.DeleteProfileAsync(id);
             return NoContent();
         }
     }

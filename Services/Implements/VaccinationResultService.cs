@@ -1,6 +1,7 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces;
+using Services.interfaces;
+using Services.Interfaces; // Add this using directive
 
 namespace Services.implements
 {
@@ -30,14 +31,14 @@ namespace Services.implements
             return await _resultRepository.GetVaccinationResultByIdAsync(id);
         }
 
-        public async Task<VaccinationResult?> GetVaccinationResultByConsentFormIdAsync(string consentFormID)
+        public async Task<VaccinationResult?> GetVaccinationResultByConsentFormIdAsync(string consentFormId)
         {
-            return await _resultRepository.GetVaccinationResultByConsentFormIdAsync(consentFormID);
+            return await _resultRepository.GetVaccinationResultByConsentFormIdAsync(consentFormId);
         }
 
-        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByVaccineTypeAsync(string vaccineTypeID)
+        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByVaccineTypeAsync(string vaccineTypeId)
         {
-            return await _resultRepository.GetVaccinationResultsByVaccineTypeAsync(vaccineTypeID);
+            return await _resultRepository.GetVaccinationResultsByVaccineTypeAsync(vaccineTypeId);
         }
 
         public async Task<VaccinationResult> CreateVaccinationResultAsync(VaccinationResult result)
@@ -55,7 +56,7 @@ namespace Services.implements
             if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeID))
                 throw new KeyNotFoundException("Vaccine type not found");
 
-            if (result.ActualVaccinationDate.HasValue && result.ActualVaccinationDate.Value.Date > DateTime.Today)
+            if (result.ActualVaccinationDate.Value.Date > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for actual vaccination date");
 
             await _resultRepository.CreateVaccinationResultAsync(result);
@@ -77,7 +78,7 @@ namespace Services.implements
             if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeID))
                 throw new KeyNotFoundException("Vaccine type not found");
 
-            if (result.ActualVaccinationDate.HasValue && result.ActualVaccinationDate.Value.Date > DateTime.Today)
+            if (result.ActualVaccinationDate.Value.Date > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for actual vaccination date");
 
             await _resultRepository.UpdateVaccinationResultAsync(result);

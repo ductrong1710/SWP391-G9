@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -29,20 +30,17 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<PeriodicHealthCheckPlan>> GetPlan(string id)
         {
             var plan = await _planService.GetPlanByIdAsync(id);
-
             if (plan == null)
-            {
                 return NotFound();
-            }
 
-            return plan;
+            return Ok(plan);
         }
 
         // GET: api/PeriodicHealthCheckPlan/creator/5
-        [HttpGet("creator/{creatorID}")]
-        public async Task<ActionResult<IEnumerable<PeriodicHealthCheckPlan>>> GetPlansByCreator(string creatorID)
+        [HttpGet("creator/{creatorId}")]
+        public async Task<ActionResult<IEnumerable<PeriodicHealthCheckPlan>>> GetPlansByCreator(string creatorId)
         {
-            var plans = await _planService.GetPlansByCreatorIdAsync(creatorID);
+            var plans = await _planService.GetPlansByCreatorIdAsync(creatorId);
             return Ok(plans);
         }
 
@@ -66,19 +64,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePlan(string id, PeriodicHealthCheckPlan plan)
         {
-            try
-            {
-                await _planService.UpdatePlanAsync(id, plan);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != plan.ID)
                 return BadRequest();
-            }
 
+            await _planService.UpdatePlanAsync(id, plan);
             return NoContent();
         }
 
@@ -86,15 +75,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlan(string id)
         {
-            try
-            {
-                await _planService.DeletePlanAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _planService.DeletePlanAsync(id);
             return NoContent();
         }
     }

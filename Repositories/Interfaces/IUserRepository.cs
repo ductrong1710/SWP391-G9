@@ -11,7 +11,5 @@ namespace Repositories.Interfaces
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(string id);
         Task<bool> UserExistsAsync(string id);
-        Task<User?> GetByIdAsync(string id);
-        Task<User?> GetParentByStudentIdAsync(string studentId);
     }
 }

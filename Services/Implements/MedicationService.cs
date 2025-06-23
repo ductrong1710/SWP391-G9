@@ -1,6 +1,7 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces;
+using Services.interfaces;
+using Services.Interfaces; // Add this using directive
 
 namespace Services.implements
 {
@@ -54,6 +55,7 @@ namespace Services.implements
         {
             if (!await _medicationRepository.MedicationExistsAsync(id))
                 throw new KeyNotFoundException("Medication not found");
+
             await _medicationRepository.DeleteMedicationAsync(id);
         }
     }

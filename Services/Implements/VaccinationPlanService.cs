@@ -1,6 +1,7 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces;
+using Services.interfaces;
+using Services.Interfaces; // Add this using directive
 
 namespace Services.implements
 {
@@ -23,9 +24,9 @@ namespace Services.implements
             return await _planRepository.GetVaccinationPlanByIdAsync(id);
         }
 
-        public async Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(string creatorID)
+        public async Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(string creatorId)
         {
-            return await _planRepository.GetVaccinationPlansByCreatorIdAsync(creatorID);
+            return await _planRepository.GetVaccinationPlansByCreatorIdAsync(creatorId);
         }
 
         public async Task<IEnumerable<VaccinationPlan>> GetUpcomingVaccinationPlansAsync()
@@ -66,11 +67,6 @@ namespace Services.implements
                 throw new InvalidOperationException("Cannot delete a vaccination plan that has associated consent forms");
 
             await _planRepository.DeleteVaccinationPlanAsync(id);
-        }
-
-        public async Task<VaccinationPlan?> GetByIdAsync(string id)
-        {
-            return await _planRepository.GetVaccinationPlanByIdAsync(id);
         }
     }
 }

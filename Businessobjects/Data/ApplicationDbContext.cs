@@ -91,7 +91,7 @@ namespace Businessobjects.Data
 
             modelBuilder.Entity<VaccinationConsentForm>()
                 .HasOne(f => f.VaccinationPlan)
-                .WithMany()
+                .WithMany(p => p.ConsentForms)
                 .HasForeignKey(f => f.VaccinationPlanID)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -103,13 +103,13 @@ namespace Businessobjects.Data
 
             modelBuilder.Entity<VaccinationResult>()
                 .HasOne(r => r.ConsentForm)
-                .WithOne()
+                .WithOne(f => f.VaccinationResult)
                 .HasForeignKey<VaccinationResult>(r => r.ConsentFormID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<VaccinationResult>()
                 .HasOne(r => r.VaccineType)
-                .WithMany()
+                .WithMany(t => t.VaccinationResults)
                 .HasForeignKey(r => r.VaccineTypeID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
@@ -135,64 +135,64 @@ namespace Businessobjects.Data
         {
             // Role seed data
             modelBuilder.Entity<Role>().HasData(
-                new Role { RoleID = "000001", RoleType = "Admin" },
-                new Role { RoleID = "000002", RoleType = "User" },
-                new Role { RoleID = "000003", RoleType = "Nurse" },
-                new Role { RoleID = "000004", RoleType = "Teacher" }
+                new Role { RoleID = "1", RoleType = "Admin" },
+                new Role { RoleID = "2", RoleType = "User" },
+                new Role { RoleID = "3", RoleType = "Nurse" },
+                new Role { RoleID = "4", RoleType = "Teacher" }
             );
 
-            // Example seed data
+            // Example seed data with fixed GUIDs
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
-                    UserID = "U00001",
+                    UserID = "c9d4c053-49b6-410c-bc78-2d54a9991870",
                     Username = "admin",
                     Password = "admin123",
-                    RoleID = "000001"
+                    RoleID = "1"
                 },
                 new User
                 {
-                    UserID = "U00002",
+                    UserID = "d8663e5e-7494-4f81-8739-6e0de1bea7ee",
                     Username = "user",
                     Password = "user123",
-                    RoleID = "000002"
+                    RoleID = "2"
                 },
                 new User
                 {
-                    UserID = "U00003",
+                    UserID = "b9e7d454-99df-4506-8c0f-3b2c33c21d12",
                     Username = "nurse",
                     Password = "nurse123",
-                    RoleID = "000003"
+                    RoleID = "3"
                 }
             );
 
             // Profile seed data
             modelBuilder.Entity<Profile>().HasData(
-                new
-                {
-                    ProfileID = "P00001",
-                    Name = "Admin User",
-                    DateOfBirth = new DateTime(1990, 1, 1),
-                    Sex = "Male",
-                    Class = "Admin Class",
-                    Phone = "1234567890",
-                    UserID = "U00001",
-                    Note = "Admin profile"
-                }
-            );
+    new
+    {
+        ProfileID = "f5b7824f-5e35-4682-98d1-0e98f8dd6b31",
+        Name = "Admin User",
+        DateOfBirth = new DateTime(1990, 1, 1),
+        Sex = "Male",
+        Class = "Admin Class",
+        Phone = "1234567890",
+        UserID = "c9d4c053-49b6-410c-bc78-2d54a9991870",
+        Note = "Admin profile"
+    }
+);
 
             // Example health record seed data
             modelBuilder.Entity<HealthRecord>().HasData(
                 new
                 {
-                    HealthRecordID = "HR0001",
-                    StudentID = "U00001",
-                    ParentID = "U00002",
+                    HealthRecordID = "a2b4c6d8-e0f2-4681-9314-123456789012",
+                    StudentID = "f5b7824f-5e35-4682-98d1-0e98f8dd6b31",
+                    ParentID = "P12345",
                     Allergies = "None",
                     ChronicDiseases = "None",
                     TreatmentHistory = "No major treatments",
-                    Eyesight = 10,
-                    Hearing = 10,
+                    Eyesight = 20,
+                    Hearing = 20,
                     VaccinationHistory = "Up to date",
                     Note = "Healthy student",
                     ParentContact = "0987654321"

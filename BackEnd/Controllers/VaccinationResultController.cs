@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -29,34 +30,28 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<VaccinationResult>> GetVaccinationResult(string id)
         {
             var result = await _resultService.GetVaccinationResultByIdAsync(id);
-
             if (result == null)
-            {
                 return NotFound();
-            }
 
-            return result;
+            return Ok(result);
         }
 
-        // GET: api/VaccinationResult/consent/5
-        [HttpGet("consent/{consentFormID}")]
-        public async Task<ActionResult<VaccinationResult>> GetVaccinationResultByConsentForm(string consentFormID)
+        // GET: api/VaccinationResult/consentform/5
+        [HttpGet("consentform/{consentFormId}")]
+        public async Task<ActionResult<VaccinationResult>> GetVaccinationResultByConsentForm(string consentFormId)
         {
-            var result = await _resultService.GetVaccinationResultByConsentFormIdAsync(consentFormID);
-
+            var result = await _resultService.GetVaccinationResultByConsentFormIdAsync(consentFormId);
             if (result == null)
-            {
                 return NotFound();
-            }
 
-            return result;
+            return Ok(result);
         }
 
-        // GET: api/VaccinationResult/vaccine-type/5
-        [HttpGet("vaccine-type/{vaccineTypeID}")]
-        public async Task<ActionResult<IEnumerable<VaccinationResult>>> GetVaccinationResultsByVaccineType(string vaccineTypeID)
+        // GET: api/VaccinationResult/vaccinetype/5
+        [HttpGet("vaccinetype/{vaccineTypeId}")]
+        public async Task<ActionResult<IEnumerable<VaccinationResult>>> GetVaccinationResultsByVaccineType(string vaccineTypeId)
         {
-            var results = await _resultService.GetVaccinationResultsByVaccineTypeAsync(vaccineTypeID);
+            var results = await _resultService.GetVaccinationResultsByVaccineTypeAsync(vaccineTypeId);
             return Ok(results);
         }
 
@@ -83,23 +78,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVaccinationResult(string id, VaccinationResult result)
         {
-            try
-            {
-                await _resultService.UpdateVaccinationResultAsync(id, result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException)
-            {
+            if (id != result.ID)
                 return BadRequest();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
 
+            await _resultService.UpdateVaccinationResultAsync(id, result);
             return NoContent();
         }
 
@@ -107,15 +89,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVaccinationResult(string id)
         {
-            try
-            {
-                await _resultService.DeleteVaccinationResultAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _resultService.DeleteVaccinationResultAsync(id);
             return NoContent();
         }
     }

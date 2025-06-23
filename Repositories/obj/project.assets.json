@@ -2821,11 +2821,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
+      "projectUniqueName": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj",
       "projectName": "Repositories",
-      "projectPath": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
+      "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj",
       "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-      "outputPath": "D:\\LEARNING\\Code\\backend\\Repositories\\obj\\",
+      "outputPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -2846,8 +2846,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
-              "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
+            "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj": {
+              "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj"
             }
           }
         }

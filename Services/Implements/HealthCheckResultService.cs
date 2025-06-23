@@ -1,6 +1,7 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces;
+using Services.interfaces;
+using Services.Interfaces; // Add this using directive
 
 namespace Services.implements
 {
@@ -27,9 +28,9 @@ namespace Services.implements
             return await _resultRepository.GetHealthCheckResultByIdAsync(id);
         }
 
-        public async Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(string consentID)
+        public async Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(string consentId)
         {
-            return await _resultRepository.GetHealthCheckResultByConsentIdAsync(consentID);
+            return await _resultRepository.GetHealthCheckResultByConsentIdAsync(consentId);
         }
 
         public async Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByCheckerAsync(string checker)
@@ -79,17 +80,23 @@ namespace Services.implements
         {
             if (id != result.ID)
                 throw new ArgumentException("ID mismatch");
+
             if (!await _resultRepository.HealthCheckResultExistsAsync(id))
                 throw new KeyNotFoundException("Health check result not found");
+
             var consentForm = await _consentFormRepository.GetConsentFormByIdAsync(result.HealthCheckConsentID);
             if (consentForm == null)
                 throw new KeyNotFoundException("Health check consent form not found");
+
             if (result.CheckUpDate > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for check-up date");
+
             if (result.ConsultationRecommended == true && !result.ConsultationAppointmentDate.HasValue)
                 throw new InvalidOperationException("Consultation appointment date is required when consultation is recommended");
+
             if (result.ConsultationAppointmentDate.HasValue && result.ConsultationAppointmentDate.Value <= DateTime.Today)
                 throw new InvalidOperationException("Consultation appointment date must be in the future");
+
             await _resultRepository.UpdateHealthCheckResultAsync(result);
         }
 
@@ -97,6 +104,7 @@ namespace Services.implements
         {
             if (!await _resultRepository.HealthCheckResultExistsAsync(id))
                 throw new KeyNotFoundException("Health check result not found");
+
             await _resultRepository.DeleteHealthCheckResultAsync(id);
         }
     }

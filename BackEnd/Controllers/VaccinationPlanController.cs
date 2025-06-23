@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -29,20 +30,17 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<VaccinationPlan>> GetVaccinationPlan(string id)
         {
             var plan = await _planService.GetVaccinationPlanByIdAsync(id);
-
             if (plan == null)
-            {
                 return NotFound();
-            }
 
-            return plan;
+            return Ok(plan);
         }
 
         // GET: api/VaccinationPlan/creator/5
-        [HttpGet("creator/{creatorID}")]
-        public async Task<ActionResult<IEnumerable<VaccinationPlan>>> GetVaccinationPlansByCreator(string creatorID)
+        [HttpGet("creator/{creatorId}")]
+        public async Task<ActionResult<IEnumerable<VaccinationPlan>>> GetVaccinationPlansByCreator(string creatorId)
         {
-            var plans = await _planService.GetVaccinationPlansByCreatorIdAsync(creatorID);
+            var plans = await _planService.GetVaccinationPlansByCreatorIdAsync(creatorId);
             return Ok(plans);
         }
 
@@ -58,27 +56,25 @@ namespace BackEnd.Controllers
         [HttpPost]
         public async Task<ActionResult<VaccinationPlan>> CreateVaccinationPlan(VaccinationPlan plan)
         {
-            var createdPlan = await _planService.CreateVaccinationPlanAsync(plan);
-            return CreatedAtAction(nameof(GetVaccinationPlan), new { id = createdPlan.ID }, createdPlan);
+            try
+            {
+                var createdPlan = await _planService.CreateVaccinationPlanAsync(plan);
+                return CreatedAtAction(nameof(GetVaccinationPlan), new { id = createdPlan.ID }, createdPlan);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT: api/VaccinationPlan/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVaccinationPlan(string id, VaccinationPlan plan)
         {
-            try
-            {
-                await _planService.UpdateVaccinationPlanAsync(id, plan);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != plan.ID)
                 return BadRequest();
-            }
 
+            await _planService.UpdateVaccinationPlanAsync(id, plan);
             return NoContent();
         }
 
@@ -86,15 +82,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVaccinationPlan(string id)
         {
-            try
-            {
-                await _planService.DeleteVaccinationPlanAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _planService.DeleteVaccinationPlanAsync(id);
             return NoContent();
         }
     }

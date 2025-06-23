@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -26,14 +27,11 @@ namespace BackEnd.Controllers
 
         // GET: api/MedicalSupply/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MedicalSupply>> GetMedicalSupply(string id)
+        public async Task<ActionResult<MedicalSupply>> GetSupply(string id)
         {
             var supply = await _service.GetSupplyByIdAsync(id);
-
             if (supply == null)
-            {
                 return NotFound();
-            }
 
             return Ok(supply);
         }
@@ -43,42 +41,25 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<MedicalSupply>> PostMedicalSupply(MedicalSupply supply)
         {
             var createdSupply = await _service.AddSupplyAsync(supply);
-            return CreatedAtAction(nameof(GetMedicalSupply), new { id = createdSupply.SupplyID }, createdSupply);
+            return CreatedAtAction(nameof(GetSupply), new { id = createdSupply.SupplyID }, createdSupply);
         }
 
         // PUT: api/MedicalSupply/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMedicalSupply(string id, MedicalSupply supply)
+        public async Task<IActionResult> UpdateSupply(string id, MedicalSupply supply)
         {
-            try
-            {
-                await _service.UpdateSupplyAsync(id, supply);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != supply.SupplyID)
                 return BadRequest();
-            }
 
+            await _service.UpdateSupplyAsync(id, supply);
             return NoContent();
         }
 
         // DELETE: api/MedicalSupply/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMedicalSupply(string id)
+        public async Task<IActionResult> DeleteSupply(string id)
         {
-            try
-            {
-                await _service.DeleteSupplyAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _service.DeleteSupplyAsync(id);
             return NoContent();
         }
     }

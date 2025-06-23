@@ -5,6 +5,7 @@ using Repositories.Implements;
 using Repositories.Interfaces;
 using Services;
 using Services.Interfaces;
+using Services.interfaces;
 using Services.implements;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,21 +31,20 @@ builder.Services.AddScoped<IVaccinationConsentFormRepository, VaccinationConsent
 builder.Services.AddScoped<IVaccinationResultRepository, VaccinationResultRepository>();
 
 // Register services
-builder.Services.AddScoped<Services.Interfaces.IUserService, UserService>();
-builder.Services.AddScoped<Services.Interfaces.IProfileService, ProfileService>();
-builder.Services.AddScoped<Services.Interfaces.IHealthRecordService, HealthRecordService>();
-builder.Services.AddScoped<Services.Interfaces.IMedicalSupplyService, MedicalSupplyService>();
-builder.Services.AddScoped<Services.Interfaces.IMedicationService, MedicationService>();
-builder.Services.AddScoped<Services.Interfaces.IMedicationSubmissionFormService, MedicationSubmissionFormService>();
-builder.Services.AddScoped<Services.Interfaces.IRoleService, RoleService>();
-builder.Services.AddScoped<Services.Interfaces.IPeriodicHealthCheckPlanService, PeriodicHealthCheckPlanService>();
-builder.Services.AddScoped<Services.Interfaces.IHealthCheckConsentFormService, HealthCheckConsentFormService>();
-builder.Services.AddScoped<Services.Interfaces.IHealthCheckResultService, HealthCheckResultService>();
-builder.Services.AddScoped<Services.Interfaces.IVaccineTypeService, VaccineTypeService>();
-builder.Services.AddScoped<Services.Interfaces.IVaccinationPlanService, VaccinationPlanService>();
-builder.Services.AddScoped<Services.Interfaces.IVaccinationConsentFormService, VaccinationConsentFormService>();
-builder.Services.AddScoped<Services.Interfaces.IVaccinationResultService, VaccinationResultService>();
-builder.Services.AddScoped<Services.Interfaces.IAuthService, Services.Implements.AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IHealthRecordService, HealthRecordService>();
+builder.Services.AddScoped<IMedicalSupplyService, MedicalSupplyService>();
+builder.Services.AddScoped<IMedicationService, MedicationService>();
+builder.Services.AddScoped<IMedicationSubmissionFormService, MedicationSubmissionFormService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IPeriodicHealthCheckPlanService, PeriodicHealthCheckPlanService>();
+builder.Services.AddScoped<IHealthCheckConsentFormService, HealthCheckConsentFormService>();
+builder.Services.AddScoped<IHealthCheckResultService, HealthCheckResultService>();
+builder.Services.AddScoped<IVaccineTypeService, VaccineTypeService>();
+builder.Services.AddScoped<IVaccinationPlanService, VaccinationPlanService>();
+builder.Services.AddScoped<IVaccinationConsentFormService, VaccinationConsentFormService>();
+builder.Services.AddScoped<IVaccinationResultService, VaccinationResultService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

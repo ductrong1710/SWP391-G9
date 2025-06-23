@@ -6,7 +6,7 @@ namespace Services.Interfaces
     {
         Task<IEnumerable<HealthCheckResult>> GetAllHealthCheckResultsAsync();
         Task<HealthCheckResult?> GetHealthCheckResultByIdAsync(string id);
-        Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(string consentID);
+        Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(string consentId);
         Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByCheckerAsync(string checker);
         Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<IEnumerable<HealthCheckResult>> GetPendingConsultationsAsync();

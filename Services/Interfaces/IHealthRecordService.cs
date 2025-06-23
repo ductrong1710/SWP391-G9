@@ -6,7 +6,7 @@ namespace Services.Interfaces
     {
         Task<IEnumerable<HealthRecord>> GetAllHealthRecordsAsync();
         Task<HealthRecord?> GetHealthRecordByIdAsync(string id);
-        Task<HealthRecord?> GetHealthRecordByStudentIdAsync(string studentID);
+        Task<HealthRecord?> GetHealthRecordByStudentIdAsync(string studentId);
         Task<HealthRecord> CreateHealthRecordAsync(HealthRecord healthRecord);
         Task UpdateHealthRecordAsync(string id, HealthRecord healthRecord);
         Task DeleteHealthRecordAsync(string id);

@@ -1,6 +1,7 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces;
+using Services.interfaces;
+using Services.Interfaces; // Add this using directive
 
 namespace Services.implements
 {
@@ -23,9 +24,9 @@ namespace Services.implements
             return await _repository.GetFormByIdAsync(id);
         }
 
-        public async Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(string studentID)
+        public async Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(string studentId)
         {
-            return await _repository.GetFormsByStudentIdAsync(studentID);
+            return await _repository.GetFormsByStudentIdAsync(studentId);
         }
 
         public async Task<MedicationSubmissionForm> CreateFormAsync(MedicationSubmissionForm form)

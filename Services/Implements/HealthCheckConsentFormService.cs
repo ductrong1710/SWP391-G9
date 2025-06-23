@@ -1,6 +1,7 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces;
+using Services.interfaces;
+using Services.Interfaces; // Add this using directive
 
 namespace Services.implements
 {
@@ -23,19 +24,19 @@ namespace Services.implements
             return await _consentFormRepository.GetConsentFormByIdAsync(id);
         }
 
-        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(string planID)
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(string planId)
         {
-            return await _consentFormRepository.GetConsentFormsByPlanIdAsync(planID);
+            return await _consentFormRepository.GetConsentFormsByPlanIdAsync(planId);
         }
 
-        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(string studentID)
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(string studentId)
         {
-            return await _consentFormRepository.GetConsentFormsByStudentIdAsync(studentID);
+            return await _consentFormRepository.GetConsentFormsByStudentIdAsync(studentId);
         }
 
-        public async Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(string planID, string studentID)
+        public async Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(string planId, string studentId)
         {
-            return await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(planID, studentID);
+            return await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(planId, studentId);
         }
 
         public async Task<HealthCheckConsentForm> CreateConsentFormAsync(HealthCheckConsentForm form)

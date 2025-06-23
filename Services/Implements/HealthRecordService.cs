@@ -23,9 +23,9 @@ namespace Services.implements
             return await _healthRecordRepository.GetHealthRecordByIdAsync(id);
         }
 
-        public async Task<HealthRecord?> GetHealthRecordByStudentIdAsync(string studentID)
+        public async Task<HealthRecord?> GetHealthRecordByStudentIdAsync(string studentId)
         {
-            return await _healthRecordRepository.GetHealthRecordByStudentIdAsync(studentID);
+            return await _healthRecordRepository.GetHealthRecordByStudentIdAsync(studentId);
         }
 
         public async Task<HealthRecord> CreateHealthRecordAsync(HealthRecord healthRecord)

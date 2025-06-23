@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -28,30 +29,38 @@ namespace BackEnd.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<HealthCheckConsentForm>> GetConsentForm(string id)
         {
-            var form = await _consentFormService.GetConsentFormByIdAsync(id);
-
-            if (form == null)
-            {
+            var consentForm = await _consentFormService.GetConsentFormByIdAsync(id);
+            if (consentForm == null)
                 return NotFound();
-            }
 
-            return form;
+            return Ok(consentForm);
         }
 
         // GET: api/HealthCheckConsentForm/plan/5
-        [HttpGet("plan/{planID}")]
-        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByPlan(string planID)
+        [HttpGet("plan/{planId}")]
+        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByPlan(string planId)
         {
-            var forms = await _consentFormService.GetConsentFormsByPlanIdAsync(planID);
-            return Ok(forms);
+            var consentForms = await _consentFormService.GetConsentFormsByPlanIdAsync(planId);
+            return Ok(consentForms);
         }
 
         // GET: api/HealthCheckConsentForm/student/5
-        [HttpGet("student/{studentID}")]
-        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByStudent(string studentID)
+        [HttpGet("student/{studentId}")]
+        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByStudent(string studentId)
         {
-            var forms = await _consentFormService.GetConsentFormsByStudentIdAsync(studentID);
-            return Ok(forms);
+            var consentForms = await _consentFormService.GetConsentFormsByStudentIdAsync(studentId);
+            return Ok(consentForms);
+        }
+
+        // GET: api/HealthCheckConsentForm/plan/5/student/5
+        [HttpGet("plan/{planId}/student/{studentId}")]
+        public async Task<ActionResult<HealthCheckConsentForm>> GetConsentFormByPlanAndStudent(string planId, string studentId)
+        {
+            var consentForm = await _consentFormService.GetConsentFormByPlanAndStudentAsync(planId, studentId);
+            if (consentForm == null)
+                return NotFound();
+
+            return Ok(consentForm);
         }
 
         // POST: api/HealthCheckConsentForm
@@ -71,21 +80,12 @@ namespace BackEnd.Controllers
 
         // PUT: api/HealthCheckConsentForm/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateConsentForm(string id, HealthCheckConsentForm form)
+        public async Task<IActionResult> UpdateConsentForm(string id, HealthCheckConsentForm consentForm)
         {
-            try
-            {
-                await _consentFormService.UpdateConsentFormAsync(id, form);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != consentForm.ID)
                 return BadRequest();
-            }
 
+            await _consentFormService.UpdateConsentFormAsync(id, consentForm);
             return NoContent();
         }
 
@@ -93,15 +93,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConsentForm(string id)
         {
-            try
-            {
-                await _consentFormService.DeleteConsentFormAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _consentFormService.DeleteConsentFormAsync(id);
             return NoContent();
         }
     }

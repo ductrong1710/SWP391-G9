@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -29,13 +30,10 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<Medication>> GetMedication(string id)
         {
             var medication = await _medicationService.GetMedicationByIdAsync(id);
-
             if (medication == null)
-            {
                 return NotFound();
-            }
 
-            return medication;
+            return Ok(medication);
         }
 
         // GET: api/Medication/expired
@@ -66,19 +64,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMedication(string id, Medication medication)
         {
-            try
-            {
-                await _medicationService.UpdateMedicationAsync(id, medication);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != medication.MedicationID)
                 return BadRequest();
-            }
 
+            await _medicationService.UpdateMedicationAsync(id, medication);
             return NoContent();
         }
 
@@ -86,15 +75,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMedication(string id)
         {
-            try
-            {
-                await _medicationService.DeleteMedicationAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _medicationService.DeleteMedicationAsync(id);
             return NoContent();
         }
     }

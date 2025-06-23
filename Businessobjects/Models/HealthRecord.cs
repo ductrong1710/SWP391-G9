@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Businessobjects.Models
 {
+    [Table("Health_Record")]
     public class HealthRecord
     {
         [Key]

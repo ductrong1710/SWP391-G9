@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
-using Services;
 using Services.Interfaces;
 
 namespace BackEnd.Controllers
@@ -29,27 +28,21 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<HealthRecord>> GetHealthRecord(string id)
         {
             var healthRecord = await _healthRecordService.GetHealthRecordByIdAsync(id);
-
             if (healthRecord == null)
-            {
                 return NotFound();
-            }
 
-            return healthRecord;
+            return Ok(healthRecord);
         }
 
         // GET: api/HealthRecord/student/5
-        [HttpGet("student/{studentID}")]
-        public async Task<ActionResult<HealthRecord>> GetHealthRecordByStudentId(string studentID)
+        [HttpGet("student/{studentId}")]
+        public async Task<ActionResult<HealthRecord>> GetHealthRecordByStudent(string studentId)
         {
-            var healthRecord = await _healthRecordService.GetHealthRecordByStudentIdAsync(studentID);
-
+            var healthRecord = await _healthRecordService.GetHealthRecordByStudentIdAsync(studentId);
             if (healthRecord == null)
-            {
                 return NotFound();
-            }
 
-            return healthRecord;
+            return Ok(healthRecord);
         }
 
         // POST: api/HealthRecord
@@ -64,19 +57,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateHealthRecord(string id, HealthRecord healthRecord)
         {
-            try
-            {
-                await _healthRecordService.UpdateHealthRecordAsync(id, healthRecord);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != healthRecord.HealthRecordID)
                 return BadRequest();
-            }
 
+            await _healthRecordService.UpdateHealthRecordAsync(id, healthRecord);
             return NoContent();
         }
 
@@ -84,15 +68,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteHealthRecord(string id)
         {
-            try
-            {
-                await _healthRecordService.DeleteHealthRecordAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _healthRecordService.DeleteHealthRecordAsync(id);
             return NoContent();
         }
     }

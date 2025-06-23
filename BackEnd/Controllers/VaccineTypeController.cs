@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
+using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -29,13 +30,10 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<VaccineType>> GetVaccineType(string id)
         {
             var vaccineType = await _vaccineTypeService.GetVaccineTypeByIdAsync(id);
-
             if (vaccineType == null)
-            {
                 return NotFound();
-            }
 
-            return vaccineType;
+            return Ok(vaccineType);
         }
 
         // POST: api/VaccineType
@@ -57,23 +55,10 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVaccineType(string id, VaccineType vaccineType)
         {
-            try
-            {
-                await _vaccineTypeService.UpdateVaccineTypeAsync(id, vaccineType);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-            catch (ArgumentException)
-            {
+            if (id != vaccineType.VaccinationID)
                 return BadRequest();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
 
+            await _vaccineTypeService.UpdateVaccineTypeAsync(id, vaccineType);
             return NoContent();
         }
 
@@ -81,15 +66,7 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVaccineType(string id)
         {
-            try
-            {
-                await _vaccineTypeService.DeleteVaccineTypeAsync(id);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-
+            await _vaccineTypeService.DeleteVaccineTypeAsync(id);
             return NoContent();
         }
     }

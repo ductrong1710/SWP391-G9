@@ -89,7 +89,7 @@ const Login = () => {
       </button>
       
       <div className="left-panel">
-        <div className="logo">
+        <div className="logo" style={{ marginTop: '64px' }}>
           <img src="/assets/healthconnect-logo.svg" alt="Logo" style={{ height: '72px', marginBottom: '16px' }} />
         </div>
         <div className="welcome-title">Chào mừng</div>

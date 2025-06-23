@@ -135,45 +135,6 @@ const Login = () => {
           {error && <div className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
           <Link to="/forgot-password" className="forgot-link">Quên tên đăng nhập hoặc mật khẩu?</Link>          <button type="submit" className="submit-btn">Đăng nhập</button>
           <Link to="/register" className="create-link">Chưa có tài khoản? Tạo tài khoản ngay.</Link>
-          
-          {/* Test Accounts Section */}
-          <div className="test-accounts">
-            <p style={{ textAlign: 'center', marginTop: '15px', fontWeight: 'bold' }}>Tài khoản thử nghiệm:</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginTop: '10px' }}>
-              <button 
-                type="button" 
-                className="test-account-btn" 
-                onClick={() => setCredentials({ username: 'admin', password: '123456' })}
-              >
-                Admin
-              </button>
-              <button 
-                type="button" 
-                className="test-account-btn" 
-                onClick={() => setCredentials({ username: 'doctor', password: '123456' })}
-              >
-                Bác sĩ
-              </button>
-              <button 
-                type="button" 
-                className="test-account-btn" 
-                onClick={() => setCredentials({ username: 'teacher', password: '123456' })}
-              >
-                Giáo viên
-              </button>
-              <button 
-                type="button" 
-                className="test-account-btn" 
-                onClick={() => setCredentials({ username: 'student', password: '123456' })}
-              >
-                Học sinh
-              </button>
-            </div>
-            <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '10px', color: '#666' }}>
-              Mật khẩu cho tất cả tài khoản: 123456
-            </p>
-          </div>
-          
           <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.95rem', color: '#555' }}>
             Hỗ trợ trực tuyến có thể được tìm thấy trong <Link to="/help" className="support-link">Trợ giúp tài khoản</Link>.
           </div>

@@ -6,24 +6,25 @@ namespace Businessobjects.Models
     public class HealthCheckResult
     {
         [Key]
-        public int Id { get; set; }
-
-        public int HealthCheckConsentId { get; set; }
-        [ForeignKey("HealthCheckConsentId")]
-        public required HealthCheckConsentForm HealthCheckConsent { get; set; }
-
-        public decimal Height { get; set; }
-        public decimal Weight { get; set; }
-        public required string BloodPressure { get; set; }
-        public int HeartRate { get; set; }
-        public required string Eyesight { get; set; }
-        public required string Hearing { get; set; }
-        public required string OralHealth { get; set; }
-        public required string Spine { get; set; }
-        public required string Conclusion { get; set; }
-        public DateTime CheckUpDate { get; set; }
-        public required string Checker { get; set; }
-        public bool ConsultationRecommended { get; set; }
+        [Column("ID")]
+        public string ID { get; set; } = null!;
+        [Required]
+        [Column("HealthCheckConsentID")]
+        public string HealthCheckConsentID { get; set; } = null!;
+        [ForeignKey("HealthCheckConsentID")]
+        public HealthCheckConsentForm? HealthCheckConsent { get; set; }
+        public int? Height { get; set; }
+        public int? Weight { get; set; }
+        public int? BloodPressure { get; set; }
+        public int? HeartRate { get; set; }
+        public string? Eyesight { get; set; }
+        public string? Hearing { get; set; }
+        public string? OralHealth { get; set; }
+        public string? Spine { get; set; }
+        public string? Conclusion { get; set; }
+        public DateTime? CheckUpDate { get; set; }
+        public string? Checker { get; set; }
+        public bool? ConsultationRecommended { get; set; }
         public DateTime? ConsultationAppointmentDate { get; set; }
     }
 }

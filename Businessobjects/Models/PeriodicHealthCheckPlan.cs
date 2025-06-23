@@ -6,15 +6,18 @@ namespace Businessobjects.Models
     public class PeriodicHealthCheckPlan
     {
         [Key]
-        public int Id { get; set; }
-        public required string PlanName { get; set; }
-        public required DateTime ScheduleDate { get; set; }
-        public required string CheckupContent { get; set; }
-        public required string Status { get; set; }
-        
-        public Guid CreatorId { get; set; }
-        [ForeignKey("CreatorId")]
-        public required User Creator { get; set; }
+        [Column("ID")]
+        public string ID { get; set; } = null!;
+        [Required]
+        public string PlanName { get; set; } = null!;
+        public DateTime? ScheduleDate { get; set; }
+        public string? CheckupContent { get; set; }
+        public string? Status { get; set; }
+        [Required]
+        [Column("CreatorID")]
+        public string CreatorID { get; set; } = null!;
+        [ForeignKey("CreatorID")]
+        public User? Creator { get; set; }
         
         public virtual ICollection<HealthCheckConsentForm>? ConsentForms { get; set; }
     }

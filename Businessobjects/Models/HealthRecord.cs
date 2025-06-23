@@ -5,20 +5,29 @@ namespace Businessobjects.Models
 {
     public class HealthRecord
     {
-        public Guid HealthRecordId { get; set; }
-        
-        public Guid StudentId { get; set; }
-        [ForeignKey("StudentId")]
-        public required Profile Student { get; set; }
-        
-        public required string ParentId { get; set; }
+        [Key]
+        [Column("HealthRecordID")]
+        public string HealthRecordID { get; set; } = null!;
+        [Required]
+        [Column("StudentID")]
+        public string StudentID { get; set; } = null!;
+        [ForeignKey("StudentID")]
+        public User? Student { get; set; }
+        [Required]
+        [Column("ParentID")]
+        public string ParentID { get; set; } = null!;
+        [ForeignKey("ParentID")]
+        public User? Parent { get; set; }
         public string? Allergies { get; set; }
+        [Column("Chronic_Diseases")]
         public string? ChronicDiseases { get; set; }
+        [Column("Treatment_History")]
         public string? TreatmentHistory { get; set; }
-        public string? Eyesight { get; set; }
-        public string? Hearing { get; set; }
+        public int? Eyesight { get; set; }
+        public int? Hearing { get; set; }
+        [Column("Vaccination_History")]
         public string? VaccinationHistory { get; set; }
         public string? Note { get; set; }
-        public required string ParentContact { get; set; }
+        public string? ParentContact { get; set; }
     }
 }

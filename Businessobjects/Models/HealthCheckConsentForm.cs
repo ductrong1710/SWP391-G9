@@ -6,19 +6,25 @@ namespace Businessobjects.Models
     public class HealthCheckConsentForm
     {
         [Key]
-        public int Id { get; set; }
-        
-        public int HealthCheckPlanId { get; set; }
-        [ForeignKey("HealthCheckPlanId")]
-        public required PeriodicHealthCheckPlan HealthCheckPlan { get; set; }
-        
-        public Guid StudentId { get; set; }
-        [ForeignKey("StudentId")]
-        public required Profile Student { get; set; }
-        
-        public required string ParentId { get; set; }
-        public required string ConsentStatus { get; set; }
-        public DateTime ResponseTime { get; set; }
+        [Column("ID")]
+        public string ID { get; set; } = null!;
+        [Required]
+        [Column("HealthCheckPlanID")]
+        public string HealthCheckPlanID { get; set; } = null!;
+        [ForeignKey("HealthCheckPlanID")]
+        public PeriodicHealthCheckPlan? HealthCheckPlan { get; set; }
+        [Required]
+        [Column("StudentID")]
+        public string StudentID { get; set; } = null!;
+        [ForeignKey("StudentID")]
+        public User? Student { get; set; }
+        [Required]
+        [Column("ParentID")]
+        public string ParentID { get; set; } = null!;
+        [ForeignKey("ParentID")]
+        public User? Parent { get; set; }
+        public string? ConsentStatus { get; set; }
+        public DateTime? ResponseTime { get; set; }
         public string? ReasonForDenial { get; set; }
     }
 }

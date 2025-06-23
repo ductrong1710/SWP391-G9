@@ -6,18 +6,28 @@ namespace Businessobjects.Models
     public class MedicationSubmissionForm
     {
         [Key]
-        public int Id { get; set; }
-        public Guid StudentId { get; set; }
-        [ForeignKey("StudentId")]
-        public required Profile Student { get; set; }
-        public required string ParentId { get; set; }
-        public required string MedicationName { get; set; }
-        public required string Dosage { get; set; }
-        public required string Instructions { get; set; }
-        public required string ConsumptionTime { get; set; }
-        public required DateTime StartDate { get; set; }
-        public required DateTime EndDate { get; set; }
-        public required string Status { get; set; }
+        [Column("ID")]
+        public string ID { get; set; } = null!;
+        [Required]
+        [Column("StudentID")]
+        public string StudentID { get; set; } = null!;
+        [ForeignKey("StudentID")]
+        public User? Student { get; set; }
+        [Required]
+        [Column("ParentID")]
+        public string ParentID { get; set; } = null!;
+        [ForeignKey("ParentID")]
+        public User? Parent { get; set; }
+        [Column("Medication_Name")]
+        public string? MedicationName { get; set; }
+        public string? Dosage { get; set; }
+        public string? Instructions { get; set; }
+        [Column("Consumption_Time")]
+        public string? ConsumptionTime { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? Status { get; set; }
+        [Column("Parents_Note")]
         public string? ParentsNote { get; set; }
     }
 }

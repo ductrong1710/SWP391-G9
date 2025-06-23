@@ -5,17 +5,21 @@ namespace Businessobjects.Models
 {
     public class Profile
     {
-        public Guid ProfileId { get; set; }
-        public required string Name { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public required string Sex { get; set; }
-        public required string Class { get; set; }
-        public required string Phone { get; set; }
-        
-        public Guid UserId { get; set; }
-        [ForeignKey("UserId")]
-        public required User User { get; set; }
-        
+        [Key]
+        [Column("ProfileID")]
+        public string ProfileID { get; set; } = null!;
+        [Required]
+        public string Name { get; set; } = null!;
+        [Column("Date_Of_Birth")]
+        public DateTime? DateOfBirth { get; set; }
+        public string? Sex { get; set; }
+        public string? Class { get; set; }
+        public string? Phone { get; set; }
+        [Required]
+        [Column("UserID")]
+        public string UserID { get; set; } = null!;
+        [ForeignKey("UserID")]
+        public User? User { get; set; }
         public string? Note { get; set; }
     }
 }

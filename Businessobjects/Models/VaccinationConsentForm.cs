@@ -6,19 +6,25 @@ namespace Businessobjects.Models
     public class VaccinationConsentForm
     {
         [Key]
-        public int Id { get; set; }
-        
-        public int VaccinationPlanId { get; set; }
-        [ForeignKey("VaccinationPlanId")]
-        public required VaccinationPlan VaccinationPlan { get; set; }
-        
-        public Guid StudentId { get; set; }
-        [ForeignKey("StudentId")]
-        public required Profile Student { get; set; }
-        
-        public required string ParentId { get; set; }
-        public required string ConsentStatus { get; set; }
-        public DateTime ResponseTime { get; set; }
+        [Column("ID")]
+        public string ID { get; set; } = null!;
+        [Required]
+        [Column("VaccinationPlanID")]
+        public string VaccinationPlanID { get; set; } = null!;
+        [ForeignKey("VaccinationPlanID")]
+        public VaccinationPlan? VaccinationPlan { get; set; }
+        [Required]
+        [Column("StudentID")]
+        public string StudentID { get; set; } = null!;
+        [ForeignKey("StudentID")]
+        public User? Student { get; set; }
+        [Required]
+        [Column("ParentID")]
+        public string ParentID { get; set; } = null!;
+        [ForeignKey("ParentID")]
+        public User? Parent { get; set; }
+        public string? ConsentStatus { get; set; }
+        public DateTime? ResponseTime { get; set; }
         public string? ReasonForDenial { get; set; }
         
         public virtual VaccinationResult? VaccinationResult { get; set; }

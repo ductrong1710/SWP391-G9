@@ -6,15 +6,18 @@ namespace Businessobjects.Models
     public class VaccinationPlan
     {
         [Key]
-        public int Id { get; set; }
-        public required string PlanName { get; set; }
-        public required DateTime ScheduledDate { get; set; }
+        [Column("ID")]
+        public string ID { get; set; } = null!;
+        [Required]
+        public string PlanName { get; set; } = null!;
+        public DateTime? ScheduledDate { get; set; }
         public string? Description { get; set; }
-        public required string Status { get; set; }
-        
-        public Guid CreatorId { get; set; }
-        [ForeignKey("CreatorId")]
-        public required User Creator { get; set; }
+        public string? Status { get; set; }
+        [Required]
+        [Column("CreatorID")]
+        public string CreatorID { get; set; } = null!;
+        [ForeignKey("CreatorID")]
+        public User? Creator { get; set; }
         
         public virtual ICollection<VaccinationConsentForm>? ConsentForms { get; set; }
     }

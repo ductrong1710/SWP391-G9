@@ -24,24 +24,24 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<HealthCheckResult?> GetHealthCheckResultByIdAsync(int id)
+        public async Task<HealthCheckResult?> GetHealthCheckResultByIdAsync(string id)
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
                     .ThenInclude(c => c.Student)
                 .Include(r => r.HealthCheckConsent)
                     .ThenInclude(c => c.HealthCheckPlan)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.ID == id);
         }
 
-        public async Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(int consentId)
+        public async Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(string consentId)
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
                     .ThenInclude(c => c.Student)
                 .Include(r => r.HealthCheckConsent)
                     .ThenInclude(c => c.HealthCheckPlan)
-                .FirstOrDefaultAsync(r => r.HealthCheckConsentId == consentId);
+                .FirstOrDefaultAsync(r => r.HealthCheckConsentID == consentId);
         }
 
         public async Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByCheckerAsync(string checker)
@@ -75,7 +75,7 @@ namespace Repositories.Implements
                     .ThenInclude(c => c.Student)
                 .Include(r => r.HealthCheckConsent)
                     .ThenInclude(c => c.HealthCheckPlan)
-                .Where(r => r.ConsultationRecommended && r.ConsultationAppointmentDate >= DateTime.Today)
+                .Where(r => r.ConsultationRecommended == true && r.ConsultationAppointmentDate >= DateTime.Today)
                 .OrderBy(r => r.ConsultationAppointmentDate)
                 .ToListAsync();
         }
@@ -92,7 +92,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteHealthCheckResultAsync(int id)
+        public async Task DeleteHealthCheckResultAsync(string id)
         {
             var result = await GetHealthCheckResultByIdAsync(id);
             if (result != null)
@@ -102,14 +102,14 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> HealthCheckResultExistsAsync(int id)
+        public async Task<bool> HealthCheckResultExistsAsync(string id)
         {
-            return await _context.HealthCheckResults.AnyAsync(r => r.Id == id);
+            return await _context.HealthCheckResults.AnyAsync(r => r.ID == id);
         }
 
-        public async Task<bool> HasResultForConsentAsync(int consentId)
+        public async Task<bool> HasResultForConsentAsync(string consentId)
         {
-            return await _context.HealthCheckResults.AnyAsync(r => r.HealthCheckConsentId == consentId);
+            return await _context.HealthCheckResults.AnyAsync(r => r.HealthCheckConsentID == consentId);
         }
     }
 }

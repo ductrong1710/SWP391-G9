@@ -17,5 +17,13 @@ namespace Businessobjects.Models
         public string RoleID { get; set; } = null!;
         [ForeignKey("RoleID")]
         public Role? Role { get; set; }
+
+        // Bổ sung quan hệ cha-con nếu chưa có
+        [InverseProperty("Parent")]
+        public virtual ICollection<User> Children { get; set; } = new List<User>();
+
+        [ForeignKey("ParentId")]
+        [InverseProperty("Children")]
+        public virtual User? Parent { get; set; }
     }
 }

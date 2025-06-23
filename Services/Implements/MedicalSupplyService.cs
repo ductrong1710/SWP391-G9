@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,7 +18,7 @@ namespace Services.implements
             return await _repository.GetAllSuppliesAsync();
         }
 
-        public async Task<MedicalSupply?> GetSupplyByIdAsync(int id)
+        public async Task<MedicalSupply?> GetSupplyByIdAsync(string id)
         {
             return await _repository.GetSupplyByIdAsync(id);
         }
@@ -29,7 +28,7 @@ namespace Services.implements
             return await _repository.AddSupplyAsync(supply);
         }
 
-        public async Task UpdateSupplyAsync(int id, MedicalSupply supply)
+        public async Task UpdateSupplyAsync(string id, MedicalSupply supply)
         {
             if (id != supply.SupplyID)
             {
@@ -45,7 +44,7 @@ namespace Services.implements
             await _repository.UpdateSupplyAsync(supply);
         }
 
-        public async Task DeleteSupplyAsync(int id)
+        public async Task DeleteSupplyAsync(string id)
         {
             var exists = await _repository.SupplyExistsAsync(id);
             if (!exists)

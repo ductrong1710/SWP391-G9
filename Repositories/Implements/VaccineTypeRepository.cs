@@ -21,11 +21,11 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<VaccineType?> GetVaccineTypeByIdAsync(int id)
+        public async Task<VaccineType?> GetVaccineTypeByIdAsync(string id)
         {
             return await _context.VaccinationTypes
                 .Include(v => v.VaccinationResults)
-                .FirstOrDefaultAsync(v => v.VaccinationId == id);
+                .FirstOrDefaultAsync(v => v.VaccinationID == id);
         }
 
         public async Task CreateVaccineTypeAsync(VaccineType vaccineType)
@@ -40,7 +40,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteVaccineTypeAsync(int id)
+        public async Task DeleteVaccineTypeAsync(string id)
         {
             var vaccineType = await GetVaccineTypeByIdAsync(id);
             if (vaccineType != null)
@@ -50,9 +50,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> VaccineTypeExistsAsync(int id)
+        public async Task<bool> VaccineTypeExistsAsync(string id)
         {
-            return await _context.VaccinationTypes.AnyAsync(v => v.VaccinationId == id);
+            return await _context.VaccinationTypes.AnyAsync(v => v.VaccinationID == id);
         }
 
         public async Task<bool> VaccineTypeExistsByNameAsync(string name)

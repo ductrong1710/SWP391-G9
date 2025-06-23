@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/PeriodicHealthCheckPlan/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PeriodicHealthCheckPlan>> GetPlan(int id)
+        public async Task<ActionResult<PeriodicHealthCheckPlan>> GetPlan(string id)
         {
             var plan = await _planService.GetPlanByIdAsync(id);
 
@@ -40,10 +39,10 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/PeriodicHealthCheckPlan/creator/5
-        [HttpGet("creator/{creatorId}")]
-        public async Task<ActionResult<IEnumerable<PeriodicHealthCheckPlan>>> GetPlansByCreator(Guid creatorId)
+        [HttpGet("creator/{creatorID}")]
+        public async Task<ActionResult<IEnumerable<PeriodicHealthCheckPlan>>> GetPlansByCreator(string creatorID)
         {
-            var plans = await _planService.GetPlansByCreatorIdAsync(creatorId);
+            var plans = await _planService.GetPlansByCreatorIdAsync(creatorID);
             return Ok(plans);
         }
 
@@ -60,12 +59,12 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<PeriodicHealthCheckPlan>> CreatePlan(PeriodicHealthCheckPlan plan)
         {
             var createdPlan = await _planService.CreatePlanAsync(plan);
-            return CreatedAtAction(nameof(GetPlan), new { id = createdPlan.Id }, createdPlan);
+            return CreatedAtAction(nameof(GetPlan), new { id = createdPlan.ID }, createdPlan);
         }
 
         // PUT: api/PeriodicHealthCheckPlan/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePlan(int id, PeriodicHealthCheckPlan plan)
+        public async Task<IActionResult> UpdatePlan(string id, PeriodicHealthCheckPlan plan)
         {
             try
             {
@@ -85,7 +84,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/PeriodicHealthCheckPlan/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlan(int id)
+        public async Task<IActionResult> DeletePlan(string id)
         {
             try
             {

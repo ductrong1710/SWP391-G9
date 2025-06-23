@@ -1,14 +1,14 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IMedicationSubmissionFormService
     {
         Task<IEnumerable<MedicationSubmissionForm>> GetAllFormsAsync();
-        Task<MedicationSubmissionForm?> GetFormByIdAsync(int id);
-        Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(Guid studentId);
+        Task<MedicationSubmissionForm?> GetFormByIdAsync(string id);
+        Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(string studentID);
         Task<MedicationSubmissionForm> CreateFormAsync(MedicationSubmissionForm form);
-        Task UpdateFormAsync(int id, MedicationSubmissionForm form);
-        Task DeleteFormAsync(int id);
+        Task UpdateFormAsync(string id, MedicationSubmissionForm form);
+        Task DeleteFormAsync(string id);
     }
 }

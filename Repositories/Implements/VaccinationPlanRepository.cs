@@ -22,20 +22,20 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<VaccinationPlan?> GetVaccinationPlanByIdAsync(int id)
+        public async Task<VaccinationPlan?> GetVaccinationPlanByIdAsync(string id)
         {
             return await _context.VaccinationPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.ID == id);
         }
 
-        public async Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(Guid creatorId)
+        public async Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(string creatorId)
         {
             return await _context.VaccinationPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
-                .Where(p => p.CreatorId == creatorId)
+                .Where(p => p.CreatorID == creatorId)
                 .ToListAsync();
         }
 
@@ -61,7 +61,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteVaccinationPlanAsync(int id)
+        public async Task DeleteVaccinationPlanAsync(string id)
         {
             var plan = await GetVaccinationPlanByIdAsync(id);
             if (plan != null)
@@ -71,9 +71,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> VaccinationPlanExistsAsync(int id)
+        public async Task<bool> VaccinationPlanExistsAsync(string id)
         {
-            return await _context.VaccinationPlans.AnyAsync(p => p.Id == id);
+            return await _context.VaccinationPlans.AnyAsync(p => p.ID == id);
         }
     }
 }

@@ -1,14 +1,14 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IHealthRecordService
     {
         Task<IEnumerable<HealthRecord>> GetAllHealthRecordsAsync();
-        Task<HealthRecord?> GetHealthRecordByIdAsync(Guid id);
-        Task<HealthRecord?> GetHealthRecordByStudentIdAsync(Guid studentId);
+        Task<HealthRecord?> GetHealthRecordByIdAsync(string id);
+        Task<HealthRecord?> GetHealthRecordByStudentIdAsync(string studentID);
         Task<HealthRecord> CreateHealthRecordAsync(HealthRecord healthRecord);
-        Task UpdateHealthRecordAsync(Guid id, HealthRecord healthRecord);
-        Task DeleteHealthRecordAsync(Guid id);
+        Task UpdateHealthRecordAsync(string id, HealthRecord healthRecord);
+        Task DeleteHealthRecordAsync(string id);
     }
 }

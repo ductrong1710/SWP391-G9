@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,14 +18,14 @@ namespace Services.implements
             return await _healthRecordRepository.GetAllHealthRecordsAsync();
         }
 
-        public async Task<HealthRecord?> GetHealthRecordByIdAsync(Guid id)
+        public async Task<HealthRecord?> GetHealthRecordByIdAsync(string id)
         {
             return await _healthRecordRepository.GetHealthRecordByIdAsync(id);
         }
 
-        public async Task<HealthRecord?> GetHealthRecordByStudentIdAsync(Guid studentId)
+        public async Task<HealthRecord?> GetHealthRecordByStudentIdAsync(string studentID)
         {
-            return await _healthRecordRepository.GetHealthRecordByStudentIdAsync(studentId);
+            return await _healthRecordRepository.GetHealthRecordByStudentIdAsync(studentID);
         }
 
         public async Task<HealthRecord> CreateHealthRecordAsync(HealthRecord healthRecord)
@@ -35,9 +34,9 @@ namespace Services.implements
             return healthRecord;
         }
 
-        public async Task UpdateHealthRecordAsync(Guid id, HealthRecord healthRecord)
+        public async Task UpdateHealthRecordAsync(string id, HealthRecord healthRecord)
         {
-            if (id != healthRecord.HealthRecordId)
+            if (id != healthRecord.HealthRecordID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _healthRecordRepository.HealthRecordExistsAsync(id))
@@ -46,7 +45,7 @@ namespace Services.implements
             await _healthRecordRepository.UpdateHealthRecordAsync(healthRecord);
         }
 
-        public async Task DeleteHealthRecordAsync(Guid id)
+        public async Task DeleteHealthRecordAsync(string id)
         {
             if (!await _healthRecordRepository.HealthRecordExistsAsync(id))
                 throw new KeyNotFoundException("Health record not found");

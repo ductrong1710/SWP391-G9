@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/HealthRecord/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<HealthRecord>> GetHealthRecord(Guid id)
+        public async Task<ActionResult<HealthRecord>> GetHealthRecord(string id)
         {
             var healthRecord = await _healthRecordService.GetHealthRecordByIdAsync(id);
 
@@ -40,10 +39,10 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/HealthRecord/student/5
-        [HttpGet("student/{studentId}")]
-        public async Task<ActionResult<HealthRecord>> GetHealthRecordByStudentId(Guid studentId)
+        [HttpGet("student/{studentID}")]
+        public async Task<ActionResult<HealthRecord>> GetHealthRecordByStudentId(string studentID)
         {
-            var healthRecord = await _healthRecordService.GetHealthRecordByStudentIdAsync(studentId);
+            var healthRecord = await _healthRecordService.GetHealthRecordByStudentIdAsync(studentID);
 
             if (healthRecord == null)
             {
@@ -58,12 +57,12 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<HealthRecord>> CreateHealthRecord(HealthRecord healthRecord)
         {
             var createdHealthRecord = await _healthRecordService.CreateHealthRecordAsync(healthRecord);
-            return CreatedAtAction(nameof(GetHealthRecord), new { id = createdHealthRecord.HealthRecordId }, createdHealthRecord);
+            return CreatedAtAction(nameof(GetHealthRecord), new { id = createdHealthRecord.HealthRecordID }, createdHealthRecord);
         }
 
         // PUT: api/HealthRecord/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateHealthRecord(Guid id, HealthRecord healthRecord)
+        public async Task<IActionResult> UpdateHealthRecord(string id, HealthRecord healthRecord)
         {
             try
             {
@@ -83,7 +82,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/HealthRecord/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteHealthRecord(Guid id)
+        public async Task<IActionResult> DeleteHealthRecord(string id)
         {
             try
             {

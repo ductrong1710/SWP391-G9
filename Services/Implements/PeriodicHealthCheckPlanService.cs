@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,14 +18,14 @@ namespace Services.implements
             return await _planRepository.GetAllPlansAsync();
         }
 
-        public async Task<PeriodicHealthCheckPlan?> GetPlanByIdAsync(int id)
+        public async Task<PeriodicHealthCheckPlan?> GetPlanByIdAsync(string id)
         {
             return await _planRepository.GetPlanByIdAsync(id);
         }
 
-        public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatorIdAsync(Guid creatorId)
+        public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatorIdAsync(string creatorID)
         {
-            return await _planRepository.GetPlansByCreatorIdAsync(creatorId);
+            return await _planRepository.GetPlansByCreatorIdAsync(creatorID);
         }
 
         public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetUpcomingPlansAsync()
@@ -40,9 +39,9 @@ namespace Services.implements
             return plan;
         }
 
-        public async Task UpdatePlanAsync(int id, PeriodicHealthCheckPlan plan)
+        public async Task UpdatePlanAsync(string id, PeriodicHealthCheckPlan plan)
         {
-            if (id != plan.Id)
+            if (id != plan.ID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _planRepository.PlanExistsAsync(id))
@@ -51,7 +50,7 @@ namespace Services.implements
             await _planRepository.UpdatePlanAsync(plan);
         }
 
-        public async Task DeletePlanAsync(int id)
+        public async Task DeletePlanAsync(string id)
         {
             if (!await _planRepository.PlanExistsAsync(id))
                 throw new KeyNotFoundException("Health check plan not found");

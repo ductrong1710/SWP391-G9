@@ -5,11 +5,11 @@ namespace Repositories.Interfaces
     public interface IProfileRepository
     {
         Task<IEnumerable<Profile>> GetAllProfilesAsync();
-        Task<Profile?> GetProfileByIdAsync(Guid id);
-        Task<Profile?> GetProfileByUserIdAsync(Guid userId);
+        Task<Profile?> GetProfileByIdAsync(string id);
+        Task<Profile?> GetProfileByUserIdAsync(string userId);
         Task CreateProfileAsync(Profile profile);
         Task UpdateProfileAsync(Profile profile);
-        Task DeleteProfileAsync(Guid id);
-        Task<bool> ProfileExistsAsync(Guid id);
+        Task DeleteProfileAsync(string id);
+        Task<bool> ProfileExistsAsync(string id);
     }
 }

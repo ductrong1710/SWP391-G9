@@ -19,7 +19,7 @@ namespace Repositories.Implements
             return await _context.Roles.ToListAsync();
         }
 
-        public async Task<Role?> GetRoleByIdAsync(int id)
+        public async Task<Role?> GetRoleByIdAsync(string id)
         {
             return await _context.Roles.FindAsync(id);
         }
@@ -41,7 +41,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteRoleAsync(int id)
+        public async Task DeleteRoleAsync(string id)
         {
             var role = await GetRoleByIdAsync(id);
             if (role != null)
@@ -51,9 +51,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> RoleExistsAsync(int id)
+        public async Task<bool> RoleExistsAsync(string id)
         {
-            return await _context.Roles.AnyAsync(r => r.RoleId == id);
+            return await _context.Roles.AnyAsync(r => r.RoleID == id);
         }
 
         public async Task<bool> RoleTypeExistsAsync(string roleType)

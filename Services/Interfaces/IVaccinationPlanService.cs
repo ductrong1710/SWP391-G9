@@ -1,15 +1,16 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IVaccinationPlanService
     {
         Task<IEnumerable<VaccinationPlan>> GetAllVaccinationPlansAsync();
-        Task<VaccinationPlan?> GetVaccinationPlanByIdAsync(int id);
-        Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(Guid creatorId);
+        Task<VaccinationPlan?> GetVaccinationPlanByIdAsync(string id);
+        Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(string creatorID);
         Task<IEnumerable<VaccinationPlan>> GetUpcomingVaccinationPlansAsync();
         Task<VaccinationPlan> CreateVaccinationPlanAsync(VaccinationPlan plan);
-        Task UpdateVaccinationPlanAsync(int id, VaccinationPlan plan);
-        Task DeleteVaccinationPlanAsync(int id);
+        Task UpdateVaccinationPlanAsync(string id, VaccinationPlan plan);
+        Task DeleteVaccinationPlanAsync(string id);
+        Task<VaccinationPlan?> GetByIdAsync(string id);
     }
 }

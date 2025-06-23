@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,14 +18,14 @@ namespace Services.implements
             return await _planRepository.GetAllVaccinationPlansAsync();
         }
 
-        public async Task<VaccinationPlan?> GetVaccinationPlanByIdAsync(int id)
+        public async Task<VaccinationPlan?> GetVaccinationPlanByIdAsync(string id)
         {
             return await _planRepository.GetVaccinationPlanByIdAsync(id);
         }
 
-        public async Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(Guid creatorId)
+        public async Task<IEnumerable<VaccinationPlan>> GetVaccinationPlansByCreatorIdAsync(string creatorID)
         {
-            return await _planRepository.GetVaccinationPlansByCreatorIdAsync(creatorId);
+            return await _planRepository.GetVaccinationPlansByCreatorIdAsync(creatorID);
         }
 
         public async Task<IEnumerable<VaccinationPlan>> GetUpcomingVaccinationPlansAsync()
@@ -43,9 +42,9 @@ namespace Services.implements
             return plan;
         }
 
-        public async Task UpdateVaccinationPlanAsync(int id, VaccinationPlan plan)
+        public async Task UpdateVaccinationPlanAsync(string id, VaccinationPlan plan)
         {
-            if (id != plan.Id)
+            if (id != plan.ID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _planRepository.VaccinationPlanExistsAsync(id))
@@ -57,7 +56,7 @@ namespace Services.implements
             await _planRepository.UpdateVaccinationPlanAsync(plan);
         }
 
-        public async Task DeleteVaccinationPlanAsync(int id)
+        public async Task DeleteVaccinationPlanAsync(string id)
         {
             if (!await _planRepository.VaccinationPlanExistsAsync(id))
                 throw new KeyNotFoundException("Vaccination plan not found");
@@ -67,6 +66,11 @@ namespace Services.implements
                 throw new InvalidOperationException("Cannot delete a vaccination plan that has associated consent forms");
 
             await _planRepository.DeleteVaccinationPlanAsync(id);
+        }
+
+        public async Task<VaccinationPlan?> GetByIdAsync(string id)
+        {
+            return await _planRepository.GetVaccinationPlanByIdAsync(id);
         }
     }
 }

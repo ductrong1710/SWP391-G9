@@ -25,7 +25,7 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<VaccinationResult?> GetVaccinationResultByIdAsync(int id)
+        public async Task<VaccinationResult?> GetVaccinationResultByIdAsync(string id)
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
@@ -33,10 +33,10 @@ namespace Repositories.Implements
                 .Include(r => r.ConsentForm)
                     .ThenInclude(f => f.VaccinationPlan)
                 .Include(r => r.VaccineType)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.ID == id);
         }
 
-        public async Task<VaccinationResult?> GetVaccinationResultByConsentFormIdAsync(int consentFormId)
+        public async Task<VaccinationResult?> GetVaccinationResultByConsentFormIdAsync(string consentFormId)
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
@@ -44,10 +44,10 @@ namespace Repositories.Implements
                 .Include(r => r.ConsentForm)
                     .ThenInclude(f => f.VaccinationPlan)
                 .Include(r => r.VaccineType)
-                .FirstOrDefaultAsync(r => r.ConsentFormId == consentFormId);
+                .FirstOrDefaultAsync(r => r.ConsentFormID == consentFormId);
         }
 
-        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByVaccineTypeAsync(int vaccineTypeId)
+        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByVaccineTypeAsync(string vaccineTypeId)
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
@@ -55,7 +55,7 @@ namespace Repositories.Implements
                 .Include(r => r.ConsentForm)
                     .ThenInclude(f => f.VaccinationPlan)
                 .Include(r => r.VaccineType)
-                .Where(r => r.VaccineTypeId == vaccineTypeId)
+                .Where(r => r.VaccineTypeID == vaccineTypeId)
                 .ToListAsync();
         }
 
@@ -71,7 +71,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteVaccinationResultAsync(int id)
+        public async Task DeleteVaccinationResultAsync(string id)
         {
             var result = await GetVaccinationResultByIdAsync(id);
             if (result != null)
@@ -81,9 +81,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> VaccinationResultExistsAsync(int id)
+        public async Task<bool> VaccinationResultExistsAsync(string id)
         {
-            return await _context.VaccinationResults.AnyAsync(r => r.Id == id);
+            return await _context.VaccinationResults.AnyAsync(r => r.ID == id);
         }
     }
 }

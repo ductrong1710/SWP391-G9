@@ -1,13 +1,13 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IMedicalSupplyService
     {
         Task<IEnumerable<MedicalSupply>> GetAllSuppliesAsync();
-        Task<MedicalSupply?> GetSupplyByIdAsync(int id);
+        Task<MedicalSupply?> GetSupplyByIdAsync(string id);
         Task<MedicalSupply> AddSupplyAsync(MedicalSupply supply);
-        Task UpdateSupplyAsync(int id, MedicalSupply supply);
-        Task DeleteSupplyAsync(int id);
+        Task UpdateSupplyAsync(string id, MedicalSupply supply);
+        Task DeleteSupplyAsync(string id);
     }
 }

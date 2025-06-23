@@ -22,20 +22,20 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<PeriodicHealthCheckPlan?> GetPlanByIdAsync(int id)
+        public async Task<PeriodicHealthCheckPlan?> GetPlanByIdAsync(string id)
         {
             return await _context.PeriodicHealthCheckPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.ID == id);
         }
 
-        public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatorIdAsync(Guid creatorId)
+        public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatorIdAsync(string creatorId)
         {
             return await _context.PeriodicHealthCheckPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
-                .Where(p => p.CreatorId == creatorId)
+                .Where(p => p.CreatorID == creatorId)
                 .ToListAsync();
         }
 
@@ -61,7 +61,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePlanAsync(int id)
+        public async Task DeletePlanAsync(string id)
         {
             var plan = await GetPlanByIdAsync(id);
             if (plan != null)
@@ -71,9 +71,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> PlanExistsAsync(int id)
+        public async Task<bool> PlanExistsAsync(string id)
         {
-            return await _context.PeriodicHealthCheckPlans.AnyAsync(p => p.Id == id);
+            return await _context.PeriodicHealthCheckPlans.AnyAsync(p => p.ID == id);
         }
     }
 }

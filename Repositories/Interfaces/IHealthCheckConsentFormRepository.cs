@@ -5,13 +5,13 @@ namespace Repositories.Interfaces
     public interface IHealthCheckConsentFormRepository
     {
         Task<IEnumerable<HealthCheckConsentForm>> GetAllConsentFormsAsync();
-        Task<HealthCheckConsentForm?> GetConsentFormByIdAsync(int id);
-        Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(int planId);
-        Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(Guid studentId);
-        Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(int planId, Guid studentId);
+        Task<HealthCheckConsentForm?> GetConsentFormByIdAsync(string id);
+        Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(string planId);
+        Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(string studentId);
+        Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(string planId, string studentId);
         Task CreateConsentFormAsync(HealthCheckConsentForm form);
         Task UpdateConsentFormAsync(HealthCheckConsentForm form);
-        Task DeleteConsentFormAsync(int id);
-        Task<bool> ConsentFormExistsAsync(int id);
+        Task DeleteConsentFormAsync(string id);
+        Task<bool> ConsentFormExistsAsync(string id);
     }
 }

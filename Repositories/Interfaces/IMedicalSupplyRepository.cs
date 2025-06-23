@@ -5,10 +5,10 @@ namespace Repositories.Interfaces
     public interface IMedicalSupplyRepository
     {
         Task<IEnumerable<MedicalSupply>> GetAllSuppliesAsync();
-        Task<MedicalSupply?> GetSupplyByIdAsync(int id);
+        Task<MedicalSupply?> GetSupplyByIdAsync(string id);
         Task<MedicalSupply> AddSupplyAsync(MedicalSupply supply);
         Task UpdateSupplyAsync(MedicalSupply supply);
-        Task DeleteSupplyAsync(int id);
-        Task<bool> SupplyExistsAsync(int id);
+        Task DeleteSupplyAsync(string id);
+        Task<bool> SupplyExistsAsync(string id);
     }
 }

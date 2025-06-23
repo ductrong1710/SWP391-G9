@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -23,29 +22,29 @@ namespace Services.implements
             return await _consentFormRepository.GetAllVaccinationConsentFormsAsync();
         }
 
-        public async Task<VaccinationConsentForm?> GetVaccinationConsentFormByIdAsync(int id)
+        public async Task<VaccinationConsentForm?> GetVaccinationConsentFormByIdAsync(string id)
         {
             return await _consentFormRepository.GetVaccinationConsentFormByIdAsync(id);
         }
 
-        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByPlanIdAsync(int planId)
+        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByPlanIdAsync(string planID)
         {
-            return await _consentFormRepository.GetConsentFormsByPlanIdAsync(planId);
+            return await _consentFormRepository.GetConsentFormsByPlanIdAsync(planID);
         }
 
-        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByStudentIdAsync(Guid studentId)
+        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByStudentIdAsync(string studentID)
         {
-            return await _consentFormRepository.GetConsentFormsByStudentIdAsync(studentId);
+            return await _consentFormRepository.GetConsentFormsByStudentIdAsync(studentID);
         }
 
-        public async Task<VaccinationConsentForm?> GetConsentFormByPlanAndStudentAsync(int planId, Guid studentId)
+        public async Task<VaccinationConsentForm?> GetConsentFormByPlanAndStudentAsync(string planID, string studentID)
         {
-            return await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(planId, studentId);
+            return await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(planID, studentID);
         }
 
         public async Task<VaccinationConsentForm> CreateVaccinationConsentFormAsync(VaccinationConsentForm form)
         {
-            var plan = await _planRepository.GetVaccinationPlanByIdAsync(form.VaccinationPlanId);
+            var plan = await _planRepository.GetVaccinationPlanByIdAsync(form.VaccinationPlanID);
             if (plan == null)
                 throw new KeyNotFoundException("Vaccination plan not found");
 
@@ -55,7 +54,7 @@ namespace Services.implements
             if (plan.ScheduledDate < DateTime.Today)
                 throw new InvalidOperationException("Cannot submit consent form for a past vaccination plan");
 
-            var existingForm = await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(form.VaccinationPlanId, form.StudentId);
+            var existingForm = await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(form.VaccinationPlanID, form.StudentID);
             if (existingForm != null)
                 throw new InvalidOperationException("A consent form already exists for this student and vaccination plan");
 
@@ -63,15 +62,15 @@ namespace Services.implements
             return form;
         }
 
-        public async Task UpdateVaccinationConsentFormAsync(int id, VaccinationConsentForm form)
+        public async Task UpdateVaccinationConsentFormAsync(string id, VaccinationConsentForm form)
         {
-            if (id != form.Id)
+            if (id != form.ID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _consentFormRepository.VaccinationConsentFormExistsAsync(id))
                 throw new KeyNotFoundException("Vaccination consent form not found");
 
-            var plan = await _planRepository.GetVaccinationPlanByIdAsync(form.VaccinationPlanId);
+            var plan = await _planRepository.GetVaccinationPlanByIdAsync(form.VaccinationPlanID);
             if (plan == null)
                 throw new KeyNotFoundException("Vaccination plan not found");
 
@@ -84,7 +83,7 @@ namespace Services.implements
             await _consentFormRepository.UpdateVaccinationConsentFormAsync(form);
         }
 
-        public async Task DeleteVaccinationConsentFormAsync(int id)
+        public async Task DeleteVaccinationConsentFormAsync(string id)
         {
             var form = await _consentFormRepository.GetVaccinationConsentFormByIdAsync(id);
             if (form == null)

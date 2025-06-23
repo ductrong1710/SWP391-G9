@@ -23,42 +23,42 @@ namespace Repositories
                 .ToListAsync();
         }
 
-        public async Task<VaccinationConsentForm?> GetVaccinationConsentFormByIdAsync(int id)
+        public async Task<VaccinationConsentForm?> GetVaccinationConsentFormByIdAsync(string id)
         {
             return await _context.VaccinationConsentForms
                 .Include(f => f.VaccinationPlan)
                 .Include(f => f.Student)
                 .Include(f => f.VaccinationResult)
-                .FirstOrDefaultAsync(f => f.Id == id);
+                .FirstOrDefaultAsync(f => f.ID == id);
         }
 
-        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByPlanIdAsync(int planId)
+        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByPlanIdAsync(string planId)
         {
             return await _context.VaccinationConsentForms
                 .Include(f => f.VaccinationPlan)
                 .Include(f => f.Student)
                 .Include(f => f.VaccinationResult)
-                .Where(f => f.VaccinationPlanId == planId)
+                .Where(f => f.VaccinationPlanID == planId)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByStudentIdAsync(Guid studentId)
+        public async Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByStudentIdAsync(string studentId)
         {
             return await _context.VaccinationConsentForms
                 .Include(f => f.VaccinationPlan)
                 .Include(f => f.Student)
                 .Include(f => f.VaccinationResult)
-                .Where(f => f.StudentId == studentId)
+                .Where(f => f.StudentID == studentId)
                 .ToListAsync();
         }
 
-        public async Task<VaccinationConsentForm?> GetConsentFormByPlanAndStudentAsync(int planId, Guid studentId)
+        public async Task<VaccinationConsentForm?> GetConsentFormByPlanAndStudentAsync(string planId, string studentId)
         {
             return await _context.VaccinationConsentForms
                 .Include(f => f.VaccinationPlan)
                 .Include(f => f.Student)
                 .Include(f => f.VaccinationResult)
-                .FirstOrDefaultAsync(f => f.VaccinationPlanId == planId && f.StudentId == studentId);
+                .FirstOrDefaultAsync(f => f.VaccinationPlanID == planId && f.StudentID == studentId);
         }
 
         public async Task CreateVaccinationConsentFormAsync(VaccinationConsentForm form)
@@ -73,7 +73,7 @@ namespace Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteVaccinationConsentFormAsync(int id)
+        public async Task DeleteVaccinationConsentFormAsync(string id)
         {
             var form = await GetVaccinationConsentFormByIdAsync(id);
             if (form != null)
@@ -83,9 +83,9 @@ namespace Repositories
             }
         }
 
-        public async Task<bool> VaccinationConsentFormExistsAsync(int id)
+        public async Task<bool> VaccinationConsentFormExistsAsync(string id)
         {
-            return await _context.VaccinationConsentForms.AnyAsync(f => f.Id == id);
+            return await _context.VaccinationConsentForms.AnyAsync(f => f.ID == id);
         }
     }
 }

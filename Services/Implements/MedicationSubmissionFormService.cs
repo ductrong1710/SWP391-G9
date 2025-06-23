@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,14 +18,14 @@ namespace Services.implements
             return await _repository.GetAllFormsAsync();
         }
 
-        public async Task<MedicationSubmissionForm?> GetFormByIdAsync(int id)
+        public async Task<MedicationSubmissionForm?> GetFormByIdAsync(string id)
         {
             return await _repository.GetFormByIdAsync(id);
         }
 
-        public async Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(Guid studentId)
+        public async Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(string studentID)
         {
-            return await _repository.GetFormsByStudentIdAsync(studentId);
+            return await _repository.GetFormsByStudentIdAsync(studentID);
         }
 
         public async Task<MedicationSubmissionForm> CreateFormAsync(MedicationSubmissionForm form)
@@ -35,9 +34,9 @@ namespace Services.implements
             return form;
         }
 
-        public async Task UpdateFormAsync(int id, MedicationSubmissionForm form)
+        public async Task UpdateFormAsync(string id, MedicationSubmissionForm form)
         {
-            if (id != form.Id)
+            if (id != form.ID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _repository.FormExistsAsync(id))
@@ -46,7 +45,7 @@ namespace Services.implements
             await _repository.UpdateFormAsync(form);
         }
 
-        public async Task DeleteFormAsync(int id)
+        public async Task DeleteFormAsync(string id)
         {
             if (!await _repository.FormExistsAsync(id))
                 throw new KeyNotFoundException("Medication submission form not found");

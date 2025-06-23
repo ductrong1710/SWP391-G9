@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,7 +18,7 @@ namespace Services.implements
             return await _medicationRepository.GetAllMedicationsAsync();
         }
 
-        public async Task<Medication?> GetMedicationByIdAsync(int id)
+        public async Task<Medication?> GetMedicationByIdAsync(string id)
         {
             return await _medicationRepository.GetMedicationByIdAsync(id);
         }
@@ -40,9 +39,9 @@ namespace Services.implements
             return medication;
         }
 
-        public async Task UpdateMedicationAsync(int id, Medication medication)
+        public async Task UpdateMedicationAsync(string id, Medication medication)
         {
-            if (id != medication.MedicationId)
+            if (id != medication.MedicationID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _medicationRepository.MedicationExistsAsync(id))
@@ -51,11 +50,10 @@ namespace Services.implements
             await _medicationRepository.UpdateMedicationAsync(medication);
         }
 
-        public async Task DeleteMedicationAsync(int id)
+        public async Task DeleteMedicationAsync(string id)
         {
             if (!await _medicationRepository.MedicationExistsAsync(id))
                 throw new KeyNotFoundException("Medication not found");
-
             await _medicationRepository.DeleteMedicationAsync(id);
         }
     }

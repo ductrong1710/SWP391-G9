@@ -1,16 +1,16 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IVaccinationConsentFormService
     {
         Task<IEnumerable<VaccinationConsentForm>> GetAllVaccinationConsentFormsAsync();
-        Task<VaccinationConsentForm?> GetVaccinationConsentFormByIdAsync(int id);
-        Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByPlanIdAsync(int planId);
-        Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByStudentIdAsync(Guid studentId);
-        Task<VaccinationConsentForm?> GetConsentFormByPlanAndStudentAsync(int planId, Guid studentId);
+        Task<VaccinationConsentForm?> GetVaccinationConsentFormByIdAsync(string id);
+        Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByPlanIdAsync(string planID);
+        Task<IEnumerable<VaccinationConsentForm>> GetConsentFormsByStudentIdAsync(string studentID);
+        Task<VaccinationConsentForm?> GetConsentFormByPlanAndStudentAsync(string planID, string studentID);
         Task<VaccinationConsentForm> CreateVaccinationConsentFormAsync(VaccinationConsentForm form);
-        Task UpdateVaccinationConsentFormAsync(int id, VaccinationConsentForm form);
-        Task DeleteVaccinationConsentFormAsync(int id);
+        Task UpdateVaccinationConsentFormAsync(string id, VaccinationConsentForm form);
+        Task DeleteVaccinationConsentFormAsync(string id);
     }
 }

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/VaccinationConsentForm/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<VaccinationConsentForm>> GetConsentForm(int id)
+        public async Task<ActionResult<VaccinationConsentForm>> GetConsentForm(string id)
         {
             var form = await _consentFormService.GetVaccinationConsentFormByIdAsync(id);
 
@@ -41,7 +40,7 @@ namespace BackEnd.Controllers
 
         // GET: api/VaccinationConsentForm/plan/5
         [HttpGet("plan/{planId}")]
-        public async Task<ActionResult<IEnumerable<VaccinationConsentForm>>> GetConsentFormsByPlan(int planId)
+        public async Task<ActionResult<IEnumerable<VaccinationConsentForm>>> GetConsentFormsByPlan(string planId)
         {
             var forms = await _consentFormService.GetConsentFormsByPlanIdAsync(planId);
             return Ok(forms);
@@ -49,7 +48,7 @@ namespace BackEnd.Controllers
 
         // GET: api/VaccinationConsentForm/student/5
         [HttpGet("student/{studentId}")]
-        public async Task<ActionResult<IEnumerable<VaccinationConsentForm>>> GetConsentFormsByStudent(Guid studentId)
+        public async Task<ActionResult<IEnumerable<VaccinationConsentForm>>> GetConsentFormsByStudent(string studentId)
         {
             var forms = await _consentFormService.GetConsentFormsByStudentIdAsync(studentId);
             return Ok(forms);
@@ -57,7 +56,7 @@ namespace BackEnd.Controllers
 
         // GET: api/VaccinationConsentForm/plan/5/student/5
         [HttpGet("plan/{planId}/student/{studentId}")]
-        public async Task<ActionResult<VaccinationConsentForm>> GetConsentFormByPlanAndStudent(int planId, Guid studentId)
+        public async Task<ActionResult<VaccinationConsentForm>> GetConsentFormByPlanAndStudent(string planId, string studentId)
         {
             var form = await _consentFormService.GetConsentFormByPlanAndStudentAsync(planId, studentId);
 
@@ -76,7 +75,7 @@ namespace BackEnd.Controllers
             try
             {
                 var createdForm = await _consentFormService.CreateVaccinationConsentFormAsync(form);
-                return CreatedAtAction(nameof(GetConsentForm), new { id = createdForm.Id }, createdForm);
+                return CreatedAtAction(nameof(GetConsentForm), new { id = createdForm.ID }, createdForm);
             }
             catch (KeyNotFoundException ex)
             {
@@ -90,7 +89,7 @@ namespace BackEnd.Controllers
 
         // PUT: api/VaccinationConsentForm/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateConsentForm(int id, VaccinationConsentForm form)
+        public async Task<IActionResult> UpdateConsentForm(string id, VaccinationConsentForm form)
         {
             try
             {
@@ -114,7 +113,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/VaccinationConsentForm/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteConsentForm(int id)
+        public async Task<IActionResult> DeleteConsentForm(string id)
         {
             try
             {

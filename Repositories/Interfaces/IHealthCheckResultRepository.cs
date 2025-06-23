@@ -5,15 +5,15 @@ namespace Repositories.Interfaces
     public interface IHealthCheckResultRepository
     {
         Task<IEnumerable<HealthCheckResult>> GetAllHealthCheckResultsAsync();
-        Task<HealthCheckResult?> GetHealthCheckResultByIdAsync(int id);
-        Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(int consentId);
+        Task<HealthCheckResult?> GetHealthCheckResultByIdAsync(string id);
+        Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(string consentId);
         Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByCheckerAsync(string checker);
         Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<IEnumerable<HealthCheckResult>> GetPendingConsultationsAsync();
         Task CreateHealthCheckResultAsync(HealthCheckResult result);
         Task UpdateHealthCheckResultAsync(HealthCheckResult result);
-        Task DeleteHealthCheckResultAsync(int id);
-        Task<bool> HealthCheckResultExistsAsync(int id);
-        Task<bool> HasResultForConsentAsync(int consentId);
+        Task DeleteHealthCheckResultAsync(string id);
+        Task<bool> HealthCheckResultExistsAsync(string id);
+        Task<bool> HasResultForConsentAsync(string consentId);
     }
 }

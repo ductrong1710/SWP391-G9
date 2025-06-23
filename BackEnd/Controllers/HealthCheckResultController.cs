@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/HealthCheckResult/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<HealthCheckResult>> GetHealthCheckResult(int id)
+        public async Task<ActionResult<HealthCheckResult>> GetHealthCheckResult(string id)
         {
             var result = await _resultService.GetHealthCheckResultByIdAsync(id);
 
@@ -40,10 +39,10 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/HealthCheckResult/consent/5
-        [HttpGet("consent/{consentId}")]
-        public async Task<ActionResult<HealthCheckResult>> GetHealthCheckResultByConsent(int consentId)
+        [HttpGet("consent/{consentID}")]
+        public async Task<ActionResult<HealthCheckResult>> GetHealthCheckResultByConsent(string consentID)
         {
-            var result = await _resultService.GetHealthCheckResultByConsentIdAsync(consentId);
+            var result = await _resultService.GetHealthCheckResultByConsentIdAsync(consentID);
 
             if (result == null)
             {
@@ -93,7 +92,7 @@ namespace BackEnd.Controllers
             try
             {
                 var createdResult = await _resultService.CreateHealthCheckResultAsync(result);
-                return CreatedAtAction(nameof(GetHealthCheckResult), new { id = createdResult.Id }, createdResult);
+                return CreatedAtAction(nameof(GetHealthCheckResult), new { id = createdResult.ID }, createdResult);
             }
             catch (KeyNotFoundException ex)
             {
@@ -107,7 +106,7 @@ namespace BackEnd.Controllers
 
         // PUT: api/HealthCheckResult/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateHealthCheckResult(int id, HealthCheckResult result)
+        public async Task<IActionResult> UpdateHealthCheckResult(string id, HealthCheckResult result)
         {
             try
             {
@@ -131,7 +130,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/HealthCheckResult/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteHealthCheckResult(int id)
+        public async Task<IActionResult> DeleteHealthCheckResult(string id)
         {
             try
             {

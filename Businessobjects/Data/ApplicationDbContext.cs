@@ -47,37 +47,37 @@ namespace Businessobjects.Data
             modelBuilder.Entity<Profile>()
                 .HasOne(p => p.User)
                 .WithOne()
-                .HasForeignKey<Profile>(p => p.UserId)
+                .HasForeignKey<Profile>(p => p.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<HealthRecord>()
                 .HasOne(h => h.Student)
                 .WithMany()
-                .HasForeignKey(h => h.StudentId)
+                .HasForeignKey(h => h.StudentID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<MedicationSubmissionForm>()
                 .HasOne(m => m.Student)
                 .WithMany()
-                .HasForeignKey(m => m.StudentId)
+                .HasForeignKey(m => m.StudentID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PeriodicHealthCheckPlan>()
                 .HasOne(p => p.Creator)
                 .WithMany()
-                .HasForeignKey(p => p.CreatorId)
+                .HasForeignKey(p => p.CreatorID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<HealthCheckConsentForm>()
                 .HasOne(h => h.HealthCheckPlan)
                 .WithMany(p => p.ConsentForms)
-                .HasForeignKey(h => h.HealthCheckPlanId)
+                .HasForeignKey(h => h.HealthCheckPlanID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<HealthCheckConsentForm>()
                 .HasOne(h => h.Student)
                 .WithMany()
-                .HasForeignKey(h => h.StudentId)
+                .HasForeignKey(h => h.StudentID)
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
@@ -86,31 +86,31 @@ namespace Businessobjects.Data
             modelBuilder.Entity<VaccinationPlan>()
                 .HasOne(p => p.Creator)
                 .WithMany()
-                .HasForeignKey(p => p.CreatorId)
+                .HasForeignKey(p => p.CreatorID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<VaccinationConsentForm>()
                 .HasOne(f => f.VaccinationPlan)
-                .WithMany(p => p.ConsentForms)
-                .HasForeignKey(f => f.VaccinationPlanId)
+                .WithMany()
+                .HasForeignKey(f => f.VaccinationPlanID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<VaccinationConsentForm>()
                 .HasOne(f => f.Student)
                 .WithMany()
-                .HasForeignKey(f => f.StudentId)
+                .HasForeignKey(f => f.StudentID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<VaccinationResult>()
                 .HasOne(r => r.ConsentForm)
-                .WithOne(f => f.VaccinationResult)
-                .HasForeignKey<VaccinationResult>(r => r.ConsentFormId)
+                .WithOne()
+                .HasForeignKey<VaccinationResult>(r => r.ConsentFormID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<VaccinationResult>()
                 .HasOne(r => r.VaccineType)
-                .WithMany(t => t.VaccinationResults)
-                .HasForeignKey(r => r.VaccineTypeId)
+                .WithMany()
+                .HasForeignKey(r => r.VaccineTypeID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
@@ -119,7 +119,7 @@ namespace Businessobjects.Data
             modelBuilder.Entity<HealthCheckResult>()
                 .HasOne(r => r.HealthCheckConsent)
                 .WithOne()
-                .HasForeignKey<HealthCheckResult>(r => r.HealthCheckConsentId)
+                .HasForeignKey<HealthCheckResult>(r => r.HealthCheckConsentID)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<HealthCheckResult>()
@@ -135,64 +135,64 @@ namespace Businessobjects.Data
         {
             // Role seed data
             modelBuilder.Entity<Role>().HasData(
-                new Role { RoleId = 1, RoleType = "Admin" },
-                new Role { RoleId = 2, RoleType = "User" },
-                new Role { RoleId = 3, RoleType = "Nurse" },
-                new Role { RoleId = 4, RoleType = "Teacher" }
+                new Role { RoleID = "000001", RoleType = "Admin" },
+                new Role { RoleID = "000002", RoleType = "User" },
+                new Role { RoleID = "000003", RoleType = "Nurse" },
+                new Role { RoleID = "000004", RoleType = "Teacher" }
             );
 
-            // Example seed data with fixed GUIDs
+            // Example seed data
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
-                    UserId = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870"),
+                    UserID = "U00001",
                     Username = "admin",
                     Password = "admin123",
-                    Role = "Admin"
+                    RoleID = "000001"
                 },
                 new User
                 {
-                    UserId = new Guid("d8663e5e-7494-4f81-8739-6e0de1bea7ee"),
+                    UserID = "U00002",
                     Username = "user",
                     Password = "user123",
-                    Role = "User"
+                    RoleID = "000002"
                 },
                 new User
                 {
-                    UserId = new Guid("b9e7d454-99df-4506-8c0f-3b2c33c21d12"),
+                    UserID = "U00003",
                     Username = "nurse",
                     Password = "nurse123",
-                    Role = "Nurse"
+                    RoleID = "000003"
                 }
             );
 
             // Profile seed data
             modelBuilder.Entity<Profile>().HasData(
-    new
-    {
-        ProfileId = new Guid("f5b7824f-5e35-4682-98d1-0e98f8dd6b31"),
-        Name = "Admin User",
-        DateOfBirth = new DateTime(1990, 1, 1),
-        Sex = "Male",
-        Class = "Admin Class",
-        Phone = "1234567890",
-        UserId = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870"),
-        Note = "Admin profile"
-    }
-);
+                new
+                {
+                    ProfileID = "P00001",
+                    Name = "Admin User",
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    Sex = "Male",
+                    Class = "Admin Class",
+                    Phone = "1234567890",
+                    UserID = "U00001",
+                    Note = "Admin profile"
+                }
+            );
 
             // Example health record seed data
             modelBuilder.Entity<HealthRecord>().HasData(
                 new
                 {
-                    HealthRecordId = new Guid("a2b4c6d8-e0f2-4681-9314-123456789012"),
-                    StudentId = new Guid("f5b7824f-5e35-4682-98d1-0e98f8dd6b31"),
-                    ParentId = "P12345",
+                    HealthRecordID = "HR0001",
+                    StudentID = "U00001",
+                    ParentID = "U00002",
                     Allergies = "None",
                     ChronicDiseases = "None",
                     TreatmentHistory = "No major treatments",
-                    Eyesight = "20/20",
-                    Hearing = "Normal",
+                    Eyesight = 10,
+                    Hearing = 10,
                     VaccinationHistory = "Up to date",
                     Note = "Healthy student",
                     ParentContact = "0987654321"

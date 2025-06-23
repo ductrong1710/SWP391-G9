@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/Medication/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Medication>> GetMedication(int id)
+        public async Task<ActionResult<Medication>> GetMedication(string id)
         {
             var medication = await _medicationService.GetMedicationByIdAsync(id);
 
@@ -60,12 +59,12 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<Medication>> CreateMedication(Medication medication)
         {
             var createdMedication = await _medicationService.CreateMedicationAsync(medication);
-            return CreatedAtAction(nameof(GetMedication), new { id = createdMedication.MedicationId }, createdMedication);
+            return CreatedAtAction(nameof(GetMedication), new { id = createdMedication.MedicationID }, createdMedication);
         }
 
         // PUT: api/Medication/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMedication(int id, Medication medication)
+        public async Task<IActionResult> UpdateMedication(string id, Medication medication)
         {
             try
             {
@@ -85,7 +84,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/Medication/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMedication(int id)
+        public async Task<IActionResult> DeleteMedication(string id)
         {
             try
             {

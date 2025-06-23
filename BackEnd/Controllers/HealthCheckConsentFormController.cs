@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/HealthCheckConsentForm/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<HealthCheckConsentForm>> GetConsentForm(int id)
+        public async Task<ActionResult<HealthCheckConsentForm>> GetConsentForm(string id)
         {
             var form = await _consentFormService.GetConsentFormByIdAsync(id);
 
@@ -40,18 +39,18 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/HealthCheckConsentForm/plan/5
-        [HttpGet("plan/{planId}")]
-        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByPlan(int planId)
+        [HttpGet("plan/{planID}")]
+        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByPlan(string planID)
         {
-            var forms = await _consentFormService.GetConsentFormsByPlanIdAsync(planId);
+            var forms = await _consentFormService.GetConsentFormsByPlanIdAsync(planID);
             return Ok(forms);
         }
 
         // GET: api/HealthCheckConsentForm/student/5
-        [HttpGet("student/{studentId}")]
-        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByStudent(Guid studentId)
+        [HttpGet("student/{studentID}")]
+        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByStudent(string studentID)
         {
-            var forms = await _consentFormService.GetConsentFormsByStudentIdAsync(studentId);
+            var forms = await _consentFormService.GetConsentFormsByStudentIdAsync(studentID);
             return Ok(forms);
         }
 
@@ -62,7 +61,7 @@ namespace BackEnd.Controllers
             try
             {
                 var createdForm = await _consentFormService.CreateConsentFormAsync(form);
-                return CreatedAtAction(nameof(GetConsentForm), new { id = createdForm.Id }, createdForm);
+                return CreatedAtAction(nameof(GetConsentForm), new { id = createdForm.ID }, createdForm);
             }
             catch (InvalidOperationException ex)
             {
@@ -72,7 +71,7 @@ namespace BackEnd.Controllers
 
         // PUT: api/HealthCheckConsentForm/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateConsentForm(int id, HealthCheckConsentForm form)
+        public async Task<IActionResult> UpdateConsentForm(string id, HealthCheckConsentForm form)
         {
             try
             {
@@ -92,7 +91,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/HealthCheckConsentForm/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteConsentForm(int id)
+        public async Task<IActionResult> DeleteConsentForm(string id)
         {
             try
             {

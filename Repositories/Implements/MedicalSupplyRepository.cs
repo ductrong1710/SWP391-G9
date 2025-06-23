@@ -19,9 +19,9 @@ namespace Repositories.Implements
             return await _context.MedicalSupplies.ToListAsync();
         }
 
-        public async Task<MedicalSupply?> GetSupplyByIdAsync(int id)
+        public async Task<MedicalSupply?> GetSupplyByIdAsync(string id)
         {
-            return await _context.MedicalSupplies.FindAsync(id);
+            return await _context.MedicalSupplies.FirstOrDefaultAsync(e => e.SupplyID == id);
         }
 
         public async Task<MedicalSupply> AddSupplyAsync(MedicalSupply supply)
@@ -37,9 +37,9 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteSupplyAsync(int id)
+        public async Task DeleteSupplyAsync(string id)
         {
-            var supply = await _context.MedicalSupplies.FindAsync(id);
+            var supply = await GetSupplyByIdAsync(id);
             if (supply != null)
             {
                 _context.MedicalSupplies.Remove(supply);
@@ -47,7 +47,7 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> SupplyExistsAsync(int id)
+        public async Task<bool> SupplyExistsAsync(string id)
         {
             return await _context.MedicalSupplies.AnyAsync(e => e.SupplyID == id);
         }

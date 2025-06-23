@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/Profile/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Profile>> GetProfile(Guid id)
+        public async Task<ActionResult<Profile>> GetProfile(string id)
         {
             var profile = await _profileService.GetProfileByIdAsync(id);
 
@@ -40,10 +39,10 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/Profile/user/5
-        [HttpGet("user/{userId}")]
-        public async Task<ActionResult<Profile>> GetProfileByUserId(Guid userId)
+        [HttpGet("user/{userID}")]
+        public async Task<ActionResult<Profile>> GetProfileByUserId(string userID)
         {
-            var profile = await _profileService.GetProfileByUserIdAsync(userId);
+            var profile = await _profileService.GetProfileByUserIdAsync(userID);
 
             if (profile == null)
             {
@@ -58,12 +57,12 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<Profile>> CreateProfile(Profile profile)
         {
             var createdProfile = await _profileService.CreateProfileAsync(profile);
-            return CreatedAtAction(nameof(GetProfile), new { id = createdProfile.ProfileId }, createdProfile);
+            return CreatedAtAction(nameof(GetProfile), new { id = createdProfile.ProfileID }, createdProfile);
         }
 
         // PUT: api/Profile/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProfile(Guid id, Profile profile)
+        public async Task<IActionResult> UpdateProfile(string id, Profile profile)
         {
             try
             {
@@ -83,7 +82,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/Profile/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProfile(Guid id)
+        public async Task<IActionResult> DeleteProfile(string id)
         {
             try
             {

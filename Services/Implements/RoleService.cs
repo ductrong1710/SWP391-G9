@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,7 +18,7 @@ namespace Services.implements
             return await _roleRepository.GetAllRolesAsync();
         }
 
-        public async Task<Role?> GetRoleByIdAsync(int id)
+        public async Task<Role?> GetRoleByIdAsync(string id)
         {
             return await _roleRepository.GetRoleByIdAsync(id);
         }
@@ -38,22 +37,22 @@ namespace Services.implements
             return role;
         }
 
-        public async Task UpdateRoleAsync(int id, Role role)
+        public async Task UpdateRoleAsync(string id, Role role)
         {
-            if (id != role.RoleId)
+            if (id != role.RoleID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _roleRepository.RoleExistsAsync(id))
                 throw new KeyNotFoundException("Role not found");
 
             var existingRole = await _roleRepository.GetRoleByTypeAsync(role.RoleType);
-            if (existingRole != null && existingRole.RoleId != id)
+            if (existingRole != null && existingRole.RoleID != id)
                 throw new InvalidOperationException("Role type already exists");
 
             await _roleRepository.UpdateRoleAsync(role);
         }
 
-        public async Task DeleteRoleAsync(int id)
+        public async Task DeleteRoleAsync(string id)
         {
             if (!await _roleRepository.RoleExistsAsync(id))
                 throw new KeyNotFoundException("Role not found");

@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,7 +18,7 @@ namespace Services.implements
             return await _userRepository.GetAllUsersAsync();
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid id)
+        public async Task<User?> GetUserByIdAsync(string id)
         {
             return await _userRepository.GetUserByIdAsync(id);
         }
@@ -35,9 +34,9 @@ namespace Services.implements
             return user;
         }
 
-        public async Task UpdateUserAsync(Guid id, User user)
+        public async Task UpdateUserAsync(string id, User user)
         {
-            if (id != user.UserId)
+            if (id != user.UserID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _userRepository.UserExistsAsync(id))
@@ -46,7 +45,7 @@ namespace Services.implements
             await _userRepository.UpdateUserAsync(user);
         }
 
-        public async Task DeleteUserAsync(Guid id)
+        public async Task DeleteUserAsync(string id)
         {
             if (!await _userRepository.UserExistsAsync(id))
                 throw new KeyNotFoundException("User not found");

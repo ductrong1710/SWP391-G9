@@ -21,18 +21,18 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<MedicationSubmissionForm?> GetFormByIdAsync(int id)
+        public async Task<MedicationSubmissionForm?> GetFormByIdAsync(string id)
         {
             return await _context.MedicationSubmissionForms
                 .Include(m => m.Student)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
         }
 
-        public async Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(Guid studentId)
+        public async Task<IEnumerable<MedicationSubmissionForm>> GetFormsByStudentIdAsync(string studentId)
         {
             return await _context.MedicationSubmissionForms
                 .Include(m => m.Student)
-                .Where(m => m.StudentId == studentId)
+                .Where(m => m.StudentID == studentId)
                 .ToListAsync();
         }
 
@@ -48,7 +48,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteFormAsync(int id)
+        public async Task DeleteFormAsync(string id)
         {
             var form = await GetFormByIdAsync(id);
             if (form != null)
@@ -58,9 +58,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> FormExistsAsync(int id)
+        public async Task<bool> FormExistsAsync(string id)
         {
-            return await _context.MedicationSubmissionForms.AnyAsync(m => m.Id == id);
+            return await _context.MedicationSubmissionForms.AnyAsync(m => m.ID == id);
         }
     }
 }

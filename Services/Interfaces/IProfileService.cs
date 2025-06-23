@@ -1,14 +1,14 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IProfileService
     {
         Task<IEnumerable<Profile>> GetAllProfilesAsync();
-        Task<Profile?> GetProfileByIdAsync(Guid id);
-        Task<Profile?> GetProfileByUserIdAsync(Guid userId);
+        Task<Profile?> GetProfileByIdAsync(string id);
+        Task<Profile?> GetProfileByUserIdAsync(string userID);
         Task<Profile> CreateProfileAsync(Profile profile);
-        Task UpdateProfileAsync(Guid id, Profile profile);
-        Task DeleteProfileAsync(Guid id);
+        Task UpdateProfileAsync(string id, Profile profile);
+        Task DeleteProfileAsync(string id);
     }
 }

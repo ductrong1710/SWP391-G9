@@ -19,9 +19,9 @@ namespace Repositories.Implements
             return await _context.Medications.ToListAsync();
         }
 
-        public async Task<Medication?> GetMedicationByIdAsync(int id)
+        public async Task<Medication?> GetMedicationByIdAsync(string id)
         {
-            return await _context.Medications.FindAsync(id);
+            return await _context.Medications.FirstOrDefaultAsync(m => m.MedicationID == id);
         }
 
         public async Task<IEnumerable<Medication>> GetExpiredMedicationsAsync()
@@ -50,7 +50,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteMedicationAsync(int id)
+        public async Task DeleteMedicationAsync(string id)
         {
             var medication = await GetMedicationByIdAsync(id);
             if (medication != null)
@@ -60,9 +60,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> MedicationExistsAsync(int id)
+        public async Task<bool> MedicationExistsAsync(string id)
         {
-            return await _context.Medications.AnyAsync(m => m.MedicationId == id);
+            return await _context.Medications.AnyAsync(m => m.MedicationID == id);
         }
     }
 }

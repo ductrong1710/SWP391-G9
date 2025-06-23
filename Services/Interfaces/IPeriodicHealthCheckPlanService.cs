@@ -1,15 +1,15 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IPeriodicHealthCheckPlanService
     {
         Task<IEnumerable<PeriodicHealthCheckPlan>> GetAllPlansAsync();
-        Task<PeriodicHealthCheckPlan?> GetPlanByIdAsync(int id);
-        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatorIdAsync(Guid creatorId);
+        Task<PeriodicHealthCheckPlan?> GetPlanByIdAsync(string id);
+        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatorIdAsync(string creatorID);
         Task<IEnumerable<PeriodicHealthCheckPlan>> GetUpcomingPlansAsync();
         Task<PeriodicHealthCheckPlan> CreatePlanAsync(PeriodicHealthCheckPlan plan);
-        Task UpdatePlanAsync(int id, PeriodicHealthCheckPlan plan);
-        Task DeletePlanAsync(int id);
+        Task UpdatePlanAsync(string id, PeriodicHealthCheckPlan plan);
+        Task DeletePlanAsync(string id);
     }
 }

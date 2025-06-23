@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/VaccineType/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<VaccineType>> GetVaccineType(int id)
+        public async Task<ActionResult<VaccineType>> GetVaccineType(string id)
         {
             var vaccineType = await _vaccineTypeService.GetVaccineTypeByIdAsync(id);
 
@@ -46,7 +45,7 @@ namespace BackEnd.Controllers
             try
             {
                 var createdVaccineType = await _vaccineTypeService.CreateVaccineTypeAsync(vaccineType);
-                return CreatedAtAction(nameof(GetVaccineType), new { id = createdVaccineType.VaccinationId }, createdVaccineType);
+                return CreatedAtAction(nameof(GetVaccineType), new { id = createdVaccineType.VaccinationID }, createdVaccineType);
             }
             catch (InvalidOperationException ex)
             {
@@ -56,7 +55,7 @@ namespace BackEnd.Controllers
 
         // PUT: api/VaccineType/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVaccineType(int id, VaccineType vaccineType)
+        public async Task<IActionResult> UpdateVaccineType(string id, VaccineType vaccineType)
         {
             try
             {
@@ -80,7 +79,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/VaccineType/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVaccineType(int id)
+        public async Task<IActionResult> DeleteVaccineType(string id)
         {
             try
             {

@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -23,14 +22,14 @@ namespace Services.implements
             return await _resultRepository.GetAllHealthCheckResultsAsync();
         }
 
-        public async Task<HealthCheckResult?> GetHealthCheckResultByIdAsync(int id)
+        public async Task<HealthCheckResult?> GetHealthCheckResultByIdAsync(string id)
         {
             return await _resultRepository.GetHealthCheckResultByIdAsync(id);
         }
 
-        public async Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(int consentId)
+        public async Task<HealthCheckResult?> GetHealthCheckResultByConsentIdAsync(string consentID)
         {
-            return await _resultRepository.GetHealthCheckResultByConsentIdAsync(consentId);
+            return await _resultRepository.GetHealthCheckResultByConsentIdAsync(consentID);
         }
 
         public async Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByCheckerAsync(string checker)
@@ -53,20 +52,20 @@ namespace Services.implements
 
         public async Task<HealthCheckResult> CreateHealthCheckResultAsync(HealthCheckResult result)
         {
-            var consentForm = await _consentFormRepository.GetConsentFormByIdAsync(result.HealthCheckConsentId);
+            var consentForm = await _consentFormRepository.GetConsentFormByIdAsync(result.HealthCheckConsentID);
             if (consentForm == null)
                 throw new KeyNotFoundException("Health check consent form not found");
 
             if (consentForm.ConsentStatus != "Approved")
                 throw new InvalidOperationException("Cannot create result for non-approved consent form");
 
-            if (await _resultRepository.HasResultForConsentAsync(result.HealthCheckConsentId))
+            if (await _resultRepository.HasResultForConsentAsync(result.HealthCheckConsentID))
                 throw new InvalidOperationException("A result already exists for this consent form");
 
             if (result.CheckUpDate > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for check-up date");
 
-            if (result.ConsultationRecommended && !result.ConsultationAppointmentDate.HasValue)
+            if (result.ConsultationRecommended == true && !result.ConsultationAppointmentDate.HasValue)
                 throw new InvalidOperationException("Consultation appointment date is required when consultation is recommended");
 
             if (result.ConsultationAppointmentDate.HasValue && result.ConsultationAppointmentDate.Value <= DateTime.Today)
@@ -76,35 +75,28 @@ namespace Services.implements
             return result;
         }
 
-        public async Task UpdateHealthCheckResultAsync(int id, HealthCheckResult result)
+        public async Task UpdateHealthCheckResultAsync(string id, HealthCheckResult result)
         {
-            if (id != result.Id)
+            if (id != result.ID)
                 throw new ArgumentException("ID mismatch");
-
             if (!await _resultRepository.HealthCheckResultExistsAsync(id))
                 throw new KeyNotFoundException("Health check result not found");
-
-            var consentForm = await _consentFormRepository.GetConsentFormByIdAsync(result.HealthCheckConsentId);
+            var consentForm = await _consentFormRepository.GetConsentFormByIdAsync(result.HealthCheckConsentID);
             if (consentForm == null)
                 throw new KeyNotFoundException("Health check consent form not found");
-
             if (result.CheckUpDate > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for check-up date");
-
-            if (result.ConsultationRecommended && !result.ConsultationAppointmentDate.HasValue)
+            if (result.ConsultationRecommended == true && !result.ConsultationAppointmentDate.HasValue)
                 throw new InvalidOperationException("Consultation appointment date is required when consultation is recommended");
-
             if (result.ConsultationAppointmentDate.HasValue && result.ConsultationAppointmentDate.Value <= DateTime.Today)
                 throw new InvalidOperationException("Consultation appointment date must be in the future");
-
             await _resultRepository.UpdateHealthCheckResultAsync(result);
         }
 
-        public async Task DeleteHealthCheckResultAsync(int id)
+        public async Task DeleteHealthCheckResultAsync(string id)
         {
             if (!await _resultRepository.HealthCheckResultExistsAsync(id))
                 throw new KeyNotFoundException("Health check result not found");
-
             await _resultRepository.DeleteHealthCheckResultAsync(id);
         }
     }

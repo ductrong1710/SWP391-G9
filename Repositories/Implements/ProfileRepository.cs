@@ -19,18 +19,18 @@ namespace Repositories.Implements
             return await _context.Profiles.Include(p => p.User).ToListAsync();
         }
 
-        public async Task<Profile?> GetProfileByIdAsync(Guid id)
+        public async Task<Profile?> GetProfileByIdAsync(string id)
         {
             return await _context.Profiles
                 .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.ProfileId == id);
+                .FirstOrDefaultAsync(p => p.ProfileID == id);
         }
 
-        public async Task<Profile?> GetProfileByUserIdAsync(Guid userId)
+        public async Task<Profile?> GetProfileByUserIdAsync(string userId)
         {
             return await _context.Profiles
                 .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.UserId == userId);
+                .FirstOrDefaultAsync(p => p.UserID == userId);
         }
 
         public async Task CreateProfileAsync(Profile profile)
@@ -45,7 +45,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteProfileAsync(Guid id)
+        public async Task DeleteProfileAsync(string id)
         {
             var profile = await GetProfileByIdAsync(id);
             if (profile != null)
@@ -55,9 +55,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> ProfileExistsAsync(Guid id)
+        public async Task<bool> ProfileExistsAsync(string id)
         {
-            return await _context.Profiles.AnyAsync(p => p.ProfileId == id);
+            return await _context.Profiles.AnyAsync(p => p.ProfileID == id);
         }
     }
 }

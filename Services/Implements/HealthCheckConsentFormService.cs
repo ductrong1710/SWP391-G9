@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,29 +18,29 @@ namespace Services.implements
             return await _consentFormRepository.GetAllConsentFormsAsync();
         }
 
-        public async Task<HealthCheckConsentForm?> GetConsentFormByIdAsync(int id)
+        public async Task<HealthCheckConsentForm?> GetConsentFormByIdAsync(string id)
         {
             return await _consentFormRepository.GetConsentFormByIdAsync(id);
         }
 
-        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(int planId)
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(string planID)
         {
-            return await _consentFormRepository.GetConsentFormsByPlanIdAsync(planId);
+            return await _consentFormRepository.GetConsentFormsByPlanIdAsync(planID);
         }
 
-        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(Guid studentId)
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(string studentID)
         {
-            return await _consentFormRepository.GetConsentFormsByStudentIdAsync(studentId);
+            return await _consentFormRepository.GetConsentFormsByStudentIdAsync(studentID);
         }
 
-        public async Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(int planId, Guid studentId)
+        public async Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(string planID, string studentID)
         {
-            return await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(planId, studentId);
+            return await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(planID, studentID);
         }
 
         public async Task<HealthCheckConsentForm> CreateConsentFormAsync(HealthCheckConsentForm form)
         {
-            var existingForm = await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(form.HealthCheckPlanId, form.StudentId);
+            var existingForm = await _consentFormRepository.GetConsentFormByPlanAndStudentAsync(form.HealthCheckPlanID, form.StudentID);
             if (existingForm != null)
                 throw new InvalidOperationException("A consent form already exists for this student and plan");
 
@@ -49,9 +48,9 @@ namespace Services.implements
             return form;
         }
 
-        public async Task UpdateConsentFormAsync(int id, HealthCheckConsentForm form)
+        public async Task UpdateConsentFormAsync(string id, HealthCheckConsentForm form)
         {
-            if (id != form.Id)
+            if (id != form.ID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _consentFormRepository.ConsentFormExistsAsync(id))
@@ -60,7 +59,7 @@ namespace Services.implements
             await _consentFormRepository.UpdateConsentFormAsync(form);
         }
 
-        public async Task DeleteConsentFormAsync(int id)
+        public async Task DeleteConsentFormAsync(string id)
         {
             if (!await _consentFormRepository.ConsentFormExistsAsync(id))
                 throw new KeyNotFoundException("Consent form not found");

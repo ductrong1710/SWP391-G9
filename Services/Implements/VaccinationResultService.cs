@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -26,65 +25,65 @@ namespace Services.implements
             return await _resultRepository.GetAllVaccinationResultsAsync();
         }
 
-        public async Task<VaccinationResult?> GetVaccinationResultByIdAsync(int id)
+        public async Task<VaccinationResult?> GetVaccinationResultByIdAsync(string id)
         {
             return await _resultRepository.GetVaccinationResultByIdAsync(id);
         }
 
-        public async Task<VaccinationResult?> GetVaccinationResultByConsentFormIdAsync(int consentFormId)
+        public async Task<VaccinationResult?> GetVaccinationResultByConsentFormIdAsync(string consentFormID)
         {
-            return await _resultRepository.GetVaccinationResultByConsentFormIdAsync(consentFormId);
+            return await _resultRepository.GetVaccinationResultByConsentFormIdAsync(consentFormID);
         }
 
-        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByVaccineTypeAsync(int vaccineTypeId)
+        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByVaccineTypeAsync(string vaccineTypeID)
         {
-            return await _resultRepository.GetVaccinationResultsByVaccineTypeAsync(vaccineTypeId);
+            return await _resultRepository.GetVaccinationResultsByVaccineTypeAsync(vaccineTypeID);
         }
 
         public async Task<VaccinationResult> CreateVaccinationResultAsync(VaccinationResult result)
         {
-            var consentForm = await _consentFormRepository.GetVaccinationConsentFormByIdAsync(result.ConsentFormId);
+            var consentForm = await _consentFormRepository.GetVaccinationConsentFormByIdAsync(result.ConsentFormID);
             if (consentForm == null)
                 throw new KeyNotFoundException("Vaccination consent form not found");
 
             if (consentForm.ConsentStatus != "Approved")
                 throw new InvalidOperationException("Cannot create vaccination result for a non-approved consent form");
 
-            if (await _resultRepository.GetVaccinationResultByConsentFormIdAsync(result.ConsentFormId) != null)
+            if (await _resultRepository.GetVaccinationResultByConsentFormIdAsync(result.ConsentFormID) != null)
                 throw new InvalidOperationException("A vaccination result already exists for this consent form");
 
-            if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeId))
+            if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeID))
                 throw new KeyNotFoundException("Vaccine type not found");
 
-            if (result.ActualVaccinationDate.Date > DateTime.Today)
+            if (result.ActualVaccinationDate.HasValue && result.ActualVaccinationDate.Value.Date > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for actual vaccination date");
 
             await _resultRepository.CreateVaccinationResultAsync(result);
             return result;
         }
 
-        public async Task UpdateVaccinationResultAsync(int id, VaccinationResult result)
+        public async Task UpdateVaccinationResultAsync(string id, VaccinationResult result)
         {
-            if (id != result.Id)
+            if (id != result.ID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _resultRepository.VaccinationResultExistsAsync(id))
                 throw new KeyNotFoundException("Vaccination result not found");
 
-            var consentForm = await _consentFormRepository.GetVaccinationConsentFormByIdAsync(result.ConsentFormId);
+            var consentForm = await _consentFormRepository.GetVaccinationConsentFormByIdAsync(result.ConsentFormID);
             if (consentForm == null)
                 throw new KeyNotFoundException("Vaccination consent form not found");
 
-            if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeId))
+            if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeID))
                 throw new KeyNotFoundException("Vaccine type not found");
 
-            if (result.ActualVaccinationDate.Date > DateTime.Today)
+            if (result.ActualVaccinationDate.HasValue && result.ActualVaccinationDate.Value.Date > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for actual vaccination date");
 
             await _resultRepository.UpdateVaccinationResultAsync(result);
         }
 
-        public async Task DeleteVaccinationResultAsync(int id)
+        public async Task DeleteVaccinationResultAsync(string id)
         {
             if (!await _resultRepository.VaccinationResultExistsAsync(id))
                 throw new KeyNotFoundException("Vaccination result not found");

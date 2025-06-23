@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -27,7 +26,7 @@ namespace BackEnd.Controllers
 
         // GET: api/Role/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Role>> GetRole(int id)
+        public async Task<ActionResult<Role>> GetRole(string id)
         {
             var role = await _roleService.GetRoleByIdAsync(id);
 
@@ -60,7 +59,7 @@ namespace BackEnd.Controllers
             try
             {
                 var createdRole = await _roleService.CreateRoleAsync(role);
-                return CreatedAtAction(nameof(GetRole), new { id = createdRole.RoleId }, createdRole);
+                return CreatedAtAction(nameof(GetRole), new { id = createdRole.RoleID }, createdRole);
             }
             catch (InvalidOperationException ex)
             {
@@ -70,7 +69,7 @@ namespace BackEnd.Controllers
 
         // PUT: api/Role/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRole(int id, Role role)
+        public async Task<IActionResult> UpdateRole(string id, Role role)
         {
             try
             {
@@ -94,7 +93,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/Role/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRole(int id)
+        public async Task<IActionResult> DeleteRole(string id)
         {
             try
             {

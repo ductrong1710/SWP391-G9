@@ -19,9 +19,9 @@ namespace Repositories.Implements
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid id)
+        public async Task<User?> GetByIdAsync(string id)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserID == id);
         }
 
         public async Task<User?> GetUserByUsernameAsync(string username)
@@ -41,9 +41,9 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteUserAsync(Guid id)
+        public async Task DeleteUserAsync(string id)
         {
-            var user = await GetUserByIdAsync(id);
+            var user = await GetByIdAsync(id);
             if (user != null)
             {
                 _context.Users.Remove(user);
@@ -51,9 +51,20 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> UserExistsAsync(Guid id)
+        public async Task<bool> UserExistsAsync(string id)
         {
-            return await _context.Users.AnyAsync(u => u.UserId == id);
+            return await _context.Users.AnyAsync(u => u.UserID == id);
+        }
+
+        public async Task<User?> GetParentByStudentIdAsync(string studentId)
+        {
+            var student = await _context.Users.Include(u => u.Parent).FirstOrDefaultAsync(u => u.UserID == studentId);
+            return student?.Parent;
+        }
+
+        public async Task<User?> GetUserByIdAsync(string id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserID == id);
         }
     }
 }

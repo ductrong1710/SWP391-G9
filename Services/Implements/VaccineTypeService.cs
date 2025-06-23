@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,7 +18,7 @@ namespace Services.implements
             return await _vaccineTypeRepository.GetAllVaccineTypesAsync();
         }
 
-        public async Task<VaccineType?> GetVaccineTypeByIdAsync(int id)
+        public async Task<VaccineType?> GetVaccineTypeByIdAsync(string id)
         {
             return await _vaccineTypeRepository.GetVaccineTypeByIdAsync(id);
         }
@@ -33,9 +32,9 @@ namespace Services.implements
             return vaccineType;
         }
 
-        public async Task UpdateVaccineTypeAsync(int id, VaccineType vaccineType)
+        public async Task UpdateVaccineTypeAsync(string id, VaccineType vaccineType)
         {
-            if (id != vaccineType.VaccinationId)
+            if (id != vaccineType.VaccinationID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(id))
@@ -49,7 +48,7 @@ namespace Services.implements
             await _vaccineTypeRepository.UpdateVaccineTypeAsync(vaccineType);
         }
 
-        public async Task DeleteVaccineTypeAsync(int id)
+        public async Task DeleteVaccineTypeAsync(string id)
         {
             if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(id))
                 throw new KeyNotFoundException("Vaccine type not found");

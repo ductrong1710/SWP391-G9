@@ -21,18 +21,18 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<HealthRecord?> GetHealthRecordByIdAsync(Guid id)
+        public async Task<HealthRecord?> GetHealthRecordByIdAsync(string id)
         {
             return await _context.HealthRecords
                 .Include(h => h.Student)
-                .FirstOrDefaultAsync(h => h.HealthRecordId == id);
+                .FirstOrDefaultAsync(h => h.HealthRecordID == id);
         }
 
-        public async Task<HealthRecord?> GetHealthRecordByStudentIdAsync(Guid studentId)
+        public async Task<HealthRecord?> GetHealthRecordByStudentIdAsync(string studentId)
         {
             return await _context.HealthRecords
                 .Include(h => h.Student)
-                .FirstOrDefaultAsync(h => h.StudentId == studentId);
+                .FirstOrDefaultAsync(h => h.StudentID == studentId);
         }
 
         public async Task CreateHealthRecordAsync(HealthRecord healthRecord)
@@ -47,7 +47,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteHealthRecordAsync(Guid id)
+        public async Task DeleteHealthRecordAsync(string id)
         {
             var healthRecord = await GetHealthRecordByIdAsync(id);
             if (healthRecord != null)
@@ -57,9 +57,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> HealthRecordExistsAsync(Guid id)
+        public async Task<bool> HealthRecordExistsAsync(string id)
         {
-            return await _context.HealthRecords.AnyAsync(h => h.HealthRecordId == id);
+            return await _context.HealthRecords.AnyAsync(h => h.HealthRecordID == id);
         }
     }
 }

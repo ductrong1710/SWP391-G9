@@ -22,38 +22,38 @@ namespace Repositories.Implements
                 .ToListAsync();
         }
 
-        public async Task<HealthCheckConsentForm?> GetConsentFormByIdAsync(int id)
+        public async Task<HealthCheckConsentForm?> GetConsentFormByIdAsync(string id)
         {
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
-                .FirstOrDefaultAsync(f => f.Id == id);
+                .FirstOrDefaultAsync(f => f.ID == id);
         }
 
-        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(int planId)
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByPlanIdAsync(string planId)
         {
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
-                .Where(f => f.HealthCheckPlanId == planId)
+                .Where(f => f.HealthCheckPlanID == planId)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(Guid studentId)
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdAsync(string studentId)
         {
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
-                .Where(f => f.StudentId == studentId)
+                .Where(f => f.StudentID == studentId)
                 .ToListAsync();
         }
 
-        public async Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(int planId, Guid studentId)
+        public async Task<HealthCheckConsentForm?> GetConsentFormByPlanAndStudentAsync(string planId, string studentId)
         {
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
-                .FirstOrDefaultAsync(f => f.HealthCheckPlanId == planId && f.StudentId == studentId);
+                .FirstOrDefaultAsync(f => f.HealthCheckPlanID == planId && f.StudentID == studentId);
         }
 
         public async Task CreateConsentFormAsync(HealthCheckConsentForm form)
@@ -68,7 +68,7 @@ namespace Repositories.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteConsentFormAsync(int id)
+        public async Task DeleteConsentFormAsync(string id)
         {
             var form = await GetConsentFormByIdAsync(id);
             if (form != null)
@@ -78,9 +78,9 @@ namespace Repositories.Implements
             }
         }
 
-        public async Task<bool> ConsentFormExistsAsync(int id)
+        public async Task<bool> ConsentFormExistsAsync(string id)
         {
-            return await _context.HealthCheckConsentForms.AnyAsync(f => f.Id == id);
+            return await _context.HealthCheckConsentForms.AnyAsync(f => f.ID == id);
         }
     }
 }

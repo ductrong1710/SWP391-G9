@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -25,7 +24,7 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MedicationSubmissionForm>> GetForm(int id)
+        public async Task<ActionResult<MedicationSubmissionForm>> GetForm(string id)
         {
             var form = await _service.GetFormByIdAsync(id);
             if (form == null)
@@ -34,10 +33,10 @@ namespace BackEnd.Controllers
             return Ok(form);
         }
 
-        [HttpGet("student/{studentId}")]
-        public async Task<ActionResult<IEnumerable<MedicationSubmissionForm>>> GetFormsByStudentId(Guid studentId)
+        [HttpGet("student/{studentID}")]
+        public async Task<ActionResult<IEnumerable<MedicationSubmissionForm>>> GetFormsByStudentId(string studentID)
         {
-            var forms = await _service.GetFormsByStudentIdAsync(studentId);
+            var forms = await _service.GetFormsByStudentIdAsync(studentID);
             return Ok(forms);
         }
 
@@ -45,11 +44,11 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<MedicationSubmissionForm>> CreateForm(MedicationSubmissionForm form)
         {
             var createdForm = await _service.CreateFormAsync(form);
-            return CreatedAtAction(nameof(GetForm), new { id = createdForm.Id }, createdForm);
+            return CreatedAtAction(nameof(GetForm), new { id = createdForm.ID }, createdForm);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateForm(int id, MedicationSubmissionForm form)
+        public async Task<IActionResult> UpdateForm(string id, MedicationSubmissionForm form)
         {
             try
             {
@@ -68,7 +67,7 @@ namespace BackEnd.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteForm(int id)
+        public async Task<IActionResult> DeleteForm(string id)
         {
             try
             {

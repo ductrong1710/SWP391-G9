@@ -1,13 +1,13 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IVaccineTypeService
     {
         Task<IEnumerable<VaccineType>> GetAllVaccineTypesAsync();
-        Task<VaccineType?> GetVaccineTypeByIdAsync(int id);
+        Task<VaccineType?> GetVaccineTypeByIdAsync(string id);
         Task<VaccineType> CreateVaccineTypeAsync(VaccineType vaccineType);
-        Task UpdateVaccineTypeAsync(int id, VaccineType vaccineType);
-        Task DeleteVaccineTypeAsync(int id);
+        Task UpdateVaccineTypeAsync(string id, VaccineType vaccineType);
+        Task DeleteVaccineTypeAsync(string id);
     }
 }

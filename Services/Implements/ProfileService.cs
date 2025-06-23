@@ -1,7 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.implements
 {
@@ -19,14 +18,14 @@ namespace Services.implements
             return await _profileRepository.GetAllProfilesAsync();
         }
 
-        public async Task<Profile?> GetProfileByIdAsync(Guid id)
+        public async Task<Profile?> GetProfileByIdAsync(string id)
         {
             return await _profileRepository.GetProfileByIdAsync(id);
         }
 
-        public async Task<Profile?> GetProfileByUserIdAsync(Guid userId)
+        public async Task<Profile?> GetProfileByUserIdAsync(string userID)
         {
-            return await _profileRepository.GetProfileByUserIdAsync(userId);
+            return await _profileRepository.GetProfileByUserIdAsync(userID);
         }
 
         public async Task<Profile> CreateProfileAsync(Profile profile)
@@ -35,9 +34,9 @@ namespace Services.implements
             return profile;
         }
 
-        public async Task UpdateProfileAsync(Guid id, Profile profile)
+        public async Task UpdateProfileAsync(string id, Profile profile)
         {
-            if (id != profile.ProfileId)
+            if (id != profile.ProfileID)
                 throw new ArgumentException("ID mismatch");
 
             if (!await _profileRepository.ProfileExistsAsync(id))
@@ -46,7 +45,7 @@ namespace Services.implements
             await _profileRepository.UpdateProfileAsync(profile);
         }
 
-        public async Task DeleteProfileAsync(Guid id)
+        public async Task DeleteProfileAsync(string id)
         {
             if (!await _profileRepository.ProfileExistsAsync(id))
                 throw new KeyNotFoundException("Profile not found");

@@ -43,3 +43,300 @@
   padding: 0.5em 0.75em;
   font-weight: 500;
 }
+
+/* Thêm mới/làm đẹp cho VaccinationManagement */
+.vaccination-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.vaccination-header h1 {
+  font-size: 2.2rem;
+  color: #2b6cb0;
+  margin-bottom: 8px;
+}
+
+.vaccination-header p {
+  color: #4a5568;
+  font-size: 1.1rem;
+}
+
+.search-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  justify-content: space-between;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 6px 14px;
+  flex: 1 1 300px;
+  max-width: 400px;
+}
+.search-box i {
+  color: #3182ce;
+  margin-right: 8px;
+}
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.filter-controls select {
+  border-radius: 6px;
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #2d3748;
+}
+
+.create-plan-btn {
+  background: #3182ce;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.create-plan-btn:hover {
+  background: #2563eb;
+}
+
+.vaccination-plans-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.vaccination-plan-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(49, 130, 206, 0.08);
+  padding: 24px 20px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid #e2e8f0;
+}
+.vaccination-plan-card:hover {
+  box-shadow: 0 8px 32px rgba(49, 130, 206, 0.16);
+  transform: translateY(-2px) scale(1.01);
+}
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.plan-title h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2b6cb0;
+  font-weight: 600;
+}
+.status-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-left: 10px;
+}
+.plan-date {
+  color: #718096;
+  font-size: 0.98rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.plan-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 32px;
+  margin-top: 8px;
+}
+.plan-description, .plan-target, .plan-stats {
+  flex: 1 1 180px;
+  min-width: 180px;
+}
+.plan-description h4, .plan-target h4, .plan-stats h4 {
+  font-size: 1.05rem;
+  color: #3182ce;
+  margin-bottom: 4px;
+}
+.plan-description p, .plan-target p {
+  margin: 0 0 4px 0;
+  color: #2d3748;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 18px;
+}
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.98rem;
+}
+.stat-value.confirmed {
+  color: #38a169;
+  font-weight: 600;
+}
+.stat-value.pending {
+  color: #d69e2e;
+  font-weight: 600;
+}
+.stat-value.completed {
+  color: #3182ce;
+  font-weight: 600;
+}
+.plan-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+.view-details-btn, .send-notifications-btn {
+  background: #f1f5f9;
+  color: #2b6cb0;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.view-details-btn:hover, .send-notifications-btn:hover {
+  background: #3182ce;
+  color: #fff;
+}
+.no-results {
+  text-align: center;
+  color: #a0aec0;
+  font-size: 1.1rem;
+  margin: 40px 0;
+}
+.no-results i {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+/* Modal overlay & modal */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.create-plan-modal {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(49, 130, 206, 0.18);
+  padding: 32px 28px 18px 28px;
+  min-width: 340px;
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.modal-header h3 {
+  margin: 0;
+  color: #2b6cb0;
+  font-size: 1.25rem;
+}
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: #a0aec0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.close-btn:hover {
+  color: #3182ce;
+}
+.form-group {
+  margin-bottom: 14px;
+}
+.form-group label {
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 4px;
+  display: block;
+}
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 1rem;
+  background: #f8fafc;
+  color: #2d3748;
+  margin-top: 2px;
+  transition: border 0.2s;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+  border: 1.5px solid #3182ce;
+  outline: none;
+}
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+.cancel-btn {
+  background: #e2e8f0;
+  color: #2d3748;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+.cancel-btn:hover {
+  background: #cbd5e1;
+}
+.submit-btn {
+  background: #3182ce;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.submit-btn:hover {
+  background: #2563eb;
+}

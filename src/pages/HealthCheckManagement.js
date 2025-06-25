@@ -170,60 +170,35 @@ const HealthCheckManagement = () => {
     }
   ], []);
   
-  // Dữ liệu mẫu cho danh sách học sinh theo lớp
-  const mockClassStudents = useMemo(() => {
-    return {
-      '10A1': [
-        { id: 'SV2022012', name: 'Phạm Thị D' },
-        { id: 'SV2022034', name: 'Hoàng Văn E' },
-        { id: 'SV2022056', name: 'Nguyễn Thị F' },
-        { id: 'SV2022078', name: 'Đỗ Văn M' },
-        { id: 'SV2022090', name: 'Trần Thị N' },
-      ],
-      '10A2': [
-        { id: 'SV2022013', name: 'Lê Văn P' },
-        { id: 'SV2022035', name: 'Nguyễn Thị Q' },
-        { id: 'SV2022057', name: 'Hoàng Văn R' },
-        { id: 'SV2022079', name: 'Phạm Thị S' },
-        { id: 'SV2022091', name: 'Vũ Văn T' },
-      ],
-      '10A3': [
-        { id: 'SV2022078', name: 'Trần Văn C' },
-        { id: 'SV2022014', name: 'Nguyễn Thị U' },
-        { id: 'SV2022036', name: 'Phạm Văn V' },
-        { id: 'SV2022058', name: 'Lê Thị X' },
-        { id: 'SV2022080', name: 'Trần Văn Y' },
-      ],
-      '11A1': [
-        { id: 'SV2022067', name: 'Vũ Văn G' },
-        { id: 'SV2022023', name: 'Trần Thị H' },
-        { id: 'SV2022015', name: 'Hoàng Văn Z' },
-        { id: 'SV2022037', name: 'Nguyễn Thị AA' },
-        { id: 'SV2022059', name: 'Lê Văn BB' },
-      ],
-      '11A2': [
-        { id: 'SV2022045', name: 'Lê Thị B' },
-        { id: 'SV2022016', name: 'Phạm Thị CC' },
-        { id: 'SV2022038', name: 'Trần Văn DD' },
-        { id: 'SV2022060', name: 'Nguyễn Thị EE' },
-        { id: 'SV2022082', name: 'Hoàng Văn FF' },
-      ],
-      '12A1': [
-        { id: 'SV2022001', name: 'Nguyễn Văn A' },
-        { id: 'SV2022017', name: 'Lê Văn GG' },
-        { id: 'SV2022039', name: 'Phạm Thị HH' },
-        { id: 'SV2022061', name: 'Trần Văn II' },
-        { id: 'SV2022083', name: 'Nguyễn Thị JJ' },
-      ],
-      '12A2': [
-        { id: 'SV2022089', name: 'Lê Văn I' },
-        { id: 'SV2022098', name: 'Nguyễn Thị K' },
-        { id: 'SV2022018', name: 'Hoàng Văn KK' },
-        { id: 'SV2022040', name: 'Trần Thị LL' },
-        { id: 'SV2022062', name: 'Nguyễn Văn MM' },
-      ]
-    };
-  }, []);  useEffect(() => {
+  // Mock data cho học sinh từng lớp để dùng cho đặt lịch hàng loạt
+  const mockClassStudents = {
+    '10A1': [
+      { id: 'SV2022001', name: 'Nguyễn Văn An' },
+      { id: 'SV2022012', name: 'Phạm Thị Dung' },
+      { id: 'SV2022013', name: 'Lê Thị Hạnh' }
+    ],
+    '10A2': [
+      { id: 'SV2022020', name: 'Trần Văn Bình' },
+      { id: 'SV2022021', name: 'Ngô Thị Mai' }
+    ],
+    '10A3': [
+      { id: 'SV2022078', name: 'Lê Minh Cường' }
+    ],
+    '11A1': [
+      { id: 'SV2022100', name: 'Phạm Văn Hòa' }
+    ],
+    '11A2': [
+      { id: 'SV2022045', name: 'Trần Thị Bình' }
+    ],
+    '12A1': [
+      { id: 'SV2023001', name: 'Nguyễn Văn Nam' }
+    ],
+    '12A2': [
+      { id: 'SV2023002', name: 'Lê Thị Lan' }
+    ]
+  };
+  
+  useEffect(() => {
     // Kiểm tra xác thực
     if (!authLoading && !isAuthenticated) {
       console.log("HealthCheckManagement: Not authenticated, redirecting to login");

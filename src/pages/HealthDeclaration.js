@@ -1,325 +1,805 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import healthRecordService from '../services/healthRecordService';
+import apiClient from '../services/apiClient';
 import './HealthDeclaration.css';
 
 const HealthDeclaration = () => {
-  const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
-  
+  const { user, getUserRole } = useAuth();
+  const [healthDeclarations, setHealthDeclarations] = useState([]);
+  const [children, setChildren] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedChild, setSelectedChild] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedDeclaration, setSelectedDeclaration] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [formData, setFormData] = useState({
-    studentId: '',
-    studentName: '',
-    studentClass: '',
-    recordDate: new Date().toISOString().split('T')[0],
+    childId: '',
+    declarationDate: new Date().toISOString().split('T')[0],
+    healthStatus: 'Good',
+    hasFever: false,
+    hasCough: false,
+    hasShortnessOfBreath: false,
+    hasFatigue: false,
+    hasLossOfTaste: false,
+    hasLossOfSmell: false,
+    hasSoreThroat: false,
+    hasHeadache: false,
+    hasMusclePain: false,
+    hasDiarrhea: false,
+    hasNausea: false,
+    hasVomiting: false,
+    hasRunnyNose: false,
+    hasCongestion: false,
+    hasChills: false,
+    hasBodyAches: false,
+    hasRecentTravel: false,
+    travelDetails: '',
+    hasContactWithSick: false,
+    contactDetails: '',
+    hasUnderlyingConditions: false,
+    underlyingConditions: '',
+    currentMedications: '',
     allergies: '',
-    chronicDiseases: '',
-    treatmentHistory: '',
-    eyesight: '',
-    hearing: '',
-    vaccinationHistory: '',
-    note: '',
-    parentContact: '',
-    parentId: localStorage.getItem('userId') || '',
-    parentalConsent: false
+    emergencyContact: '',
+    emergencyPhone: '',
+    additionalNotes: ''
   });
 
-  const [alerts, setAlerts] = useState({ success: false });
-  const [healthRecordHistory, setHealthRecordHistory] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
-  const [backendConnection, setBackendConnection] = useState({ checking: true, connected: false, message: '' });
-
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate('/login', { state: { from: { pathname: '/health-declaration' }, manualLogin: true } });
-    }
-  }, [isAuthenticated, loading, navigate]);
-
-  useEffect(() => {
-    setFormData(prev => ({ ...prev, recordDate: new Date().toISOString().split('T')[0] }));
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchHealthRecordHistory = async () => {
-      if (!isAuthenticated) return;
-      setLoadingHistory(true);
-      try {
-        const studentId = localStorage.getItem('studentId');
-        if (studentId) {
-          const records = await healthRecordService.getHealthRecordsByStudentId(studentId);
-          setHealthRecordHistory(records);
-        }
-      } catch (error) {
-        setHealthRecordHistory([]);
-      } finally {
-        setLoadingHistory(false);
-      }
-    };
-    fetchHealthRecordHistory();
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    const checkBackendConnection = async () => {
-      try {
-        const connectionStatus = await healthRecordService.checkBackendConnection();
-        setBackendConnection({ checking: false, connected: connectionStatus.connected, message: connectionStatus.message });
-      } catch (error) {
-        setBackendConnection({ checking: false, connected: false, message: 'Không thể kết nối với backend. Vui lòng kiểm tra kết nối mạng và đảm bảo server đang chạy.' });
-      }
-    };
-    checkBackendConnection();
-  }, []);
-
-  if (loading || !isAuthenticated) {
-    return <div style={{ display: 'flex', justifyContent: 'center', margin: '50px 0' }}><div className="loading-spinner">Đang kiểm tra thông tin đăng nhập...</div></div>;
-  }
-  if (backendConnection.checking) {
-    return <div style={{ display: 'flex', justifyContent: 'center', margin: '50px 0' }}><div className="loading-spinner">Đang kiểm tra kết nối với server...</div></div>;
-  }
-  if (!backendConnection.connected) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '50px 0' }}>
-        <div className="alert alert-danger" style={{ maxWidth: '600px' }}>
-          <h4 className="alert-heading"><i className="fas fa-exclamation-triangle me-2"></i>Lỗi kết nối</h4>
-          <p>{backendConnection.message}</p>
-          <hr />
-          <p className="mb-0">Vui lòng liên hệ với quản trị viên hoặc thử lại sau.</p>
-          <button className="btn btn-primary mt-3" onClick={async () => {
-            setBackendConnection({ checking: true, connected: false, message: '' });
-            const connectionStatus = await healthRecordService.checkBackendConnection();
-            setBackendConnection({ checking: false, connected: connectionStatus.connected, message: connectionStatus.message });
-          }}>
-            <i className="fas fa-sync-alt me-2"></i>Thử lại
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.studentId) {
-      alert('Không tìm thấy học sinh để khai báo sức khỏe!');
-      return;
-    }
-    if (!formData.studentName || !formData.studentClass) {
-      alert('Vui lòng điền đầy đủ các thông tin bắt buộc!');
-      return;
-    }
-    if (!formData.parentalConsent) {
-      alert('Bạn phải xác nhận thông tin khai báo là chính xác và đồng ý để trường theo dõi sức khỏe!');
-      return;
-    }
-    const healthRecordData = {
-      healthRecordId: '00000000-0000-0000-0000-000000000000',
-      studentId: formData.studentId,
-      allergies: formData.allergies || '',
-      chronicDiseases: formData.chronicDiseases || '',
-      treatmentHistory: formData.treatmentHistory || '',
-      eyesight: formData.eyesight || '',
-      hearing: formData.hearing || '',
-      vaccinationHistory: formData.vaccinationHistory || '',
-      note: formData.note || '',
-      parentId: formData.parentId || localStorage.getItem('userId') || '',
-      parentContact: formData.parentContact || localStorage.getItem('userContact') || '',
-      recordDate: formData.recordDate
-    };
+  const fetchData = async () => {
     try {
-      await healthRecordService.createHealthRecord(healthRecordData);
-      setAlerts({ success: true });
-      setFormData({
-        studentId: '', studentName: '', studentClass: '', recordDate: new Date().toISOString().split('T')[0], allergies: '', chronicDiseases: '', treatmentHistory: '', eyesight: '', hearing: '', vaccinationHistory: '', note: '', parentContact: '', parentId: localStorage.getItem('userId') || '', parentalConsent: false
-      });
-      setTimeout(() => setAlerts({ success: false }), 3000);
+      setLoading(true);
+      const userRole = getUserRole();
+      if (userRole !== 'Parent') {
+        navigate('/dashboard');
+        return;
+      }
+      const [declarationsResponse, childrenResponse] = await Promise.all([
+        apiClient.get(`/HealthDeclaration/parent/${user.UserID}`),
+        apiClient.get(`/User/parent/${user.UserID}/children`)
+      ]);
+      setHealthDeclarations(declarationsResponse.data);
+      setChildren(childrenResponse.data);
     } catch (error) {
-      alert('Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại sau!');
+      setHealthDeclarations(getMockHealthDeclarations());
+      setChildren(getMockChildren());
+    } finally {
+      setLoading(false);
     }
   };
 
-  const HealthRecordHistory = () => {
-    if (loadingHistory) return <div className="mt-4 text-center">Đang tải lịch sử khai báo...</div>;
-    if (healthRecordHistory.length === 0) return <div className="mt-4 text-center">Chưa có lịch sử khai báo sức khỏe.</div>;
+  const getMockHealthDeclarations = () => {
+    return [
+      {
+        id: 1,
+        childId: 1,
+        childName: 'Nguyễn Văn An',
+        childClass: '10A1',
+        declarationDate: '2024-12-15',
+        healthStatus: 'Good',
+        hasFever: false,
+        hasCough: false,
+        hasShortnessOfBreath: false,
+        hasFatigue: false,
+        hasLossOfTaste: false,
+        hasLossOfSmell: false,
+        hasSoreThroat: false,
+        hasHeadache: false,
+        hasMusclePain: false,
+        hasDiarrhea: false,
+        hasNausea: false,
+        hasVomiting: false,
+        hasRunnyNose: false,
+        hasCongestion: false,
+        hasChills: false,
+        hasBodyAches: false,
+        hasRecentTravel: false,
+        travelDetails: '',
+        hasContactWithSick: false,
+        contactDetails: '',
+        hasUnderlyingConditions: false,
+        underlyingConditions: '',
+        currentMedications: '',
+        allergies: 'Không có',
+        emergencyContact: 'Nguyễn Văn Phụ Huynh',
+        emergencyPhone: '0901234567',
+        additionalNotes: 'Học sinh khỏe mạnh, không có triệu chứng bất thường',
+        status: 'Submitted',
+        reviewedBy: null,
+        reviewDate: null,
+        reviewNotes: null
+      },
+      {
+        id: 2,
+        childId: 2,
+        childName: 'Nguyễn Thị Bình',
+        childClass: '8A2',
+        declarationDate: '2024-12-14',
+        healthStatus: 'Fair',
+        hasFever: false,
+        hasCough: true,
+        hasShortnessOfBreath: false,
+        hasFatigue: false,
+        hasLossOfTaste: false,
+        hasLossOfSmell: false,
+        hasSoreThroat: true,
+        hasHeadache: false,
+        hasMusclePain: false,
+        hasDiarrhea: false,
+        hasNausea: false,
+        hasVomiting: false,
+        hasRunnyNose: true,
+        hasCongestion: false,
+        hasChills: false,
+        hasBodyAches: false,
+        hasRecentTravel: false,
+        travelDetails: '',
+        hasContactWithSick: false,
+        contactDetails: '',
+        hasUnderlyingConditions: false,
+        underlyingConditions: '',
+        currentMedications: 'Thuốc ho, thuốc cảm',
+        allergies: 'Không có',
+        emergencyContact: 'Nguyễn Văn Phụ Huynh',
+        emergencyPhone: '0901234567',
+        additionalNotes: 'Học sinh có triệu chứng ho và đau họng nhẹ, đang điều trị',
+        status: 'Under Review',
+        reviewedBy: 'BS. Trần Thị Bình',
+        reviewDate: '2024-12-15',
+        reviewNotes: 'Cần theo dõi thêm, có thể đến trường nếu triệu chứng nhẹ'
+      }
+    ];
+  };
+
+  const getMockChildren = () => {
+    return [
+      { id: 1, name: 'Nguyễn Văn An', className: '10A1' },
+      { id: 2, name: 'Nguyễn Thị Bình', className: '8A2' }
+    ];
+  };
+
+  const filteredDeclarations = healthDeclarations.filter(declaration => {
+    const childMatch = selectedChild === '' || declaration.childId === parseInt(selectedChild);
+    const statusMatch = filterStatus === 'all' || declaration.status === filterStatus;
+    return childMatch && statusMatch;
+  });
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Submitted':
+        return '#3182ce';
+      case 'Under Review':
+        return '#d69e2e';
+      case 'Approved':
+        return '#38a169';
+      case 'Rejected':
+        return '#e53e3e';
+      default:
+        return '#718096';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'Submitted':
+        return 'Đã gửi';
+      case 'Under Review':
+        return 'Đang xem xét';
+      case 'Approved':
+        return 'Đã phê duyệt';
+      case 'Rejected':
+        return 'Từ chối';
+      default:
+        return status;
+    }
+  };
+
+  const getHealthStatusColor = (status) => {
+    switch (status) {
+      case 'Good':
+        return '#38a169';
+      case 'Fair':
+        return '#d69e2e';
+      case 'Poor':
+        return '#e53e3e';
+      default:
+        return '#718096';
+    }
+  };
+
+  const handleCreateDeclaration = () => {
+    setFormData({
+      childId: '',
+      declarationDate: new Date().toISOString().split('T')[0],
+      healthStatus: 'Good',
+      hasFever: false,
+      hasCough: false,
+      hasShortnessOfBreath: false,
+      hasFatigue: false,
+      hasLossOfTaste: false,
+      hasLossOfSmell: false,
+      hasSoreThroat: false,
+      hasHeadache: false,
+      hasMusclePain: false,
+      hasDiarrhea: false,
+      hasNausea: false,
+      hasVomiting: false,
+      hasRunnyNose: false,
+      hasCongestion: false,
+      hasChills: false,
+      hasBodyAches: false,
+      hasRecentTravel: false,
+      travelDetails: '',
+      hasContactWithSick: false,
+      contactDetails: '',
+      hasUnderlyingConditions: false,
+      underlyingConditions: '',
+      currentMedications: '',
+      allergies: '',
+      emergencyContact: '',
+      emergencyPhone: '',
+      additionalNotes: ''
+    });
+    setShowCreateModal(true);
+  };
+
+  const handleViewDetails = (declaration) => {
+    setSelectedDeclaration(declaration);
+    setShowDetailsModal(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmitDeclaration = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const selectedChildData = children.find(c => c.id === parseInt(formData.childId));
+      const newDeclaration = {
+        ...formData,
+        childId: parseInt(formData.childId),
+        childName: selectedChildData?.name || '',
+        childClass: selectedChildData?.className || '',
+        status: 'Submitted',
+        reviewedBy: null,
+        reviewDate: null,
+        reviewNotes: null
+      };
+
+      const response = await apiClient.post('/HealthDeclaration', newDeclaration);
+      setHealthDeclarations([...healthDeclarations, response.data]);
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error('Error creating health declaration:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getSymptomCount = (declaration) => {
+    const symptoms = [
+      declaration.hasFever, declaration.hasCough, declaration.hasShortnessOfBreath,
+      declaration.hasFatigue, declaration.hasLossOfTaste, declaration.hasLossOfSmell,
+      declaration.hasSoreThroat, declaration.hasHeadache, declaration.hasMusclePain,
+      declaration.hasDiarrhea, declaration.hasNausea, declaration.hasVomiting,
+      declaration.hasRunnyNose, declaration.hasCongestion, declaration.hasChills,
+      declaration.hasBodyAches
+    ];
+    return symptoms.filter(symptom => symptom).length;
+  };
+
+  if (loading && healthDeclarations.length === 0) {
     return (
-      <div className="mt-4">
-        <h4 className="mb-3">Lịch sử khai báo sức khỏe</h4>
-        <div className="table-responsive">
-          <table className="table table-striped table-hover">
-            <thead>
-              <tr>
-                <th>Ngày khai báo</th>
-                <th>Mã học sinh</th>
-                <th>Dị ứng</th>
-                <th>Bệnh mãn tính</th>
-                <th>Lịch sử điều trị</th>
-                <th>Thị lực</th>
-                <th>Thính lực</th>
-                <th>Ghi chú</th>
-              </tr>
-            </thead>
-            <tbody>
-              {healthRecordHistory.map((record) => (
-                <tr key={record.healthRecordId}>
-                  <td>{new Date(record.recordDate).toLocaleDateString('vi-VN')}</td>
-                  <td>{record.studentId}</td>
-                  <td>{record.allergies || '-'}</td>
-                  <td>{record.chronicDiseases || '-'}</td>
-                  <td>{record.treatmentHistory || '-'}</td>
-                  <td>{record.eyesight || '-'}</td>
-                  <td>{record.hearing || '-'}</td>
-                  <td>{record.note || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="health-declaration-container">
+        <div className="loading-spinner"></div>
       </div>
     );
-  };
+  }
 
   return (
-    <div className="main-container">
-      <main className="main-content">
-        <div className="page-header">
-          <h1 className="page-title"><i className="fas fa-file-medical me-2"></i>Khai báo sức khỏe</h1>
-          <p className="page-subtitle">Theo dõi và quản lý tình trạng sức khỏe học sinh</p>
+    <div className="health-declaration-container">
+      <div className="declaration-header">
+        <h1>Khai báo sức khỏe</h1>
+        <p>Khai báo tình trạng sức khỏe của con em hàng ngày</p>
+      </div>
+
+      {/* Filters */}
+      <div className="filters-section">
+        <div className="filter-group">
+          <label>Con em:</label>
+          <select 
+            value={selectedChild} 
+            onChange={(e) => setSelectedChild(e.target.value)}
+          >
+            <option value="">Tất cả con em</option>
+            {children.map(child => (
+              <option key={child.id} value={child.id}>
+                {child.name} - {child.className}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="content-layout">
-          <div className="main-panel">
-            <div className="panel-header"><i className="fas fa-clipboard-check me-2"></i>Form khai báo sức khỏe</div>
-            <div className="panel-content">
-              {alerts.success && (
-                <div className="alert alert-success" style={{marginBottom: '1rem'}}>
-                  <i className="fas fa-check-circle me-2"></i> Khai báo sức khỏe đã được ghi nhận thành công!
+        
+        <div className="filter-group">
+          <label>Trạng thái:</label>
+          <select 
+            value={filterStatus} 
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="all">Tất cả trạng thái</option>
+            <option value="Submitted">Đã gửi</option>
+            <option value="Under Review">Đang xem xét</option>
+            <option value="Approved">Đã phê duyệt</option>
+            <option value="Rejected">Từ chối</option>
+          </select>
+        </div>
+
+        <button 
+          className="create-declaration-btn"
+          onClick={handleCreateDeclaration}
+        >
+          <i className="fas fa-plus"></i>
+          Khai báo mới
+        </button>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="summary-stats">
+        <div className="stat-card">
+          <div className="stat-icon">
+            <i className="fas fa-clipboard-list"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">{filteredDeclarations.length}</div>
+            <div className="stat-label">Tổng số khai báo</div>
+          </div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-icon approved">
+            <i className="fas fa-check-circle"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">
+              {filteredDeclarations.filter(d => d.status === 'Approved').length}
+            </div>
+            <div className="stat-label">Đã phê duyệt</div>
+          </div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-icon review">
+            <i className="fas fa-clock"></i>
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">
+              {filteredDeclarations.filter(d => d.status === 'Under Review').length}
+            </div>
+            <div className="stat-label">Đang xem xét</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Declarations List */}
+      <div className="declarations-list">
+        {filteredDeclarations.map((declaration) => (
+          <div key={declaration.id} className="declaration-card">
+            <div className="declaration-header">
+              <div className="declaration-title">
+                <h3>Khai báo - {declaration.childName}</h3>
+                <div className="declaration-badges">
+                  <span 
+                    className="status-badge"
+                    style={{ backgroundColor: getStatusColor(declaration.status) }}
+                  >
+                    {getStatusText(declaration.status)}
+                  </span>
+                  <span 
+                    className="health-badge"
+                    style={{ backgroundColor: getHealthStatusColor(declaration.healthStatus) }}
+                  >
+                    {declaration.healthStatus}
+                  </span>
+                </div>
+              </div>
+              <div className="declaration-date">
+                <i className="fas fa-calendar"></i>
+                {new Date(declaration.declarationDate).toLocaleDateString('vi-VN')}
+              </div>
+            </div>
+
+            <div className="declaration-content">
+              <div className="child-info">
+                <h4>Thông tin con em</h4>
+                <p><strong>Họ tên:</strong> {declaration.childName}</p>
+                <p><strong>Lớp:</strong> {declaration.childClass}</p>
+                <p><strong>Tình trạng sức khỏe:</strong> {declaration.healthStatus}</p>
+                <p><strong>Số triệu chứng:</strong> {getSymptomCount(declaration)}</p>
+              </div>
+
+              <div className="symptoms-summary">
+                <h4>Tóm tắt triệu chứng</h4>
+                <div className="symptoms-list">
+                  {declaration.hasFever && <span className="symptom-tag">Sốt</span>}
+                  {declaration.hasCough && <span className="symptom-tag">Ho</span>}
+                  {declaration.hasSoreThroat && <span className="symptom-tag">Đau họng</span>}
+                  {declaration.hasHeadache && <span className="symptom-tag">Đau đầu</span>}
+                  {declaration.hasRunnyNose && <span className="symptom-tag">Sổ mũi</span>}
+                  {declaration.hasFatigue && <span className="symptom-tag">Mệt mỏi</span>}
+                  {getSymptomCount(declaration) === 0 && (
+                    <span className="no-symptoms">Không có triệu chứng</span>
+                  )}
+                </div>
+              </div>
+
+              {declaration.currentMedications && (
+                <div className="medications-info">
+                  <h4>Thuốc đang sử dụng</h4>
+                  <p>{declaration.currentMedications}</p>
                 </div>
               )}
-              <form onSubmit={handleSubmit} className="health-declaration-form">
-                <div className="form-section">
-                  <h3 className="section-title"><i className="fas fa-user me-2"></i>Thông tin học sinh</h3>
-                  <div className="row mb-4">
-                    <div className="col-md-3">
-                      <label htmlFor="studentId" className="form-label mb-2">Mã học sinh <span className="required">*</span></label>
-                      <input type="text" id="studentId" name="studentId" className="form-control" placeholder="Nhập mã học sinh" value={formData.studentId} onChange={handleChange} required />
-                    </div>
-                    <div className="col-md-3">
-                      <label htmlFor="studentName" className="form-label mb-2">Họ và tên <span className="required">*</span></label>
-                      <input type="text" id="studentName" name="studentName" className="form-control" placeholder="Nhập họ và tên" value={formData.studentName} onChange={handleChange} required />
-                    </div>
-                    <div className="col-md-3">
-                      <label htmlFor="studentClass" className="form-label mb-2">Lớp <span className="required">*</span></label>
-                      <select id="studentClass" name="studentClass" className="form-select" value={formData.studentClass} onChange={handleChange} required>
-                        <option value="">Chọn lớp</option>
-                        <option value="10A1">10A1</option>
-                        <option value="10A2">10A2</option>
-                        <option value="10B1">10B1</option>
-                        <option value="11A1">11A1</option>
-                        <option value="11A2">11A2</option>
-                        <option value="11B1">11B1</option>
-                        <option value="12A1">12A1</option>
-                        <option value="12A2">12A2</option>
-                        <option value="12B1">12B1</option>
-                      </select>
-                    </div>
-                    <div className="col-md-3">
-                      <label htmlFor="recordDate" className="form-label mb-2">Ngày khai báo <span className="required">*</span></label>
-                      <input type="date" id="recordDate" name="recordDate" className="form-control" value={formData.recordDate} onChange={handleChange} required />
-                    </div>
-                  </div>
+
+              {declaration.additionalNotes && (
+                <div className="additional-notes">
+                  <h4>Ghi chú bổ sung</h4>
+                  <p>{declaration.additionalNotes}</p>
                 </div>
-                <div className="form-section">
-                  <h3 className="section-title"><i className="fas fa-notes-medical me-2"></i>Thông tin sức khỏe</h3>
-                  <div className="row mb-4">
-                    <div className="col-md-6">
-                      <label htmlFor="allergies" className="form-label mb-2">Dị ứng (nếu có)</label>
-                      <textarea id="allergies" name="allergies" className="form-control" placeholder="Ghi rõ các dị ứng mà học sinh mắc phải" value={formData.allergies || ''} onChange={handleChange} rows="2"></textarea>
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="chronicDiseases" className="form-label mb-2">Bệnh mãn tính (nếu có)</label>
-                      <textarea id="chronicDiseases" name="chronicDiseases" className="form-control" placeholder="Ghi rõ các bệnh mãn tính mà học sinh mắc phải" value={formData.chronicDiseases || ''} onChange={handleChange} rows="2"></textarea>
-                    </div>
-                  </div>
-                  <div className="row mb-4">
-                    <div className="col-md-6">
-                      <label htmlFor="treatmentHistory" className="form-label mb-2">Lịch sử điều trị (nếu có)</label>
-                      <textarea id="treatmentHistory" name="treatmentHistory" className="form-control" placeholder="Ghi rõ lịch sử điều trị các bệnh" value={formData.treatmentHistory || ''} onChange={handleChange} rows="2"></textarea>
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="vaccinationHistory" className="form-label mb-2">Lịch sử tiêm chủng (nếu có)</label>
-                      <textarea id="vaccinationHistory" name="vaccinationHistory" className="form-control" placeholder="Ghi rõ các vaccine đã tiêm" value={formData.vaccinationHistory || ''} onChange={handleChange} rows="2"></textarea>
-                    </div>
-                  </div>
-                  <div className="row mb-4">
-                    <div className="col-md-4">
-                      <label htmlFor="eyesight" className="form-label mb-2">Thị lực</label>
-                      <input type="text" id="eyesight" name="eyesight" className="form-control" placeholder="VD: 10/10, 8/10" value={formData.eyesight || ''} onChange={handleChange} />
-                    </div>
-                    <div className="col-md-4">
-                      <label htmlFor="hearing" className="form-label mb-2">Thính lực</label>
-                      <input type="text" id="hearing" name="hearing" className="form-control" placeholder="VD: Bình thường, Kém" value={formData.hearing || ''} onChange={handleChange} />
-                    </div>
-                    <div className="col-md-4">
-                      <label htmlFor="parentContact" className="form-label mb-2">Liên hệ phụ huynh</label>
-                      <input type="text" id="parentContact" name="parentContact" className="form-control" placeholder="Số điện thoại liên hệ" value={formData.parentContact || ''} onChange={handleChange} />
-                    </div>
-                  </div>
-                  <div className="row mb-4">
-                    <div className="col-md-12">
-                      <label htmlFor="note" className="form-label mb-2">Ghi chú thêm</label>
-                      <textarea id="note" name="note" className="form-control" placeholder="Mô tả thêm về tình trạng sức khỏe hoặc các vấn đề khác" value={formData.note || ''} onChange={handleChange} rows="2"></textarea>
-                    </div>
-                  </div>
-                  <div className="row mb-3">
-                    <div className="col-md-12">
-                      <label className="custom-checkbox-label" htmlFor="parentalConsent">
-                        <input
-                          type="checkbox"
-                          id="parentalConsent"
-                          name="parentalConsent"
-                          checked={!!formData.parentalConsent}
-                          onChange={e => setFormData(prev => ({ ...prev, parentalConsent: e.target.checked }))}
-                          style={{ display: 'none' }}
-                        />
-                        <span className={`custom-checkbox ${formData.parentalConsent ? 'checked' : ''}`}>{formData.parentalConsent ? '✗' : ''}</span>
-                        Tôi xác nhận thông tin khai báo là chính xác và đồng ý để trường theo dõi sức khỏe
-                      </label>
-                    </div>
-                  </div>
+              )}
+
+              {declaration.status === 'Under Review' && declaration.reviewNotes && (
+                <div className="review-notes">
+                  <h4>Ghi chú từ nhân viên y tế</h4>
+                  <p>{declaration.reviewNotes}</p>
                 </div>
-                <div className="alert alert-info mb-4">
-                  <div className="alert-content">
-                    <i className="fas fa-info-circle me-2"></i>
-                    <span>Vui lòng kiểm tra kỹ thông tin trước khi gửi. Thông tin sức khỏe sẽ được bảo mật theo quy định của nhà trường.</span>
-                  </div>
-                </div>
-                <div className="action-buttons">
-                  <button type="submit" className="btn btn-primary px-4 py-2"><i className="fas fa-save me-2"></i> Gửi khai báo</button>
-                  <button type="button" className="btn btn-secondary px-4 py-2" onClick={() => setFormData({ studentId: '', studentName: '', studentClass: '', recordDate: new Date().toISOString().split('T')[0], allergies: '', chronicDiseases: '', treatmentHistory: '', eyesight: '', hearing: '', vaccinationHistory: '', note: '', parentContact: '', parentId: localStorage.getItem('userId') || '', parentalConsent: false })}><i className="fas fa-undo me-2"></i> Làm lại</button>
-                </div>
-              </form>
-              <HealthRecordHistory />
+              )}
+
+              <div className="declaration-actions">
+                <button 
+                  className="view-details-btn"
+                  onClick={() => handleViewDetails(declaration)}
+                >
+                  <i className="fas fa-eye"></i>
+                  Xem chi tiết
+                </button>
+              </div>
             </div>
           </div>
-          <div className="side-panel">
-            <div className="alert alert-warning mb-3">
-              <h4 className="mb-2" style={{ color: "#92400e", fontWeight: 600 }}><i className="fas fa-exclamation-triangle me-2"></i> Lưu ý quan trọng</h4>
-              <ul style={{ listStyle: "none", padding: 0, fontSize: "0.9rem", lineHeight: 1.6, marginBottom: 0 }}>
-                <li><i className="fas fa-angle-right me-2"></i> Khai báo này được gửi trực tiếp đến hệ thống quản lý y tế của trường.</li>
-                <li><i className="fas fa-angle-right me-2"></i> Hãy cập nhật tình trạng sức khỏe hàng ngày để được theo dõi hiệu quả.</li>
-              </ul>
+        ))}
+
+        {filteredDeclarations.length === 0 && (
+          <div className="no-results">
+            <i className="fas fa-clipboard-list"></i>
+            <p>Không tìm thấy khai báo sức khỏe nào</p>
+          </div>
+        )}
+      </div>
+
+      {/* Create Declaration Modal */}
+      {showCreateModal && (
+        <div className="modal-overlay">
+          <div className="create-declaration-modal">
+            <div className="modal-header">
+              <h3>Khai báo sức khỏe mới</h3>
+              <button 
+                className="close-btn"
+                onClick={() => setShowCreateModal(false)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
             </div>
-            <div className="contact-box p-3 mt-4">
-              <h4 className="mb-2" style={{ fontWeight: 600 }}><i className="fas fa-phone me-2"></i> Liên hệ khẩn cấp</h4>
-              <p className="mb-1" style={{ fontWeight: 600 }}>Y tế trường: 024-xxxx-xxxx</p>
-              <p className="mb-0" style={{ fontSize: "0.9rem" }}>Hotline 24/7: 1900-xxxx</p>
+            <form onSubmit={handleSubmitDeclaration}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Con em:</label>
+                  <select
+                    name="childId"
+                    value={formData.childId}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Chọn con em</option>
+                    {children.map(child => (
+                      <option key={child.id} value={child.id}>
+                        {child.name} - {child.className}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Ngày khai báo:</label>
+                    <input
+                      type="date"
+                      name="declarationDate"
+                      value={formData.declarationDate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Tình trạng sức khỏe:</label>
+                    <select
+                      name="healthStatus"
+                      value={formData.healthStatus}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="Good">Tốt</option>
+                      <option value="Fair">Khá</option>
+                      <option value="Poor">Kém</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="symptoms-section">
+                  <h4>Triệu chứng (nếu có)</h4>
+                  <div className="symptoms-grid">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="hasFever"
+                        checked={formData.hasFever}
+                        onChange={handleInputChange}
+                      />
+                      Sốt
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="hasCough"
+                        checked={formData.hasCough}
+                        onChange={handleInputChange}
+                      />
+                      Ho
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="hasSoreThroat"
+                        checked={formData.hasSoreThroat}
+                        onChange={handleInputChange}
+                      />
+                      Đau họng
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="hasHeadache"
+                        checked={formData.hasHeadache}
+                        onChange={handleInputChange}
+                      />
+                      Đau đầu
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="hasRunnyNose"
+                        checked={formData.hasRunnyNose}
+                        onChange={handleInputChange}
+                      />
+                      Sổ mũi
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="hasFatigue"
+                        checked={formData.hasFatigue}
+                        onChange={handleInputChange}
+                      />
+                      Mệt mỏi
+                    </label>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Thuốc đang sử dụng (nếu có):</label>
+                  <textarea
+                    name="currentMedications"
+                    value={formData.currentMedications}
+                    onChange={handleInputChange}
+                    placeholder="Nhập tên thuốc đang sử dụng..."
+                    rows="2"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Dị ứng (nếu có):</label>
+                  <input
+                    type="text"
+                    name="allergies"
+                    value={formData.allergies}
+                    onChange={handleInputChange}
+                    placeholder="Nhập thông tin dị ứng..."
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Liên hệ khẩn cấp:</label>
+                    <input
+                      type="text"
+                      name="emergencyContact"
+                      value={formData.emergencyContact}
+                      onChange={handleInputChange}
+                      placeholder="Tên người liên hệ..."
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Số điện thoại khẩn cấp:</label>
+                    <input
+                      type="tel"
+                      name="emergencyPhone"
+                      value={formData.emergencyPhone}
+                      onChange={handleInputChange}
+                      placeholder="Số điện thoại..."
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Ghi chú bổ sung:</label>
+                  <textarea
+                    name="additionalNotes"
+                    value={formData.additionalNotes}
+                    onChange={handleInputChange}
+                    placeholder="Nhập ghi chú bổ sung..."
+                    rows="3"
+                  />
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button 
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowCreateModal(false)}
+                >
+                  Hủy
+                </button>
+                <button 
+                  type="submit"
+                  className="submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Đang gửi...' : 'Gửi khai báo'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      {showDetailsModal && selectedDeclaration && (
+        <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
+          <div className="details-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Chi tiết khai báo - {selectedDeclaration.childName}</h3>
+              <button 
+                className="close-btn"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="detail-section">
+                <h4>Thông tin cơ bản</h4>
+                <div className="detail-grid">
+                  <div className="detail-item">
+                    <label>Con em:</label>
+                    <span>{selectedDeclaration.childName}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>Lớp:</label>
+                    <span>{selectedDeclaration.childClass}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>Ngày khai báo:</label>
+                    <span>{new Date(selectedDeclaration.declarationDate).toLocaleDateString('vi-VN')}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>Tình trạng sức khỏe:</label>
+                    <span>{selectedDeclaration.healthStatus}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>Trạng thái:</label>
+                    <span>{getStatusText(selectedDeclaration.status)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="detail-section">
+                <h4>Triệu chứng chi tiết</h4>
+                <div className="symptoms-detail">
+                  <div className="symptoms-grid">
+                    <div className="symptom-item">
+                      <span className="symptom-label">Sốt:</span>
+                      <span className="symptom-value">{selectedDeclaration.hasFever ? 'Có' : 'Không'}</span>
+                    </div>
+                    <div className="symptom-item">
+                      <span className="symptom-label">Ho:</span>
+                      <span className="symptom-value">{selectedDeclaration.hasCough ? 'Có' : 'Không'}</span>
+                    </div>
+                    <div className="symptom-item">
+                      <span className="symptom-label">Đau họng:</span>
+                      <span className="symptom-value">{selectedDeclaration.hasSoreThroat ? 'Có' : 'Không'}</span>
+                    </div>
+                    <div className="symptom-item">
+                      <span className="symptom-label">Đau đầu:</span>
+                      <span className="symptom-value">{selectedDeclaration.hasHeadache ? 'Có' : 'Không'}</span>
+                    </div>
+                    <div className="symptom-item">
+                      <span className="symptom-label">Sổ mũi:</span>
+                      <span className="symptom-value">{selectedDeclaration.hasRunnyNose ? 'Có' : 'Không'}</span>
+                    </div>
+                    <div className="symptom-item">
+                      <span className="symptom-label">Mệt mỏi:</span>
+                      <span className="symptom-value">{selectedDeclaration.hasFatigue ? 'Có' : 'Không'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {selectedDeclaration.currentMedications && (
+                <div className="detail-section">
+                  <h4>Thuốc đang sử dụng</h4>
+                  <p>{selectedDeclaration.currentMedications}</p>
+                </div>
+              )}
+
+              {selectedDeclaration.allergies && (
+                <div className="detail-section">
+                  <h4>Dị ứng</h4>
+                  <p>{selectedDeclaration.allergies}</p>
+                </div>
+              )}
+
+              <div className="detail-section">
+                <h4>Thông tin liên hệ khẩn cấp</h4>
+                <div className="detail-grid">
+                  <div className="detail-item">
+                    <label>Người liên hệ:</label>
+                    <span>{selectedDeclaration.emergencyContact}</span>
+                  </div>
+                  <div className="detail-item">
+                    <label>Số điện thoại:</label>
+                    <span>{selectedDeclaration.emergencyPhone}</span>
+                  </div>
+                </div>
+              </div>
+
+              {selectedDeclaration.additionalNotes && (
+                <div className="detail-section">
+                  <h4>Ghi chú bổ sung</h4>
+                  <p>{selectedDeclaration.additionalNotes}</p>
+                </div>
+              )}
+
+              {selectedDeclaration.status === 'Under Review' && selectedDeclaration.reviewNotes && (
+                <div className="detail-section">
+                  <h4>Ghi chú từ nhân viên y tế</h4>
+                  <p>{selectedDeclaration.reviewNotes}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </main>
+      )}
     </div>
   );
 };

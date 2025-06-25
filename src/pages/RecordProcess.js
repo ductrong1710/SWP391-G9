@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './RecordProcess.css';
+import apiClient from '../services/apiClient';
 
 const RecordProcess = () => {
   // Mock data cho hồ sơ y tế từng học sinh
@@ -110,10 +111,20 @@ const RecordProcess = () => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      setRecords(mockRecords);
-      setLoading(false);
-    }, 800);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Gọi API backend lấy records
+        const response = await apiClient.get('/HealthRecord');
+        setRecords(response.data);
+      } catch (error) {
+        // Nếu lỗi, fallback về mock data
+        setRecords(mockRecords);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [mockRecords]);
 
   useEffect(() => {

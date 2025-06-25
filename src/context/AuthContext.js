@@ -45,6 +45,17 @@ export const AuthProvider = ({ children }) => {
     console.log("User logged out");
   };
 
+  // Helper function to get user role
+  const getUserRole = () => {
+    // Ưu tiên lấy roleType (chữ thường), fallback sang RoleType nếu cần
+    return user?.roleType || user?.RoleType || 'Unknown';
+  };
+
+  // Helper function to check if user has specific role
+  const hasRole = (role) => {
+    return getUserRole() === role;
+  };
+
   // For debugging purposes
   console.log("AuthContext current state - isAuthenticated:", isAuthenticated, "user:", user);
 
@@ -55,7 +66,9 @@ export const AuthProvider = ({ children }) => {
       loading, 
       authError,
       login, 
-      logout 
+      logout,
+      getUserRole,
+      hasRole
     }}>
       {children}
     </AuthContext.Provider>

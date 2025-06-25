@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './DocumentsBlog.css';
+import apiClient from '../services/apiClient';
 
 const DocumentsBlog = () => {
   const [documents, setDocuments] = useState([]);
@@ -83,13 +84,22 @@ const DocumentsBlog = () => {
   ];
 
   useEffect(() => {
-    // In a real app, fetch data from API
-    // For now, use mock data
-    setTimeout(() => {
-      setDocuments(mockDocuments);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Gọi API backend lấy documents
+        // const response = await apiClient.get('/DocumentsBlog');
+        // setDocuments(response.data);
+        // Tạm thời dùng mock nếu API chưa có
+        setDocuments(mockDocuments);
+      } catch (error) {
+        setDocuments(mockDocuments);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [mockDocuments]);
 
   const handleDocumentSelect = (document) => {
     setSelectedDocument(document);

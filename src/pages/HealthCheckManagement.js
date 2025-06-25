@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './HealthCheckManagement.css';
+import apiClient from '../services/apiClient';
 
 const HealthCheckManagement = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -236,12 +237,20 @@ const HealthCheckManagement = () => {
   }, [isAuthenticated, authLoading, navigate]);
   
   useEffect(() => {
-    // Trong ứng dụng thực tế, lấy dữ liệu từ API
-    // Hiện tại, sử dụng dữ liệu mẫu
-    setTimeout(() => {
-      setHealthChecks(mockHealthChecks);
-      setLoading(false);
-    }, 1000);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Gọi API backend lấy health checks
+        const response = await apiClient.get('/HealthCheck');
+        setHealthChecks(response.data);
+      } catch (error) {
+        // Nếu lỗi, fallback về mock data
+        setHealthChecks(mockHealthChecks);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [mockHealthChecks]);
 
   // Thêm useEffect để xử lý lọc

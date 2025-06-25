@@ -7,7 +7,8 @@ import './Sidebar.css';
 const Sidebar = ({ onSidebarToggle }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, getUserRole, user } = useAuth();
+  const userRole = getUserRole();
   const [collapsed, setCollapsed] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -85,48 +86,94 @@ const Sidebar = ({ onSidebarToggle }) => {
             </div>
             {!collapsed && <span className="menu-text">Tổng quan</span>}
           </Link>
-          
-          <Link to="/health-declaration" className={`menu-item ${isActive('/health-declaration')}`}>
-            <div className="menu-icon">
-              <i className="fas fa-clipboard-list"></i>
-            </div>
-            {!collapsed && <span className="menu-text">Khai báo y tế</span>}
-          </Link>
-          
-          <Link to="/health-check-management" className={`menu-item ${isActive('/health-check-management')}`}>
-            <div className="menu-icon">
-              <i className="fas fa-stethoscope"></i>
-            </div>
-            {!collapsed && <span className="menu-text">Khám sức khỏe</span>}
-          </Link>
-          
-          <Link to="/vaccination-management" className={`menu-item ${isActive('/vaccination-management')}`}>
-            <div className="menu-icon">
-              <i className="fas fa-syringe"></i>
-            </div>
-            {!collapsed && <span className="menu-text">Tiêm chủng</span>}
-          </Link>
-          
-          <Link to="/send-medicine" className={`menu-item ${isActive('/send-medicine')}`}>
-            <div className="menu-icon">
-              <i className="fas fa-pills"></i>
-            </div>
-            {!collapsed && <span className="menu-text">Gửi thuốc</span>}
-          </Link>
-          
-          <Link to="/record-process" className={`menu-item ${isActive('/record-process')}`}>
-            <div className="menu-icon">
-              <i className="fas fa-file-medical"></i>
-            </div>
-            {!collapsed && <span className="menu-text">Hồ sơ y tế</span>}
-          </Link>
-          
-          <Link to="/documents-blog" className={`menu-item ${isActive('/documents-blog')}`}>
-            <div className="menu-icon">
-              <i className="fas fa-book-medical"></i>
-            </div>
-            {!collapsed && <span className="menu-text">Tài liệu</span>}
-          </Link>
+          {/* Menu cho Admin: hiển thị tất cả các chức năng */}
+          {userRole === 'Admin' && <>
+            <Link to="/health-record" className={`menu-item ${isActive('/health-record')}`}>
+              <div className="menu-icon"><i className="fas fa-clipboard-list"></i></div>
+              {!collapsed && <span className="menu-text">Tra cứu hồ sơ sức khỏe</span>}
+            </Link>
+            <Link to="/send-medicine" className={`menu-item ${isActive('/send-medicine')}`}>
+              <div className="menu-icon"><i className="fas fa-pills"></i></div>
+              {!collapsed && <span className="menu-text">Quản lý thuốc</span>}
+            </Link>
+            <Link to="/vaccination-management" className={`menu-item ${isActive('/vaccination-management')}`}>
+              <div className="menu-icon"><i className="fas fa-syringe"></i></div>
+              {!collapsed && <span className="menu-text">Quản lý tiêm chủng</span>}
+            </Link>
+            <Link to="/health-check-management" className={`menu-item ${isActive('/health-check-management')}`}>
+              <div className="menu-icon"><i className="fas fa-stethoscope"></i></div>
+              {!collapsed && <span className="menu-text">Quản lý kiểm tra định kỳ</span>}
+            </Link>
+            <Link to="/documents-blog" className={`menu-item ${isActive('/documents-blog')}`}>
+              <div className="menu-icon"><i className="fas fa-book-medical"></i></div>
+              {!collapsed && <span className="menu-text">Blog & Tài liệu</span>}
+            </Link>
+            <Link to="/notifications" className={`menu-item ${isActive('/notifications')}`}>
+              <div className="menu-icon"><i className="fas fa-bell"></i></div>
+              {!collapsed && <span className="menu-text">Thông báo xác nhận</span>}
+            </Link>
+            <Link to="/medical-history" className={`menu-item ${isActive('/medical-history')}`}>
+              <div className="menu-icon"><i className="fas fa-history"></i></div>
+              {!collapsed && <span className="menu-text">Lịch sử kiểm tra y tế</span>}
+            </Link>
+          </>}
+          {/* Menu cho MedicalStaff */}
+          {userRole === 'MedicalStaff' && <>
+            <Link to="/health-record" className={`menu-item ${isActive('/health-record')}`}>
+              <div className="menu-icon"><i className="fas fa-clipboard-list"></i></div>
+              {!collapsed && <span className="menu-text">Tra cứu hồ sơ sức khỏe</span>}
+            </Link>
+            <Link to="/send-medicine" className={`menu-item ${isActive('/send-medicine')}`}>
+              <div className="menu-icon"><i className="fas fa-pills"></i></div>
+              {!collapsed && <span className="menu-text">Quản lý thuốc</span>}
+            </Link>
+            <Link to="/vaccination-management" className={`menu-item ${isActive('/vaccination-management')}`}>
+              <div className="menu-icon"><i className="fas fa-syringe"></i></div>
+              {!collapsed && <span className="menu-text">Quản lý tiêm chủng</span>}
+            </Link>
+            <Link to="/health-check-management" className={`menu-item ${isActive('/health-check-management')}`}>
+              <div className="menu-icon"><i className="fas fa-stethoscope"></i></div>
+              {!collapsed && <span className="menu-text">Quản lý kiểm tra định kỳ</span>}
+            </Link>
+            <Link to="/documents-blog" className={`menu-item ${isActive('/documents-blog')}`}>
+              <div className="menu-icon"><i className="fas fa-book-medical"></i></div>
+              {!collapsed && <span className="menu-text">Blog & Tài liệu</span>}
+            </Link>
+          </>}
+          {/* Menu cho Parent */}
+          {userRole === 'Parent' && <>
+            <Link to="/health-record" className={`menu-item ${isActive('/health-record')}`}>
+              <div className="menu-icon"><i className="fas fa-clipboard-list"></i></div>
+              {!collapsed && <span className="menu-text">Khai báo hồ sơ sức khỏe</span>}
+            </Link>
+            <Link to="/send-medicine" className={`menu-item ${isActive('/send-medicine')}`}>
+              <div className="menu-icon"><i className="fas fa-pills"></i></div>
+              {!collapsed && <span className="menu-text">Gửi thuốc</span>}
+            </Link>
+            <Link to="/notifications" className={`menu-item ${isActive('/notifications')}`}>
+              <div className="menu-icon"><i className="fas fa-bell"></i></div>
+              {!collapsed && <span className="menu-text">Thông báo xác nhận</span>}
+            </Link>
+            <Link to="/medical-history" className={`menu-item ${isActive('/medical-history')}`}>
+              <div className="menu-icon"><i className="fas fa-history"></i></div>
+              {!collapsed && <span className="menu-text">Lịch sử kiểm tra y tế</span>}
+            </Link>
+            <Link to="/documents-blog" className={`menu-item ${isActive('/documents-blog')}`}>
+              <div className="menu-icon"><i className="fas fa-book-medical"></i></div>
+              {!collapsed && <span className="menu-text">Blog & Tài liệu</span>}
+            </Link>
+          </>}
+          {/* Menu cho Student */}
+          {userRole === 'Student' && <>
+            <Link to="/medical-history" className={`menu-item ${isActive('/medical-history')}`}>
+              <div className="menu-icon"><i className="fas fa-history"></i></div>
+              {!collapsed && <span className="menu-text">Lịch sử kiểm tra y tế</span>}
+            </Link>
+            <Link to="/documents-blog" className={`menu-item ${isActive('/documents-blog')}`}>
+              <div className="menu-icon"><i className="fas fa-book-medical"></i></div>
+              {!collapsed && <span className="menu-text">Blog & Tài liệu</span>}
+            </Link>
+          </>}
         </div>
         
         <div className="sidebar-footer">

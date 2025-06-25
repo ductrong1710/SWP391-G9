@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './SendMedicine.css';
+import apiClient from '../services/apiClient';
 
 const SendMedicine = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -122,14 +123,23 @@ const SendMedicine = () => {
     }
   }, [isAuthenticated, authLoading, navigate]);
   // Load mock data
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    setTimeout(() => {
-      setMedicines(mockMedicines);
-      setLoading(false);
-    }, 1000);
-  }, [mockMedicines]); // Add mockMedicines to dependency array
-    // Handler for new medicine request (individual)
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Gọi API backend lấy medicines
+        const response = await apiClient.get('/Medicine');
+        setMedicines(response.data);
+      } catch (error) {
+        setMedicines(mockMedicines);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [mockMedicines]);
+
+  // Handler for new medicine request (individual)
   const handleNewMedicine = () => {
     setShowForm(true);
   };

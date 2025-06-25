@@ -29,5 +29,7 @@ namespace Businessobjects.Models
         public string? Status { get; set; }
         [Column("Parents_Note")]
         public string? ParentsNote { get; set; }
+        
+        public virtual ICollection<MedicationReceipt>? MedicationReceipts { get; set; }
     }
 }

@@ -342,7 +342,6 @@ D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\staticwebassets.build.json
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\staticwebassets.build.json.cache
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\staticwebassets.development.json
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\BackEnd.csproj.Up2Date
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\BackEnd.dll
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\refint\BackEnd.dll

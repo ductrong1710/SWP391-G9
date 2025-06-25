@@ -20,5 +20,6 @@ namespace Businessobjects.Models
         public User? Creator { get; set; }
         
         public virtual ICollection<VaccinationConsentForm>? ConsentForms { get; set; }
+        public virtual ICollection<VaccinationHealthCheck>? VaccinationHealthChecks { get; set; }
     }
 }

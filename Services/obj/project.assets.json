@@ -2840,11 +2840,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\Services.csproj",
+      "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj",
       "projectName": "Services",
-      "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\Services.csproj",
+      "projectPath": "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj",
       "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-      "outputPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Services\\obj\\",
+      "outputPath": "D:\\LEARNING\\Code\\backend\\Services\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -2865,11 +2865,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj": {
-              "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Businessobjects\\Businessobjects.csproj"
+            "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
+              "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
             },
-            "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj": {
-              "projectPath": "D:\\LEARNING\\Code\\backend\\SWP391-G9\\Repositories\\Repositories.csproj"
+            "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj": {
+              "projectPath": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj"
             }
           }
         }

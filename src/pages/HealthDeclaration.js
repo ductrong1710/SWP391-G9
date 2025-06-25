@@ -4,10 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/apiClient';
 import './HealthDeclaration.css';
 
-const HealthDeclaration = () => {
+const HealthRecord = () => {
   const navigate = useNavigate();
   const { user, getUserRole } = useAuth();
-  const [healthDeclarations, setHealthDeclarations] = useState([]);
+  const [healthRecords, setHealthRecords] = useState([]);
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedChild, setSelectedChild] = useState('');
@@ -60,21 +60,21 @@ const HealthDeclaration = () => {
         navigate('/dashboard');
         return;
       }
-      const [declarationsResponse, childrenResponse] = await Promise.all([
-        apiClient.get(`/HealthDeclaration/parent/${user.UserID}`),
-        apiClient.get(`/User/parent/${user.UserID}/children`)
+      const [recordsResponse, childrenResponse] = await Promise.all([
+        apiClient.get(`/api/HealthRecord/parent/${user.UserID}`),
+        apiClient.get(`/api/User/parent/${user.UserID}/children`)
       ]);
-      setHealthDeclarations(declarationsResponse.data);
+      setHealthRecords(recordsResponse.data);
       setChildren(childrenResponse.data);
     } catch (error) {
-      setHealthDeclarations(getMockHealthDeclarations());
+      setHealthRecords(getMockHealthRecords());
       setChildren(getMockChildren());
     } finally {
       setLoading(false);
     }
   };
 
-  const getMockHealthDeclarations = () => {
+  const getMockHealthRecords = () => {
     return [
       {
         id: 1,
@@ -164,9 +164,9 @@ const HealthDeclaration = () => {
     ];
   };
 
-  const filteredDeclarations = healthDeclarations.filter(declaration => {
-    const childMatch = selectedChild === '' || declaration.childId === parseInt(selectedChild);
-    const statusMatch = filterStatus === 'all' || declaration.status === filterStatus;
+  const filteredRecords = healthRecords.filter(record => {
+    const childMatch = selectedChild === '' || record.childId === parseInt(selectedChild);
+    const statusMatch = filterStatus === 'all' || record.status === filterStatus;
     return childMatch && statusMatch;
   });
 
@@ -249,8 +249,8 @@ const HealthDeclaration = () => {
     setShowCreateModal(true);
   };
 
-  const handleViewDetails = (declaration) => {
-    setSelectedDeclaration(declaration);
+  const handleViewDetails = (record) => {
+    setSelectedDeclaration(record);
     setShowDetailsModal(true);
   };
 
@@ -267,7 +267,7 @@ const HealthDeclaration = () => {
     try {
       setLoading(true);
       const selectedChildData = children.find(c => c.id === parseInt(formData.childId));
-      const newDeclaration = {
+      const newRecord = {
         ...formData,
         childId: parseInt(formData.childId),
         childName: selectedChildData?.name || '',
@@ -278,29 +278,29 @@ const HealthDeclaration = () => {
         reviewNotes: null
       };
 
-      const response = await apiClient.post('/HealthDeclaration', newDeclaration);
-      setHealthDeclarations([...healthDeclarations, response.data]);
+      const response = await apiClient.post('/api/HealthRecord', newRecord);
+      setHealthRecords([...healthRecords, response.data]);
       setShowCreateModal(false);
     } catch (error) {
-      console.error('Error creating health declaration:', error);
+      console.error('Error creating health record:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const getSymptomCount = (declaration) => {
+  const getSymptomCount = (record) => {
     const symptoms = [
-      declaration.hasFever, declaration.hasCough, declaration.hasShortnessOfBreath,
-      declaration.hasFatigue, declaration.hasLossOfTaste, declaration.hasLossOfSmell,
-      declaration.hasSoreThroat, declaration.hasHeadache, declaration.hasMusclePain,
-      declaration.hasDiarrhea, declaration.hasNausea, declaration.hasVomiting,
-      declaration.hasRunnyNose, declaration.hasCongestion, declaration.hasChills,
-      declaration.hasBodyAches
+      record.hasFever, record.hasCough, record.hasShortnessOfBreath,
+      record.hasFatigue, record.hasLossOfTaste, record.hasLossOfSmell,
+      record.hasSoreThroat, record.hasHeadache, record.hasMusclePain,
+      record.hasDiarrhea, record.hasNausea, record.hasVomiting,
+      record.hasRunnyNose, record.hasCongestion, record.hasChills,
+      record.hasBodyAches
     ];
     return symptoms.filter(symptom => symptom).length;
   };
 
-  if (loading && healthDeclarations.length === 0) {
+  if (loading && healthRecords.length === 0) {
     return (
       <div className="health-declaration-container">
         <div className="loading-spinner"></div>
@@ -362,7 +362,7 @@ const HealthDeclaration = () => {
             <i className="fas fa-clipboard-list"></i>
           </div>
           <div className="stat-content">
-            <div className="stat-number">{filteredDeclarations.length}</div>
+            <div className="stat-number">{filteredRecords.length}</div>
             <div className="stat-label">Tổng số khai báo</div>
           </div>
         </div>
@@ -373,7 +373,7 @@ const HealthDeclaration = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">
-              {filteredDeclarations.filter(d => d.status === 'Approved').length}
+              {filteredRecords.filter(d => d.status === 'Approved').length}
             </div>
             <div className="stat-label">Đã phê duyệt</div>
           </div>
@@ -385,90 +385,90 @@ const HealthDeclaration = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">
-              {filteredDeclarations.filter(d => d.status === 'Under Review').length}
+              {filteredRecords.filter(d => d.status === 'Under Review').length}
             </div>
             <div className="stat-label">Đang xem xét</div>
           </div>
         </div>
       </div>
 
-      {/* Declarations List */}
-      <div className="declarations-list">
-        {filteredDeclarations.map((declaration) => (
-          <div key={declaration.id} className="declaration-card">
-            <div className="declaration-header">
-              <div className="declaration-title">
-                <h3>Khai báo - {declaration.childName}</h3>
-                <div className="declaration-badges">
+      {/* Records List */}
+      <div className="records-list">
+        {filteredRecords.map((record) => (
+          <div key={record.id} className="record-card">
+            <div className="record-header">
+              <div className="record-title">
+                <h3>Khai báo - {record.childName}</h3>
+                <div className="record-badges">
                   <span 
                     className="status-badge"
-                    style={{ backgroundColor: getStatusColor(declaration.status) }}
+                    style={{ backgroundColor: getStatusColor(record.status) }}
                   >
-                    {getStatusText(declaration.status)}
+                    {getStatusText(record.status)}
                   </span>
                   <span 
                     className="health-badge"
-                    style={{ backgroundColor: getHealthStatusColor(declaration.healthStatus) }}
+                    style={{ backgroundColor: getHealthStatusColor(record.healthStatus) }}
                   >
-                    {declaration.healthStatus}
+                    {record.healthStatus}
                   </span>
                 </div>
               </div>
-              <div className="declaration-date">
+              <div className="record-date">
                 <i className="fas fa-calendar"></i>
-                {new Date(declaration.declarationDate).toLocaleDateString('vi-VN')}
+                {new Date(record.declarationDate).toLocaleDateString('vi-VN')}
               </div>
             </div>
 
-            <div className="declaration-content">
+            <div className="record-content">
               <div className="child-info">
                 <h4>Thông tin con em</h4>
-                <p><strong>Họ tên:</strong> {declaration.childName}</p>
-                <p><strong>Lớp:</strong> {declaration.childClass}</p>
-                <p><strong>Tình trạng sức khỏe:</strong> {declaration.healthStatus}</p>
-                <p><strong>Số triệu chứng:</strong> {getSymptomCount(declaration)}</p>
+                <p><strong>Họ tên:</strong> {record.childName}</p>
+                <p><strong>Lớp:</strong> {record.childClass}</p>
+                <p><strong>Tình trạng sức khỏe:</strong> {record.healthStatus}</p>
+                <p><strong>Số triệu chứng:</strong> {getSymptomCount(record)}</p>
               </div>
 
               <div className="symptoms-summary">
                 <h4>Tóm tắt triệu chứng</h4>
                 <div className="symptoms-list">
-                  {declaration.hasFever && <span className="symptom-tag">Sốt</span>}
-                  {declaration.hasCough && <span className="symptom-tag">Ho</span>}
-                  {declaration.hasSoreThroat && <span className="symptom-tag">Đau họng</span>}
-                  {declaration.hasHeadache && <span className="symptom-tag">Đau đầu</span>}
-                  {declaration.hasRunnyNose && <span className="symptom-tag">Sổ mũi</span>}
-                  {declaration.hasFatigue && <span className="symptom-tag">Mệt mỏi</span>}
-                  {getSymptomCount(declaration) === 0 && (
+                  {record.hasFever && <span className="symptom-tag">Sốt</span>}
+                  {record.hasCough && <span className="symptom-tag">Ho</span>}
+                  {record.hasSoreThroat && <span className="symptom-tag">Đau họng</span>}
+                  {record.hasHeadache && <span className="symptom-tag">Đau đầu</span>}
+                  {record.hasRunnyNose && <span className="symptom-tag">Sổ mũi</span>}
+                  {record.hasFatigue && <span className="symptom-tag">Mệt mỏi</span>}
+                  {getSymptomCount(record) === 0 && (
                     <span className="no-symptoms">Không có triệu chứng</span>
                   )}
                 </div>
               </div>
 
-              {declaration.currentMedications && (
+              {record.currentMedications && (
                 <div className="medications-info">
                   <h4>Thuốc đang sử dụng</h4>
-                  <p>{declaration.currentMedications}</p>
+                  <p>{record.currentMedications}</p>
                 </div>
               )}
 
-              {declaration.additionalNotes && (
+              {record.additionalNotes && (
                 <div className="additional-notes">
                   <h4>Ghi chú bổ sung</h4>
-                  <p>{declaration.additionalNotes}</p>
+                  <p>{record.additionalNotes}</p>
                 </div>
               )}
 
-              {declaration.status === 'Under Review' && declaration.reviewNotes && (
+              {record.status === 'Under Review' && record.reviewNotes && (
                 <div className="review-notes">
                   <h4>Ghi chú từ nhân viên y tế</h4>
-                  <p>{declaration.reviewNotes}</p>
+                  <p>{record.reviewNotes}</p>
                 </div>
               )}
 
-              <div className="declaration-actions">
+              <div className="record-actions">
                 <button 
                   className="view-details-btn"
-                  onClick={() => handleViewDetails(declaration)}
+                  onClick={() => handleViewDetails(record)}
                 >
                   <i className="fas fa-eye"></i>
                   Xem chi tiết
@@ -478,7 +478,7 @@ const HealthDeclaration = () => {
           </div>
         ))}
 
-        {filteredDeclarations.length === 0 && (
+        {filteredRecords.length === 0 && (
           <div className="no-results">
             <i className="fas fa-clipboard-list"></i>
             <p>Không tìm thấy khai báo sức khỏe nào</p>
@@ -804,4 +804,4 @@ const HealthDeclaration = () => {
   );
 };
 
-export default HealthDeclaration;
+export default HealthRecord;

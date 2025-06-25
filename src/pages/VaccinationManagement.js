@@ -53,63 +53,44 @@ const VaccinationManagement = () => {
   const getMockVaccinationPlans = () => {
     return [
       {
-        id: 1,
-        vaccineName: 'Vaccine COVID-19',
-        description: 'Tiêm chủng COVID-19 cho học sinh lớp 10-12',
-        scheduledDate: '2024-12-20',
-        targetClass: '10A1, 10A2, 11A1, 11A2, 12A1, 12A2',
-        targetGrade: '10-12',
-        status: 'Active',
-        totalStudents: 180,
-        confirmedCount: 156,
-        pendingCount: 24,
-        completedCount: 0,
-        notes: 'Tiêm chủng định kỳ theo kế hoạch của Bộ Y tế',
-        createdDate: '2024-12-01',
-        createdBy: 'BS. Trần Thị Bình'
-      },
-      {
-        id: 2,
-        vaccineName: 'Vaccine Cúm',
-        description: 'Tiêm chủng cúm mùa cho toàn trường',
-        scheduledDate: '2024-12-25',
-        targetClass: 'Tất cả các lớp',
-        targetGrade: 'Tất cả',
-        status: 'Active',
-        totalStudents: 2456,
-        confirmedCount: 1890,
-        pendingCount: 566,
-        completedCount: 0,
-        notes: 'Tiêm chủng hàng năm để phòng ngừa cúm mùa',
-        createdDate: '2024-12-05',
-        createdBy: 'BS. Lê Văn Cường'
-      },
-      {
-        id: 3,
-        vaccineName: 'Vaccine Viêm gan B',
-        description: 'Tiêm chủng viêm gan B cho học sinh lớp 6',
-        scheduledDate: '2024-12-30',
-        targetClass: '6A1, 6A2, 6A3, 6A4',
+        id: 'VP0001',
+        vaccineName: 'Vắc-xin Viêm gan B',
+        description: 'Tiêm cho học sinh lớp 6',
+        scheduledDate: '2025-06-25',
+        targetClass: '6A, 6B',
         targetGrade: '6',
+        status: 'Pending',
+        totalStudents: 2,
+        confirmedCount: 1,
+        pendingCount: 1,
+        completedCount: 1,
+        notes: 'Chiến dịch tiêm vắc-xin Viêm gan B',
+        createdDate: '2025-06-01',
+        createdBy: 'Trần Thị B'
+      },
+      {
+        id: 'VP0002',
+        vaccineName: 'Vắc-xin Sởi - Quai bị - Rubella',
+        description: 'Tiêm cho học sinh lớp 7',
+        scheduledDate: '2025-07-10',
+        targetClass: '',
+        targetGrade: '7',
         status: 'Completed',
-        totalStudents: 120,
-        confirmedCount: 118,
-        pendingCount: 2,
-        completedCount: 118,
-        notes: 'Tiêm chủng bổ sung cho học sinh mới',
-        createdDate: '2024-11-20',
-        createdBy: 'BS. Phạm Thị Dung'
+        totalStudents: 0,
+        confirmedCount: 0,
+        pendingCount: 0,
+        completedCount: 0,
+        notes: 'Chiến dịch tiêm vắc-xin Sởi - Quai bị - Rubella',
+        createdDate: '2025-07-01',
+        createdBy: 'Lê Văn C'
       }
     ];
   };
 
   const getMockStudents = () => {
     return [
-      { id: 1, fullName: 'Nguyễn Văn An', className: '10A1', grade: '10' },
-      { id: 2, fullName: 'Trần Thị Bình', className: '10A1', grade: '10' },
-      { id: 3, fullName: 'Lê Minh Cường', className: '11A1', grade: '11' },
-      { id: 4, fullName: 'Phạm Thị Dung', className: '11A1', grade: '11' },
-      { id: 5, fullName: 'Hoàng Văn Em', className: '12A1', grade: '12' }
+      { id: 'U00007', fullName: 'Học Sinh G', className: '6A', grade: '6' },
+      { id: 'U00008', fullName: 'Học Sinh H', className: '6B', grade: '6' }
     ];
   };
 

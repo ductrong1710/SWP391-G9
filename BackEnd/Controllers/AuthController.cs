@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services.interfaces;
+using Repositories.Interfaces;
 using System.Threading.Tasks;
 
 namespace BackEnd.Controllers
@@ -10,10 +11,12 @@ namespace BackEnd.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IRoleRepository _roleRepository;
 
-        public AuthController(IUserService userService)
+        public AuthController(IUserService userService, IRoleRepository roleRepository)
         {
             _userService = userService;
+            _roleRepository = roleRepository;
         }
 
         [HttpPost("login")]
@@ -38,9 +41,16 @@ namespace BackEnd.Controllers
             
             System.Console.WriteLine($"--- Login successful for user: {loginRequest.Username} ---");
 
-            // Bỏ mật khẩu trước khi trả về cho client
-            user.Password = null; 
-            return Ok(user);
+            // Tạo response object với thông tin user và role
+            var response = new
+            {
+                UserID = user.UserID,
+                Username = user.Username,
+                RoleID = user.RoleID,
+                RoleType = user.Role?.RoleType ?? "Unknown"
+            };
+
+            return Ok(response);
         }
     }
 } 

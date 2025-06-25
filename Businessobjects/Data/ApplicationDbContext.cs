@@ -15,7 +15,7 @@ namespace Businessobjects.Data
         public DbSet<HealthRecord> HealthRecords { get; set; }
         public DbSet<MedicalSupply> MedicalSupplies { get; set; }
         public DbSet<Medication> Medications { get; set; }
-        public DbSet<Role> Roles { get; set; }
+        public DbSet<Role> Role { get; set; }
         public DbSet<MedicationSubmissionForm> MedicationSubmissionForms { get; set; }
         public DbSet<PeriodicHealthCheckPlan> PeriodicHealthCheckPlans { get; set; }
         public DbSet<HealthCheckConsentForm> HealthCheckConsentForms { get; set; }
@@ -24,6 +24,9 @@ namespace Businessobjects.Data
         public DbSet<VaccinationPlan> VaccinationPlans { get; set; }
         public DbSet<VaccinationConsentForm> VaccinationConsentForms { get; set; }
         public DbSet<VaccinationResult> VaccinationResults { get; set; }
+        public DbSet<MedicationReceipt> MedicationReceipts { get; set; }
+        public DbSet<VaccinationConsultation> VaccinationConsultations { get; set; }
+        public DbSet<VaccinationHealthCheck> VaccinationHealthChecks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +40,51 @@ namespace Businessobjects.Data
 
             // Configure health check result relationships
             ConfigureHealthCheckResultRelationships(modelBuilder);
+
+            // Cấu hình mối quan hệ VaccinationConsultation - User (Student, Parent, MedicalStaff)
+            modelBuilder.Entity<VaccinationConsultation>()
+                .HasOne(vc => vc.Student)
+                .WithMany(u => u.StudentVaccinationConsultations)
+                .HasForeignKey(vc => vc.StudentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VaccinationConsultation>()
+                .HasOne(vc => vc.Parent)
+                .WithMany(u => u.ParentVaccinationConsultations)
+                .HasForeignKey(vc => vc.ParentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VaccinationConsultation>()
+                .HasOne(vc => vc.MedicalStaff)
+                .WithMany(u => u.MedicalStaffVaccinationConsultations)
+                .HasForeignKey(vc => vc.MedicalStaffID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Cấu hình mối quan hệ MedicationReceipt - User (MedicalStaff, Parent)
+            modelBuilder.Entity<MedicationReceipt>()
+                .HasOne(m => m.MedicalStaff)
+                .WithMany(u => u.MedicalStaffMedicationReceipts)
+                .HasForeignKey(m => m.MedicalStaffID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MedicationReceipt>()
+                .HasOne(m => m.Parent)
+                .WithMany(u => u.ParentMedicationReceipts)
+                .HasForeignKey(m => m.ParentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Cấu hình mối quan hệ VaccinationHealthCheck - User (Parent, Student)
+            modelBuilder.Entity<VaccinationHealthCheck>()
+                .HasOne(vh => vh.Parent)
+                .WithMany(u => u.ParentVaccinationHealthChecks)
+                .HasForeignKey(vh => vh.ParentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VaccinationHealthCheck>()
+                .HasOne(vh => vh.Student)
+                .WithMany(u => u.StudentVaccinationHealthChecks)
+                .HasForeignKey(vh => vh.StudentID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Seed data
             SeedData(modelBuilder);

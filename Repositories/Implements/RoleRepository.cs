@@ -16,22 +16,22 @@ namespace Repositories.Implements
 
         public async Task<IEnumerable<Role>> GetAllRolesAsync()
         {
-            return await _context.Roles.ToListAsync();
+            return await _context.Role.ToListAsync();
         }
 
         public async Task<Role?> GetRoleByIdAsync(string id)
         {
-            return await _context.Roles.FirstOrDefaultAsync(r => r.RoleID == id);
+            return await _context.Role.FirstOrDefaultAsync(r => r.RoleID == id);
         }
 
         public async Task<Role?> GetRoleByTypeAsync(string roleType)
         {
-            return await _context.Roles.FirstOrDefaultAsync(r => r.RoleType.ToLower() == roleType.ToLower());
+            return await _context.Role.FirstOrDefaultAsync(r => r.RoleType.ToLower() == roleType.ToLower());
         }
 
         public async Task CreateRoleAsync(Role role)
         {
-            await _context.Roles.AddAsync(role);
+            await _context.Role.AddAsync(role);
             await _context.SaveChangesAsync();
         }
 
@@ -46,19 +46,19 @@ namespace Repositories.Implements
             var role = await GetRoleByIdAsync(id);
             if (role != null)
             {
-                _context.Roles.Remove(role);
+                _context.Role.Remove(role);
                 await _context.SaveChangesAsync();
             }
         }
 
         public async Task<bool> RoleExistsAsync(string id)
         {
-            return await _context.Roles.AnyAsync(r => r.RoleID == id);
+            return await _context.Role.AnyAsync(r => r.RoleID == id);
         }
 
         public async Task<bool> RoleTypeExistsAsync(string roleType)
         {
-            return await _context.Roles.AnyAsync(r => r.RoleType.ToLower() == roleType.ToLower());
+            return await _context.Role.AnyAsync(r => r.RoleType.ToLower() == roleType.ToLower());
         }
     }
 }

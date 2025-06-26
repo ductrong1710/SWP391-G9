@@ -10,7 +10,6 @@ import { AuthProvider } from './context/AuthContext';
 // Import pages
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import HealthRecord from './pages/HealthRecord';
 import HealthCheckManagement from './pages/HealthCheckManagement';
@@ -56,7 +55,7 @@ function App() {
               {/* Public routes */}
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              {/* <Route path="/register" element={<Register />} /> */}
               
               {/* Các route có sidebar */}
               <Route path="/dashboard" element={

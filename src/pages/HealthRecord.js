@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/apiClient';
+import healthRecordService from '../services/healthRecordService';
 import './HealthRecord.css';
 
 const HealthRecord = () => {
@@ -9,43 +10,17 @@ const HealthRecord = () => {
   const { user, getUserRole } = useAuth();
   const [healthRecords, setHealthRecords] = useState([]);
   const [children, setChildren] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedChild, setSelectedChild] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [formData, setFormData] = useState({
-    childId: '',
-    recordDate: new Date().toISOString().split('T')[0],
-    healthStatus: 'Good',
-    hasFever: false,
-    hasCough: false,
-    hasShortnessOfBreath: false,
-    hasFatigue: false,
-    hasLossOfTaste: false,
-    hasLossOfSmell: false,
-    hasSoreThroat: false,
-    hasHeadache: false,
-    hasMusclePain: false,
-    hasDiarrhea: false,
-    hasNausea: false,
-    hasVomiting: false,
-    hasRunnyNose: false,
-    hasCongestion: false,
-    hasChills: false,
-    hasBodyAches: false,
-    hasRecentTravel: false,
-    travelDetails: '',
-    hasContactWithSick: false,
-    contactDetails: '',
-    hasUnderlyingConditions: false,
-    underlyingConditions: '',
-    currentMedications: '',
+    healthRecordID: '',
+    studentID: '',
+    parentID: '',
     allergies: '',
-    emergencyContact: '',
-    emergencyPhone: '',
-    additionalNotes: '',
     chronicDiseases: '',
     treatmentHistory: '',
     eyesight: '',
@@ -54,38 +29,6 @@ const HealthRecord = () => {
     note: '',
     parentContact: ''
   });
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const userRole = getUserRole();
-      if (userRole !== 'Parent') {
-        navigate('/dashboard');
-        return;
-      }
-      const [recordsResponse, profilesResponse] = await Promise.all([
-        apiClient.get(`/HealthRecord/parent/${user.UserID}`),
-        apiClient.get(`/Profile/user/${user.UserID}`)
-      ]);
-      setHealthRecords(recordsResponse.data);
-      let profiles = profilesResponse.data;
-      if (profiles && !Array.isArray(profiles)) profiles = [profiles];
-      setChildren(profiles.map(profile => ({
-        id: profile.StudentID || profile.ProfileID || profile.id,
-        name: profile.FullName || profile.fullName || profile.Name || profile.name,
-        className: profile.ClassName || profile.className || ''
-      })));
-    } catch (error) {
-      setHealthRecords(getMockHealthRecords());
-      setChildren(getMockChildren());
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getMockHealthRecords = () => {
     return [
@@ -228,36 +171,10 @@ const HealthRecord = () => {
 
   const handleCreateRecord = () => {
     setFormData({
-      childId: '',
-      recordDate: new Date().toISOString().split('T')[0],
-      healthStatus: 'Good',
-      hasFever: false,
-      hasCough: false,
-      hasShortnessOfBreath: false,
-      hasFatigue: false,
-      hasLossOfTaste: false,
-      hasLossOfSmell: false,
-      hasSoreThroat: false,
-      hasHeadache: false,
-      hasMusclePain: false,
-      hasDiarrhea: false,
-      hasNausea: false,
-      hasVomiting: false,
-      hasRunnyNose: false,
-      hasCongestion: false,
-      hasChills: false,
-      hasBodyAches: false,
-      hasRecentTravel: false,
-      travelDetails: '',
-      hasContactWithSick: false,
-      contactDetails: '',
-      hasUnderlyingConditions: false,
-      underlyingConditions: '',
-      currentMedications: '',
+      healthRecordID: '',
+      studentID: '',
+      parentID: '',
       allergies: '',
-      emergencyContact: '',
-      emergencyPhone: '',
-      additionalNotes: '',
       chronicDiseases: '',
       treatmentHistory: '',
       eyesight: '',
@@ -324,23 +241,11 @@ const HealthRecord = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const selectedChildData = children.find(c => c.id === formData.childId || c.id === parseInt(formData.childId));
-      const newRecord = {
-        healthRecordID: '', // Backend sẽ tự sinh
-        studentID: formData.childId,
-        parentID: user?.UserID,
-        allergies: formData.allergies,
-        chronicDiseases: formData.chronicDiseases,
-        treatmentHistory: formData.treatmentHistory,
-        eyesight: formData.eyesight,
-        hearing: formData.hearing,
-        vaccinationHistory: formData.vaccinationHistory,
-        note: formData.note,
-        parentContact: formData.parentContact
-      };
+      const newRecord = { ...formData };
       await apiClient.post('/HealthRecord', newRecord);
-      // Reset form
-      setFormData({ ...formData, allergies: '', chronicDiseases: '', treatmentHistory: '', eyesight: '', hearing: '', vaccinationHistory: '', note: '', parentContact: '' });
+      setFormData({
+        healthRecordID: '', studentID: '', parentID: '', allergies: '', chronicDiseases: '', treatmentHistory: '', eyesight: '', hearing: '', vaccinationHistory: '', note: '', parentContact: ''
+      });
       alert('Lưu hồ sơ sức khỏe thành công!');
     } catch (error) {
       alert('Có lỗi khi lưu hồ sơ sức khỏe!');
@@ -350,12 +255,17 @@ const HealthRecord = () => {
     }
   };
 
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
   if (loading && healthRecords.length === 0) {
-    return (
-      <div className="health-record-container">
-        <div className="loading-spinner"></div>
-      </div>
-    );
+    // Xóa điều kiện này hoặc luôn trả về null
+    // return (
+    //   <div className="health-record-container">
+    //     <div className="loading-spinner"></div>
+    //   </div>
+    // );
   }
 
   return (
@@ -364,25 +274,24 @@ const HealthRecord = () => {
       <form className="health-record-form" onSubmit={handleHealthRecordFormSubmit} autoComplete="off">
         <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16}}>
           <div className="form-group">
-            <label>Con em:</label>
-            <select name="childId" value={formData.childId} onChange={handleInputChange} required style={{width: '100%'}}>
-              <option value="">Chọn con em</option>
-              {children.map(child => (
-                <option key={child.id} value={child.id}>{child.name} - {child.className}</option>
-              ))}
-            </select>
+            <label>Họ và tên:</label>
+            <input type="text" name="fullName" value={formData.fullName} onChange={handleInputChange} required style={{width: '100%'}} />
+          </div>
+          <div className="form-group">
+            <label>Lớp:</label>
+            <input type="text" name="className" value={formData.className} onChange={handleInputChange} required style={{width: '100%'}} />
           </div>
           <div className="form-group">
             <label>Dị ứng:</label>
             <input type="text" name="allergies" value={formData.allergies} onChange={handleInputChange} style={{width: '100%'}} />
           </div>
           <div className="form-group">
-            <label>Bệnh mãn tính:</label>
-            <input type="text" name="chronicDiseases" value={formData.chronicDiseases} onChange={handleInputChange} style={{width: '100%'}} />
-          </div>
-          <div className="form-group">
             <label>Lịch sử điều trị:</label>
             <input type="text" name="treatmentHistory" value={formData.treatmentHistory} onChange={handleInputChange} style={{width: '100%'}} />
+          </div>
+          <div className="form-group">
+            <label>Bệnh mãn tính:</label>
+            <input type="text" name="chronicDiseases" value={formData.chronicDiseases} onChange={handleInputChange} style={{width: '100%'}} />
           </div>
           <div className="form-group">
             <label>Thị lực:</label>

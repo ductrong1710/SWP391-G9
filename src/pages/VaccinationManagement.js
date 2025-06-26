@@ -16,12 +16,12 @@ const VaccinationManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [formData, setFormData] = useState({
-    vaccineName: '',
-    description: '',
-    scheduledDate: '',
-    targetClass: '',
-    targetGrade: '',
-    notes: ''
+    ID: '',
+    PlanName: '',
+    ScheduledDate: '',
+    Description: '',
+    Status: '',
+    CreatorID: ''
   });
 
   useEffect(() => {
@@ -150,16 +150,19 @@ const VaccinationManagement = () => {
     }
   };
 
-  const handleCreatePlan = () => {
-    setFormData({
-      vaccineName: '',
-      description: '',
-      scheduledDate: '',
-      targetClass: '',
-      targetGrade: '',
-      notes: ''
-    });
-    setShowCreateModal(true);
+  const handleCreatePlan = async () => {
+    try {
+      setLoading(true);
+      const newPlan = { ...formData };
+      await apiClient.post('/VaccinationPlan', newPlan);
+      setShowCreateModal(false);
+      fetchData();
+    } catch (error) {
+      alert('Có lỗi khi tạo kế hoạch tiêm chủng!');
+      console.error('Error creating vaccination plan:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleViewDetails = (plan) => {
@@ -173,31 +176,6 @@ const VaccinationManagement = () => {
       ...prev,
       [name]: value
     }));
-  };
-
-  const handleSubmitCreate = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const newPlan = {
-        ...formData,
-        status: 'Active',
-        totalStudents: 0,
-        confirmedCount: 0,
-        pendingCount: 0,
-        completedCount: 0,
-        createdDate: new Date().toISOString().split('T')[0],
-        createdBy: 'BS. Medical Staff'
-      };
-
-      const response = await apiClient.post('/VaccinationPlan', newPlan);
-      setVaccinationPlans([...vaccinationPlans, response.data]);
-      setShowCreateModal(false);
-    } catch (error) {
-      console.error('Error creating vaccination plan:', error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleSendNotifications = async (planId) => {
@@ -254,7 +232,7 @@ const VaccinationManagement = () => {
 
         <button 
           className="create-plan-btn"
-          onClick={handleCreatePlan}
+          onClick={() => setShowCreateModal(true)}
         >
           <i className="fas fa-plus"></i>
           Tạo kế hoạch mới
@@ -359,14 +337,14 @@ const VaccinationManagement = () => {
                 <i className="fas fa-times"></i>
               </button>
             </div>
-            <form onSubmit={handleSubmitCreate}>
+            <form onSubmit={handleCreatePlan}>
               <div className="modal-body">
                 <div className="form-group">
                   <label>Tên vaccine:</label>
                   <input
                     type="text"
-                    name="vaccineName"
-                    value={formData.vaccineName}
+                    name="PlanName"
+                    value={formData.PlanName}
                     onChange={handleInputChange}
                     placeholder="Nhập tên vaccine..."
                     required
@@ -376,8 +354,8 @@ const VaccinationManagement = () => {
                 <div className="form-group">
                   <label>Mô tả:</label>
                   <textarea
-                    name="description"
-                    value={formData.description}
+                    name="Description"
+                    value={formData.Description}
                     onChange={handleInputChange}
                     placeholder="Mô tả chi tiết về vaccine và mục đích tiêm chủng..."
                     rows="3"
@@ -390,8 +368,8 @@ const VaccinationManagement = () => {
                     <label>Ngày dự kiến:</label>
                     <input
                       type="date"
-                      name="scheduledDate"
-                      value={formData.scheduledDate}
+                      name="ScheduledDate"
+                      value={formData.ScheduledDate}
                       onChange={handleInputChange}
                       required
                     />

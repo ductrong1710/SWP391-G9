@@ -31,12 +31,14 @@ const MedicalHistory = () => {
           apiClient.get(`/HealthCheckResult/parent/${user.UserID}/history`),
           apiClient.get(`/User/parent/${user.UserID}/children`)
         ]);
-        setMedicalHistory(historyResponse.data);
+        const mappedHistory = (historyResponse.data || []).map(mapBackendToFrontend);
+        setMedicalHistory(mappedHistory);
         setChildren(childrenResponse.data);
       } else if (userRole === 'Student') {
         // Fetch medical history for student
         const historyResponse = await apiClient.get(`/HealthCheckResult/student/${user.UserID}/history`);
-        setMedicalHistory(historyResponse.data);
+        const mappedHistory = (historyResponse.data || []).map(mapBackendToFrontend);
+        setMedicalHistory(mappedHistory);
         setChildren([]);
       } else {
         navigate('/dashboard');
@@ -235,6 +237,24 @@ const MedicalHistory = () => {
     if (bmi < 30) return { category: 'Thừa cân', color: '#d69e2e' };
     return { category: 'Béo phì', color: '#e53e3e' };
   };
+
+  const mapBackendToFrontend = (record) => ({
+    id: record.id || record.ID,
+    healthCheckConsentID: record.healthCheckConsentID || record.HealthCheckConsentID,
+    height: record.height || record.Height,
+    weight: record.weight || record.Weight,
+    bloodPressure: record.bloodPressure || record.BloodPressure,
+    heartRate: record.heartRate || record.HeartRate,
+    eyesight: record.eyesight || record.Eyesight,
+    hearing: record.hearing || record.Hearing,
+    oralHealth: record.oralHealth || record.OralHealth,
+    spine: record.spine || record.Spine,
+    conclusion: record.conclusion || record.Conclusion,
+    checkUpDate: record.checkUpDate || record.CheckUpDate,
+    checker: record.checker || record.Checker,
+    consultationRecommended: record.consultationRecommended || record.ConsultationRecommended,
+    consultationAppointmentDate: record.consultationAppointmentDate || record.ConsultationAppointmentDate
+  });
 
   if (loading) {
     return (

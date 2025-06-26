@@ -10,20 +10,17 @@ const healthCheckService = {
             const records = Array.isArray(response.data) ? response.data : [response.data];
             // Chuyển đổi dữ liệu để phù hợp với frontend
             const formattedRecords = records.map(record => ({
-                healthCheckId: record.healthCheckId,
-                studentId: record.studentId,
-                studentName: record.student?.fullName || '',
-                studentClass: record.student?.className || '',
-                checkDate: record.checkDate || new Date().toISOString(),
-                allergies: record.allergies || '',
-                chronicDiseases: record.chronicDiseases || '',
-                treatmentHistory: record.treatmentHistory || '',
-                eyesight: record.eyesight || '',
-                hearing: record.hearing || '',
-                vaccinationHistory: record.vaccinationHistory || '',
-                note: record.note || '',
-                parentContact: record.parentContact || '',
-                parentId: record.parentId || ''
+                healthRecordID: record.healthRecordID,
+                studentID: record.studentID,
+                parentID: record.parentID,
+                allergies: record.allergies,
+                chronicDiseases: record.chronicDiseases,
+                treatmentHistory: record.treatmentHistory,
+                eyesight: record.eyesight,
+                hearing: record.hearing,
+                vaccinationHistory: record.vaccinationHistory,
+                note: record.note,
+                parentContact: record.parentContact
             }));
             return formattedRecords;
         } catch (error) {
@@ -38,20 +35,17 @@ const healthCheckService = {
             const response = await apiClient.get(`/HealthCheck/${id}`);
             const record = response.data;
             return {
-                healthCheckId: record.healthCheckId,
-                studentId: record.studentId,
-                studentName: record.student?.fullName || '',
-                studentClass: record.student?.className || '',
-                checkDate: record.checkDate || new Date().toISOString(),
-                allergies: record.allergies || '',
-                chronicDiseases: record.chronicDiseases || '',
-                treatmentHistory: record.treatmentHistory || '',
-                eyesight: record.eyesight || '',
-                hearing: record.hearing || '',
-                vaccinationHistory: record.vaccinationHistory || '',
-                note: record.note || '',
-                parentContact: record.parentContact || '',
-                parentId: record.parentId || ''
+                healthRecordID: record.healthRecordID,
+                studentID: record.studentID,
+                parentID: record.parentID,
+                allergies: record.allergies,
+                chronicDiseases: record.chronicDiseases,
+                treatmentHistory: record.treatmentHistory,
+                eyesight: record.eyesight,
+                hearing: record.hearing,
+                vaccinationHistory: record.vaccinationHistory,
+                note: record.note,
+                parentContact: record.parentContact
             };
         } catch (error) {
             console.error(`Error fetching health check with ID ${id}:`, error);
@@ -67,20 +61,17 @@ const healthCheckService = {
                 records = Array.isArray(response.data) ? response.data : [response.data];
             }
             const formattedRecords = records.map(record => ({
-                healthCheckId: record.healthCheckId,
-                studentId: record.studentId,
-                studentName: record.student?.fullName || '',
-                studentClass: record.student?.className || '',
-                checkDate: record.checkDate || new Date().toISOString(),
-                allergies: record.allergies || '',
-                chronicDiseases: record.chronicDiseases || '',
-                treatmentHistory: record.treatmentHistory || '',
-                eyesight: record.eyesight || '',
-                hearing: record.hearing || '',
-                vaccinationHistory: record.vaccinationHistory || '',
-                note: record.note || '',
-                parentContact: record.parentContact || '',
-                parentId: record.parentId || ''
+                healthRecordID: record.healthRecordID,
+                studentID: record.studentID,
+                parentID: record.parentID,
+                allergies: record.allergies,
+                chronicDiseases: record.chronicDiseases,
+                treatmentHistory: record.treatmentHistory,
+                eyesight: record.eyesight,
+                hearing: record.hearing,
+                vaccinationHistory: record.vaccinationHistory,
+                note: record.note,
+                parentContact: record.parentContact
             }));
             console.log('Formatted health checks:', formattedRecords);
             return formattedRecords;
@@ -93,18 +84,17 @@ const healthCheckService = {
     createHealthCheck: async (healthCheckData) => {
         try {
             const formattedData = {
-                healthCheckId: healthCheckData.healthCheckId || '00000000-0000-0000-0000-000000000000',
-                studentId: healthCheckData.studentId,
-                parentId: healthCheckData.parentId || localStorage.getItem('userId') || '',
-                allergies: healthCheckData.allergies || '',
-                chronicDiseases: healthCheckData.chronicDiseases || '',
-                treatmentHistory: healthCheckData.treatmentHistory || '',
-                eyesight: healthCheckData.eyesight || '',
-                hearing: healthCheckData.hearing || '',
-                vaccinationHistory: healthCheckData.vaccinationHistory || '',
-                note: healthCheckData.note || '',
-                parentContact: healthCheckData.parentContact || localStorage.getItem('userContact') || '',
-                checkDate: healthCheckData.checkDate || new Date().toISOString()
+                healthRecordID: healthCheckData.healthRecordID,
+                studentID: healthCheckData.studentID,
+                parentID: healthCheckData.parentID,
+                allergies: healthCheckData.allergies,
+                chronicDiseases: healthCheckData.chronicDiseases,
+                treatmentHistory: healthCheckData.treatmentHistory,
+                eyesight: healthCheckData.eyesight,
+                hearing: healthCheckData.hearing,
+                vaccinationHistory: healthCheckData.vaccinationHistory,
+                note: healthCheckData.note,
+                parentContact: healthCheckData.parentContact
             };
             console.log('Sending health check data to API:', formattedData);
             const response = await apiClient.post('/HealthCheck', formattedData);
@@ -118,18 +108,17 @@ const healthCheckService = {
     updateHealthCheck: async (id, healthCheckData) => {
         try {
             const formattedData = {
-                healthCheckId: id,
-                studentId: healthCheckData.studentId,
-                parentId: healthCheckData.parentId || localStorage.getItem('userId') || '',
-                allergies: healthCheckData.allergies || '',
-                chronicDiseases: healthCheckData.chronicDiseases || '',
-                treatmentHistory: healthCheckData.treatmentHistory || '',
-                eyesight: healthCheckData.eyesight || '',
-                hearing: healthCheckData.hearing || '',
-                vaccinationHistory: healthCheckData.vaccinationHistory || '',
-                note: healthCheckData.note || '',
-                parentContact: healthCheckData.parentContact || localStorage.getItem('userContact') || '',
-                checkDate: healthCheckData.checkDate || new Date().toISOString()
+                healthRecordID: id,
+                studentID: healthCheckData.studentID,
+                parentID: healthCheckData.parentID,
+                allergies: healthCheckData.allergies,
+                chronicDiseases: healthCheckData.chronicDiseases,
+                treatmentHistory: healthCheckData.treatmentHistory,
+                eyesight: healthCheckData.eyesight,
+                hearing: healthCheckData.hearing,
+                vaccinationHistory: healthCheckData.vaccinationHistory,
+                note: healthCheckData.note,
+                parentContact: healthCheckData.parentContact
             };
             console.log('Updating health check data:', formattedData);
             const response = await apiClient.put(`/HealthCheck/${id}`, formattedData);
@@ -173,6 +162,16 @@ const healthCheckService = {
                 return { connected: false, message: `Lỗi từ server: ${error.response.status} - ${error.response.statusText}` };
             }
             return { connected: false, message: 'Không thể kết nối với backend. Vui lòng kiểm tra lại cấu hình hoặc liên hệ quản trị viên.' };
+        }
+    },
+    // Tìm profile theo họ tên và lớp
+    findProfileByNameAndClass: async (name, className) => {
+        try {
+            const response = await apiClient.get(`/Profile/search`, { params: { name, class: className } });
+            return response.data;
+        } catch (error) {
+            console.error('Không tìm thấy profile:', error);
+            return null;
         }
     },
 };

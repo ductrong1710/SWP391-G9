@@ -180,10 +180,16 @@ const Sidebar = ({ onSidebarToggle }) => {
           {!collapsed ? (
             <div className="user-menu">
               <div className="user-info">
-                <div className="user-avatar">A</div>
+                <div className="user-avatar">{user?.name?.charAt(0)?.toUpperCase() || user?.Name?.charAt(0)?.toUpperCase() || 'U'}</div>
                 <div className="user-details">
-                  <div className="user-name">Admin</div>
-                  <div className="user-role">Quản trị viên</div>
+                  <div className="user-name">{user?.name || user?.Name || 'Người dùng'}</div>
+                  <div className="user-role">{
+                    userRole === 'Admin' ? 'Quản trị viên' :
+                    userRole === 'MedicalStaff' ? 'Nhân viên y tế' :
+                    userRole === 'Parent' ? 'Phụ huynh' :
+                    userRole === 'Student' ? 'Học sinh' :
+                    'Khách'
+                  }</div>
                 </div>
               </div>
               <button className="logout-btn" onClick={handleLogoutClick}>
@@ -193,7 +199,7 @@ const Sidebar = ({ onSidebarToggle }) => {
             </div>
           ) : (
             <div className="user-menu collapsed">
-              <div className="user-avatar" title="Admin - Quản trị viên">A</div>
+              <div className="user-avatar" title={`${user?.name || user?.Name || 'Người dùng'} - ${userRole === 'Admin' ? 'Quản trị viên' : userRole === 'MedicalStaff' ? 'Nhân viên y tế' : userRole === 'Parent' ? 'Phụ huynh' : userRole === 'Student' ? 'Học sinh' : 'Khách'}`}>{user?.name?.charAt(0)?.toUpperCase() || user?.Name?.charAt(0)?.toUpperCase() || 'U'}</div>
               <button className="logout-btn collapsed" title="Đăng xuất" onClick={handleLogoutClick}>
                 <i className="fas fa-sign-out-alt"></i>
               </button>

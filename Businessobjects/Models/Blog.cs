@@ -3,22 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Businessobjects.Models
 {
-    public class Blog
+    [Table("BlogDocument")]
+    public class BlogDocument
     {
         [Key]
-        [Column("ID")]
-        public string ID { get; set; } = null!;
+        [Column("DocumentID")]
+        public int DocumentID { get; set; }
         [Required]
         public string Title { get; set; } = null!;
-        [Required]
-        public string Content { get; set; } = null!;
-        [Column("AuthorID")]
-        public string? AuthorID { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
         public string? Category { get; set; }
-        public string? Status { get; set; } // Draft, Published, Archived
-        [ForeignKey("AuthorID")]
-        public User? Author { get; set; }
+        public string? Author { get; set; }
+        public DateTime? PublishDate { get; set; }
+        public string? Summary { get; set; }
+        public string Content { get; set; } = null!;
+        public string? ImageURL { get; set; }
     }
 } 

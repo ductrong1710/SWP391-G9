@@ -19,7 +19,6 @@ namespace Businessobjects.Models
         public Role? Role { get; set; }
         
         // Navigation properties for new models
-        public ICollection<Blog> Blogs { get; set; } = new List<Blog>();
         public ICollection<VaccinationHealthCheck> StudentVaccinationHealthChecks { get; set; } = new List<VaccinationHealthCheck>();
         public ICollection<VaccinationHealthCheck> ParentVaccinationHealthChecks { get; set; } = new List<VaccinationHealthCheck>();
         public ICollection<VaccinationConsultation> StudentVaccinationConsultations { get; set; } = new List<VaccinationConsultation>();

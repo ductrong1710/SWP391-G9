@@ -4,10 +4,10 @@ namespace Repositories.Interfaces
 {
     public interface IBlogRepository
     {
-        Task<IEnumerable<Blog>> GetAllAsync();
-        Task<Blog?> GetByIdAsync(string id);
-        Task<Blog> AddAsync(Blog blog);
-        Task<Blog> UpdateAsync(Blog blog);
+        Task<IEnumerable<BlogDocument>> GetAllAsync();
+        Task<BlogDocument?> GetByIdAsync(int id);
+        Task<BlogDocument> AddAsync(BlogDocument blog);
+        Task<BlogDocument> UpdateAsync(BlogDocument blog);
         Task<bool> DeleteAsync(string id);
     }
 } 

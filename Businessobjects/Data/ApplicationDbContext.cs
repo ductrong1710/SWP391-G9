@@ -223,7 +223,7 @@ namespace Businessobjects.Data
         DateOfBirth = new DateTime(1990, 1, 1),
         Sex = "Male",
         Class = "Admin Class",
-        Phone = "1234567890",
+        Phone = 1234567890m,
         UserID = "c9d4c053-49b6-410c-bc78-2d54a9991870",
         Note = "Admin profile"
     }

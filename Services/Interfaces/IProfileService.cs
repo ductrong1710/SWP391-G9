@@ -10,5 +10,6 @@ namespace Services.interfaces
         Task<Profile> CreateProfileAsync(Profile profile);
         Task UpdateProfileAsync(string id, Profile profile);
         Task DeleteProfileAsync(string id);
+        Task<Profile?> FindProfileByNameAndClassAsync(string name, string @class);
     }
 }

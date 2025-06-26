@@ -4,10 +4,10 @@ namespace Services.Interfaces
 {
     public interface IBlogService
     {
-        Task<IEnumerable<Blog>> GetAllBlogsAsync();
-        Task<Blog?> GetBlogByIdAsync(string id);
-        Task<Blog> CreateBlogAsync(Blog blog);
-        Task<Blog> UpdateBlogAsync(Blog blog);
-        Task<bool> DeleteBlogAsync(string id);
+        Task<IEnumerable<BlogDocument>> GetAllBlogsAsync();
+        Task<BlogDocument?> GetBlogByIdAsync(int id);
+        Task<BlogDocument> CreateBlogAsync(BlogDocument blog);
+        Task<BlogDocument> UpdateBlogAsync(BlogDocument blog);
+        Task<bool> DeleteBlogAsync(int id);
     }
 } 

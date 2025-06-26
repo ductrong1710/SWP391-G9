@@ -50,7 +50,7 @@ namespace BackEnd.Controllers
         public async Task<ActionResult<HealthRecord>> CreateHealthRecord(HealthRecord healthRecord)
         {
             var createdHealthRecord = await _healthRecordService.CreateHealthRecordAsync(healthRecord);
-            return CreatedAtAction(nameof(GetHealthRecord), new { id = createdHealthRecord.HealthRecordID }, createdHealthRecord);
+            return Ok(createdHealthRecord);
         }
 
         // PUT: api/HealthRecord/5

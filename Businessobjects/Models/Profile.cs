@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Businessobjects.Models
 {
+    [Table("Profile")]
     public class Profile
     {
         [Key]

@@ -47,6 +47,16 @@ namespace BackEnd.Controllers
             return Ok(profile);
         }
 
+        // GET: api/Profile/search?name=...&class=...
+        [HttpGet("search")]
+        public async Task<ActionResult<Profile>> SearchProfile([FromQuery] string name, [FromQuery] string @class)
+        {
+            var profile = await _profileService.FindProfileByNameAndClassAsync(name, @class);
+            if (profile == null)
+                return NotFound();
+            return Ok(profile);
+        }
+
         // POST: api/Profile
         [HttpPost]
         public async Task<ActionResult<Profile>> CreateProfile(Profile profile)

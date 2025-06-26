@@ -12,7 +12,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import HealthDeclaration from './pages/HealthDeclaration';
+import HealthRecord from './pages/HealthRecord';
 import HealthCheckManagement from './pages/HealthCheckManagement';
 import VaccinationManagement from './pages/VaccinationManagement';
 import SendMedicine from './pages/SendMedicine';
@@ -27,6 +27,7 @@ function App() {
   const sidebarRoutes = [
     '/dashboard',
     '/health-declaration',
+    '/health-record',
     '/health-check-management',
     '/vaccination-management',
     '/send-medicine',
@@ -65,7 +66,12 @@ function App() {
               } />
               <Route path="/health-declaration" element={
                 <div className="page-wrapper">
-                  <HealthDeclaration />
+                  <HealthRecord />
+                </div>
+              } />
+              <Route path="/health-record" element={
+                <div className="page-wrapper">
+                  <HealthRecord />
                 </div>
               } />
               <Route path="/health-check-management" element={

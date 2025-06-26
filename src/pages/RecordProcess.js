@@ -115,7 +115,7 @@ const RecordProcess = () => {
       try {
         setLoading(true);
         // Gọi API backend lấy records
-        const response = await apiClient.get('/HealthRecord');
+        const response = await apiClient.get('/HealthCheck');
         setRecords(response.data);
       } catch (error) {
         // Nếu lỗi, fallback về mock data

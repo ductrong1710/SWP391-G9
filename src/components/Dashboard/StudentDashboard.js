@@ -5,7 +5,7 @@ import './Dashboard.css';
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
-    healthRecords: 1,
+    healthChecks: 1,
     medicalHistory: 8,
     upcomingCheckups: 2,
     blogRead: 12
@@ -31,7 +31,7 @@ const StudentDashboard = () => {
               
               <div className="hero-stats">
                 <div className="hero-stat">
-                  <div className="hero-stat-value">{stats.healthRecords}</div>
+                  <div className="hero-stat-value">{stats.healthChecks}</div>
                   <div className="hero-stat-label">Hồ sơ sức khỏe</div>
                 </div>
                 <div className="hero-stat">
@@ -122,7 +122,7 @@ const StudentDashboard = () => {
                 <div className="stat-icon">
                   <i className="fas fa-file-medical-alt"></i>
                 </div>
-                <div className="stat-value">{stats.healthRecords}</div>
+                <div className="stat-value">{stats.healthChecks}</div>
                 <div className="stat-label">Hồ sơ sức khỏe</div>
                 <div className="stat-change stat-increase">Cập nhật mới nhất</div>
               </div>

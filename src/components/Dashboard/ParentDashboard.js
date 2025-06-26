@@ -6,7 +6,7 @@ const ParentDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     childrenCount: 2,
-    healthRecords: 2,
+    healthChecks: 2,
     pendingNotifications: 3,
     medicalHistory: 15,
     medicationSubmissions: 5
@@ -36,7 +36,7 @@ const ParentDashboard = () => {
                   <div className="hero-stat-label">Con em đang theo dõi</div>
                 </div>
                 <div className="hero-stat">
-                  <div className="hero-stat-value">{stats.healthRecords}</div>
+                  <div className="hero-stat-value">{stats.healthChecks}</div>
                   <div className="hero-stat-label">Hồ sơ sức khỏe</div>
                 </div>
                 <div className="hero-stat">
@@ -132,7 +132,7 @@ const ParentDashboard = () => {
                 <div className="stat-icon">
                   <i className="fas fa-file-medical-alt"></i>
                 </div>
-                <div className="stat-value">{stats.healthRecords}</div>
+                <div className="stat-value">{stats.healthChecks}</div>
                 <div className="stat-label">Hồ sơ sức khỏe</div>
                 <div className="stat-change stat-increase">Đã cập nhật gần đây</div>
               </div>

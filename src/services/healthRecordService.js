@@ -1,23 +1,20 @@
 import apiClient from './apiClient';
 
-const healthRecordService = {
-    // Lấy tất cả health records
-    getAllHealthRecords: async () => {
+const healthCheckService = {
+    // Lấy tất cả health checks
+    getAllHealthChecks: async () => {
         try {
-            const response = await apiClient.get('/HealthRecord');
-            console.log('GET /HealthRecord response:', response); // Thêm dòng này
-
-
+            const response = await apiClient.get('/HealthCheck');
+            console.log('GET /HealthCheck response:', response); // Thêm dòng này
             // Đảm bảo dữ liệu trả về là một mảng
             const records = Array.isArray(response.data) ? response.data : [response.data];
-
             // Chuyển đổi dữ liệu để phù hợp với frontend
             const formattedRecords = records.map(record => ({
-                healthRecordId: record.healthRecordId,
+                healthCheckId: record.healthCheckId,
                 studentId: record.studentId,
                 studentName: record.student?.fullName || '',
                 studentClass: record.student?.className || '',
-                recordDate: record.recordDate || new Date().toISOString(),
+                checkDate: record.checkDate || new Date().toISOString(),
                 allergies: record.allergies || '',
                 chronicDiseases: record.chronicDiseases || '',
                 treatmentHistory: record.treatmentHistory || '',
@@ -28,27 +25,24 @@ const healthRecordService = {
                 parentContact: record.parentContact || '',
                 parentId: record.parentId || ''
             }));
-
             return formattedRecords;
         } catch (error) {
-            console.error('Error fetching health records:', error);
+            console.error('Error fetching health checks:', error);
             // Trả về mảng rỗng trong trường hợp lỗi
             return [];
         }
     },
-
-    // Lấy health record bằng ID
-    getHealthRecordById: async (id) => {
+    // Lấy health check bằng ID
+    getHealthCheckById: async (id) => {
         try {
-            const response = await apiClient.get(`/HealthRecord/${id}`);
+            const response = await apiClient.get(`/HealthCheck/${id}`);
             const record = response.data;
-
             return {
-                healthRecordId: record.healthRecordId,
+                healthCheckId: record.healthCheckId,
                 studentId: record.studentId,
                 studentName: record.student?.fullName || '',
                 studentClass: record.student?.className || '',
-                recordDate: record.recordDate || new Date().toISOString(),
+                checkDate: record.checkDate || new Date().toISOString(),
                 allergies: record.allergies || '',
                 chronicDiseases: record.chronicDiseases || '',
                 treatmentHistory: record.treatmentHistory || '',
@@ -60,29 +54,24 @@ const healthRecordService = {
                 parentId: record.parentId || ''
             };
         } catch (error) {
-            console.error(`Error fetching health record with ID ${id}:`, error);
+            console.error(`Error fetching health check with ID ${id}:`, error);
             throw error;
         }
     },
-
-    // Lấy health records theo student ID
-    getHealthRecordsByStudentId: async (studentId) => {
+    // Lấy health checks theo student ID
+    getHealthChecksByStudentId: async (studentId) => {
         try {
-            const response = await apiClient.get(`/HealthRecord/student/${studentId}`);
-
-            // Trong trường hợp backend trả về một record đơn lẻ thay vì mảng
+            const response = await apiClient.get(`/HealthCheck/student/${studentId}`);
             let records = [];
             if (response.data) {
                 records = Array.isArray(response.data) ? response.data : [response.data];
             }
-
-            // Chuyển đổi dữ liệu để phù hợp với frontend
             const formattedRecords = records.map(record => ({
-                healthRecordId: record.healthRecordId,
+                healthCheckId: record.healthCheckId,
                 studentId: record.studentId,
                 studentName: record.student?.fullName || '',
                 studentClass: record.student?.className || '',
-                recordDate: record.recordDate || new Date().toISOString(),
+                checkDate: record.checkDate || new Date().toISOString(),
                 allergies: record.allergies || '',
                 chronicDiseases: record.chronicDiseases || '',
                 treatmentHistory: record.treatmentHistory || '',
@@ -93,78 +82,70 @@ const healthRecordService = {
                 parentContact: record.parentContact || '',
                 parentId: record.parentId || ''
             }));
-
-            console.log('Formatted health records:', formattedRecords);
+            console.log('Formatted health checks:', formattedRecords);
             return formattedRecords;
         } catch (error) {
-            console.error(`Error fetching health records for student ${studentId}:`, error);
-            // Trả về mảng rỗng trong trường hợp lỗi
+            console.error(`Error fetching health checks for student ${studentId}:`, error);
             return [];
         }
     },
-
-    // Tạo health record mới
-    createHealthRecord: async (healthRecordData) => {
+    // Tạo health check mới
+    createHealthCheck: async (healthCheckData) => {
         try {
-            // Đảm bảo dữ liệu phù hợp với model backend
             const formattedData = {
-                healthRecordId: healthRecordData.healthRecordId || '00000000-0000-0000-0000-000000000000', // Default Guid for new record
-                studentId: healthRecordData.studentId,
-                parentId: healthRecordData.parentId || localStorage.getItem('userId') || '',
-                allergies: healthRecordData.allergies || '',
-                chronicDiseases: healthRecordData.chronicDiseases || '',
-                treatmentHistory: healthRecordData.treatmentHistory || '',
-                eyesight: healthRecordData.eyesight || '',
-                hearing: healthRecordData.hearing || '',
-                vaccinationHistory: healthRecordData.vaccinationHistory || '',
-                note: healthRecordData.note || '',
-                parentContact: healthRecordData.parentContact || localStorage.getItem('userContact') || '',
-                recordDate: healthRecordData.recordDate || new Date().toISOString()
+                healthCheckId: healthCheckData.healthCheckId || '00000000-0000-0000-0000-000000000000',
+                studentId: healthCheckData.studentId,
+                parentId: healthCheckData.parentId || localStorage.getItem('userId') || '',
+                allergies: healthCheckData.allergies || '',
+                chronicDiseases: healthCheckData.chronicDiseases || '',
+                treatmentHistory: healthCheckData.treatmentHistory || '',
+                eyesight: healthCheckData.eyesight || '',
+                hearing: healthCheckData.hearing || '',
+                vaccinationHistory: healthCheckData.vaccinationHistory || '',
+                note: healthCheckData.note || '',
+                parentContact: healthCheckData.parentContact || localStorage.getItem('userContact') || '',
+                checkDate: healthCheckData.checkDate || new Date().toISOString()
             };
-
-            console.log('Sending health record data to API:', formattedData);
-            const response = await apiClient.post('/HealthRecord', formattedData);
+            console.log('Sending health check data to API:', formattedData);
+            const response = await apiClient.post('/HealthCheck', formattedData);
             return response.data;
         } catch (error) {
-            console.error('Error creating health record:', error);
+            console.error('Error creating health check:', error);
             throw error;
         }
     },
-
-    // Cập nhật health record
-    updateHealthRecord: async (id, healthRecordData) => {
+    // Cập nhật health check
+    updateHealthCheck: async (id, healthCheckData) => {
         try {
-            // Đảm bảo dữ liệu phù hợp với model backend
             const formattedData = {
-                healthRecordId: id,
-                studentId: healthRecordData.studentId,
-                parentId: healthRecordData.parentId || localStorage.getItem('userId') || '',
-                allergies: healthRecordData.allergies || '',
-                chronicDiseases: healthRecordData.chronicDiseases || '',
-                treatmentHistory: healthRecordData.treatmentHistory || '', eyesight: healthRecordData.eyesight || '',
-                hearing: healthRecordData.hearing || '',
-                vaccinationHistory: healthRecordData.vaccinationHistory || '',
-                note: healthRecordData.note || '',
-                parentContact: healthRecordData.parentContact || localStorage.getItem('userContact') || '',
-                recordDate: healthRecordData.recordDate || new Date().toISOString()
+                healthCheckId: id,
+                studentId: healthCheckData.studentId,
+                parentId: healthCheckData.parentId || localStorage.getItem('userId') || '',
+                allergies: healthCheckData.allergies || '',
+                chronicDiseases: healthCheckData.chronicDiseases || '',
+                treatmentHistory: healthCheckData.treatmentHistory || '',
+                eyesight: healthCheckData.eyesight || '',
+                hearing: healthCheckData.hearing || '',
+                vaccinationHistory: healthCheckData.vaccinationHistory || '',
+                note: healthCheckData.note || '',
+                parentContact: healthCheckData.parentContact || localStorage.getItem('userContact') || '',
+                checkDate: healthCheckData.checkDate || new Date().toISOString()
             };
-
-            console.log('Updating health record data:', formattedData);
-            const response = await apiClient.put(`/HealthRecord/${id}`, formattedData);
+            console.log('Updating health check data:', formattedData);
+            const response = await apiClient.put(`/HealthCheck/${id}`, formattedData);
             return response.data;
         } catch (error) {
-            console.error(`Error updating health record with ID ${id}:`, error);
+            console.error(`Error updating health check with ID ${id}:`, error);
             throw error;
         }
     },
-
-    // Xóa health record
-    deleteHealthRecord: async (id) => {
+    // Xóa health check
+    deleteHealthCheck: async (id) => {
         try {
-            const response = await apiClient.delete(`/HealthRecord/${id}`);
+            const response = await apiClient.delete(`/HealthCheck/${id}`);
             return response.data;
         } catch (error) {
-            console.error(`Error deleting health record with ID ${id}:`, error);
+            console.error(`Error deleting health check with ID ${id}:`, error);
             throw error;
         }
     },
@@ -172,7 +153,7 @@ const healthRecordService = {
     checkBackendConnection: async () => {
         try {
             // Gọi đúng endpoint REST
-            const response = await apiClient.get('/HealthRecord');
+            const response = await apiClient.get('/HealthCheck');
             if (response && (Array.isArray(response.data) || typeof response.data === 'object')) {
                 return { connected: true, message: 'Kết nối thành công với backend' };
             }
@@ -196,4 +177,4 @@ const healthRecordService = {
     },
 };
 
-export default healthRecordService;
+export default healthCheckService;

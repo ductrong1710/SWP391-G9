@@ -303,7 +303,6 @@ INSERT INTO Vaccination_Consent_Form VALUES
 ('VCF001', 'VP0001', 'U00007', 'U00005', N'Đồng ý', '2025-06-18', NULL),
 ('VCF002', 'VP0002', 'U00008', 'U00006', N'Từ chối', '2025-06-18', N'Phụ huynh lo ngại về phản ứng phụ');
 
--- Bảng Vaccination_Result
 CREATE TABLE Vaccination_Result (
     ID CHAR(6) PRIMARY KEY,
     ConsentFormID CHAR(6),
@@ -312,10 +311,43 @@ CREATE TABLE Vaccination_Result (
     Performer NVARCHAR(100),
     PostVaccinationReaction NVARCHAR(255),
     Notes NVARCHAR(255),
+    NeedToContactParent BIT, -- ✅ Cột mới
     FOREIGN KEY (ConsentFormID) REFERENCES Vaccination_Consent_Form(ID),
     FOREIGN KEY (VaccineTypeID) REFERENCES Vaccine_Type(VaccinationID)
 );
 
 INSERT INTO Vaccination_Result VALUES
-('VR0001', 'VCF001', 'VC0001', '2025-06-25', N'Trần Thị B', N'Không có phản ứng', N'Tiêm thành công, theo dõi 24h'),
-('VR0002', 'VCF002', 'VC0002', NULL, NULL, N'Sốt nhẹ', N'Phụ huynh từ chối, chưa tiêm');
+('VR0001', 'VCF001', 'VC0001', '2025-06-25', N'Trần Thị B', N'Không có phản ứng', N'Tiêm thành công, theo dõi 24h', 0),
+('VR0002', 'VCF002', 'VC0002', NULL, NULL, N'Sốt nhẹ', N'Phụ huynh từ chối, chưa tiêm', 1);
+
+CREATE TABLE BlogDocument (
+    DocumentID INT PRIMARY KEY,
+    Title NVARCHAR(255),
+    Category NVARCHAR(100),
+    Author NVARCHAR(100),
+    PublishDate DATE,
+    Summary NVARCHAR(500),
+    Content NVARCHAR(MAX),
+    ImageURL NVARCHAR(255)
+);
+
+INSERT INTO BlogDocument VALUES
+(1, N'Understanding COVID-19 Vaccination', N'vaccination', N'Dr. Rebecca Simmons', '2025-05-15',
+ N'A comprehensive guide to COVID-19 vaccination, including types of vaccines, efficacy, and side effects.',
+ N'<h2>COVID-19 Vaccination Guide</h2>... (trích nội dung)',
+ N'https://example.com/images/covid-vaccination.jpg'),
+
+(2, N'Heart Health: Prevention and Management', N'health', N'Dr. Michael Garcia', '2025-06-01',
+ N'Learn about heart disease prevention, risk factors, and lifestyle changes for better heart health.',
+ N'<h2>Heart Health: Prevention and Management</h2>... (trích nội dung)',
+ N'https://example.com/images/heart-health.jpg'),
+
+(3, N'Mental Health During a Pandemic', N'mental health', N'Dr. Jennifer Lee', '2025-04-10',
+ N'Strategies for maintaining mental health during difficult times like a pandemic.',
+ N'<h2>Mental Health During a Pandemic</h2>... (trích nội dung)',
+ N'https://example.com/images/mental-health.jpg'),
+
+(4, N'Nutrition Basics: Eating for Health', N'nutrition', N'Dr. Sarah Thompson', '2025-03-20',
+ N'A guide to basic nutrition principles for maintaining good health and preventing disease.',
+ N'<h2>Nutrition Basics: Eating for Health</h2>... (trích nội dung)',
+ N'https://example.com/images/nutrition.jpg');

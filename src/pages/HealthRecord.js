@@ -27,7 +27,9 @@ const HealthRecord = () => {
     hearing: '',
     vaccinationHistory: '',
     note: '',
-    parentContact: ''
+    parentContact: '',
+    fullName: '',
+    className: ''
   });
 
   const getMockHealthRecords = () => {
@@ -181,7 +183,9 @@ const HealthRecord = () => {
       hearing: '',
       vaccinationHistory: '',
       note: '',
-      parentContact: ''
+      parentContact: '',
+      fullName: '',
+      className: ''
     });
     setShowCreateModal(true);
   };
@@ -241,10 +245,29 @@ const HealthRecord = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const newRecord = { ...formData };
-      await apiClient.post('/HealthRecord', newRecord);
+      // 1. Gọi API lấy profile theo họ tên và lớp
+      const profileRes = await apiClient.get('/Profile/search', {
+        params: { name: formData.fullName, class: formData.className }
+      });
+      const studentID = profileRes.data.userID || profileRes.data.UserID;
+      // 2. Lấy parentID từ context đăng nhập
+      const parentID = user?.id || user?.userID || user?.UserID;
+      // 3. Tạo object gửi lên backend
+      const healthRecordPayload = {
+        StudentID: studentID,
+        ParentID: parentID,
+        Allergies: formData.allergies,
+        ChronicDiseases: formData.chronicDiseases,
+        TreatmentHistory: formData.treatmentHistory,
+        Eyesight: formData.eyesight,
+        Hearing: formData.hearing,
+        VaccinationHistory: formData.vaccinationHistory,
+        Note: formData.note,
+        ParentContact: formData.parentContact
+      };
+      await apiClient.post('/HealthRecord', healthRecordPayload);
       setFormData({
-        healthRecordID: '', studentID: '', parentID: '', allergies: '', chronicDiseases: '', treatmentHistory: '', eyesight: '', hearing: '', vaccinationHistory: '', note: '', parentContact: ''
+        healthRecordID: '', studentID: '', parentID: '', allergies: '', chronicDiseases: '', treatmentHistory: '', eyesight: '', hearing: '', vaccinationHistory: '', note: '', parentContact: '', fullName: '', className: ''
       });
       alert('Lưu hồ sơ sức khỏe thành công!');
     } catch (error) {

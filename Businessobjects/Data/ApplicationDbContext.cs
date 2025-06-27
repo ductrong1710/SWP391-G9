@@ -27,6 +27,7 @@ namespace Businessobjects.Data
         public DbSet<MedicationReceipt> MedicationReceipts { get; set; }
         public DbSet<VaccinationConsultation> VaccinationConsultations { get; set; }
         public DbSet<VaccinationHealthCheck> VaccinationHealthChecks { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

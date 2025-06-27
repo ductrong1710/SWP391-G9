@@ -29,6 +29,7 @@ builder.Services.AddScoped<IVaccineTypeRepository, VaccineTypeRepository>();
 builder.Services.AddScoped<IVaccinationPlanRepository, VaccinationPlanRepository>();
 builder.Services.AddScoped<IVaccinationConsentFormRepository, VaccinationConsentFormRepository>();
 builder.Services.AddScoped<IVaccinationResultRepository, VaccinationResultRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IVaccineTypeService, VaccineTypeService>();
 builder.Services.AddScoped<IVaccinationPlanService, VaccinationPlanService>();
 builder.Services.AddScoped<IVaccinationConsentFormService, VaccinationConsentFormService>();
 builder.Services.AddScoped<IVaccinationResultService, VaccinationResultService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

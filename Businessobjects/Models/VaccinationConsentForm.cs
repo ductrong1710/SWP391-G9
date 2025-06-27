@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Businessobjects.Models
 {
+    [Table("Vaccination_Consent_Form")]
     public class VaccinationConsentForm
     {
         [Key]
@@ -12,7 +14,8 @@ namespace Businessobjects.Models
         [Column("VaccinationPlanID")]
         public string VaccinationPlanID { get; set; } = null!;
         [ForeignKey("VaccinationPlanID")]
-        public VaccinationPlan? VaccinationPlan { get; set; }
+        [JsonIgnore]
+        public virtual VaccinationPlan? VaccinationPlan { get; set; }
         [Required]
         [Column("StudentID")]
         public string StudentID { get; set; } = null!;

@@ -1,13 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Businessobjects.Models
 {
+    [Table("Vaccination_Plan")]
     public class VaccinationPlan
     {
         [Key]
         [Column("ID")]
-        public string ID { get; set; } = null!;
+        [StringLength(6, ErrorMessage = "ID must be 6 characters.")]
+        public string? ID { get; set; }
         [Required]
         public string PlanName { get; set; } = null!;
         public DateTime? ScheduledDate { get; set; }
@@ -15,11 +18,15 @@ namespace Businessobjects.Models
         public string? Status { get; set; }
         [Required]
         [Column("CreatorID")]
+        [StringLength(6, ErrorMessage = "CreatorID must be 6 characters.")]
         public string CreatorID { get; set; } = null!;
         [ForeignKey("CreatorID")]
+        [JsonIgnore]
         public User? Creator { get; set; }
         
+        [JsonIgnore]
         public virtual ICollection<VaccinationConsentForm>? ConsentForms { get; set; }
+        [JsonIgnore]
         public virtual ICollection<VaccinationHealthCheck>? VaccinationHealthChecks { get; set; }
     }
 }

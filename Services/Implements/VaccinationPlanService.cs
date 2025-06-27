@@ -2,16 +2,20 @@ using Businessobjects.Models;
 using Repositories.Interfaces;
 using Services.interfaces;
 using Services.Interfaces; // Add this using directive
+using Businessobjects.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Services.implements
 {
     public class VaccinationPlanService : IVaccinationPlanService
     {
         private readonly IVaccinationPlanRepository _planRepository;
+        private readonly ApplicationDbContext _context;
 
-        public VaccinationPlanService(IVaccinationPlanRepository planRepository)
+        public VaccinationPlanService(IVaccinationPlanRepository planRepository, ApplicationDbContext context)
         {
             _planRepository = planRepository;
+            _context = context;
         }
 
         public async Task<IEnumerable<VaccinationPlan>> GetAllVaccinationPlansAsync()
@@ -34,11 +38,24 @@ namespace Services.implements
             return await _planRepository.GetUpcomingVaccinationPlansAsync();
         }
 
+        public async Task<string> GenerateNextVaccinationPlanIDAsync()
+        {
+            var lastPlan = await _context.VaccinationPlans
+                .OrderByDescending(p => p.ID)
+                .FirstOrDefaultAsync();
+            if (lastPlan == null)
+                return "VP0001";
+            var lastNumber = int.Parse(lastPlan.ID.Substring(2));
+            var nextNumber = lastNumber + 1;
+            // Đảm bảo ID luôn đúng 6 ký tự: VP + 4 số
+            return "VP" + nextNumber.ToString("D4");
+        }
+
         public async Task<VaccinationPlan> CreateVaccinationPlanAsync(VaccinationPlan plan)
         {
             if (plan.ScheduledDate < DateTime.Today)
                 throw new InvalidOperationException("Cannot create a vaccination plan with a past date");
-
+            plan.ID = await GenerateNextVaccinationPlanIDAsync();
             await _planRepository.CreateVaccinationPlanAsync(plan);
             return plan;
         }

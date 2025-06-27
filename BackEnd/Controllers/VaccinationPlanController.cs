@@ -11,10 +11,17 @@ namespace BackEnd.Controllers
     public class VaccinationPlanController : ControllerBase
     {
         private readonly IVaccinationPlanService _planService;
+        private readonly IVaccinationConsentFormService _consentFormService;
+        private readonly INotificationService _notificationService;
 
-        public VaccinationPlanController(IVaccinationPlanService planService)
+        public VaccinationPlanController(
+            IVaccinationPlanService planService,
+            IVaccinationConsentFormService consentFormService,
+            INotificationService notificationService)
         {
             _planService = planService;
+            _consentFormService = consentFormService;
+            _notificationService = notificationService;
         }
 
         // GET: api/VaccinationPlan
@@ -59,6 +66,28 @@ namespace BackEnd.Controllers
             try
             {
                 var createdPlan = await _planService.CreateVaccinationPlanAsync(plan);
+
+                // Lấy danh sách consent form theo planId
+                var consentForms = await _consentFormService.GetConsentFormsByPlanIdAsync(createdPlan.ID);
+                var notifiedParents = new HashSet<string>();
+                foreach (var form in consentForms)
+                {
+                    if (!string.IsNullOrEmpty(form.ParentID) && !notifiedParents.Contains(form.ParentID))
+                    {
+                        var notification = new Notification
+                        {
+                            NotificationID = Guid.NewGuid().ToString(),
+                            UserID = form.ParentID,
+                            Title = "Xác nhận kế hoạch tiêm chủng",
+                            Message = $"Kế hoạch tiêm chủng '{createdPlan.PlanName}' đã được tạo. Vui lòng xác nhận cho con bạn.",
+                            CreatedAt = DateTime.Now,
+                            IsRead = false
+                        };
+                        await _notificationService.CreateNotificationAsync(notification);
+                        notifiedParents.Add(form.ParentID);
+                    }
+                }
+
                 return CreatedAtAction(nameof(GetVaccinationPlan), new { id = createdPlan.ID }, createdPlan);
             }
             catch (InvalidOperationException ex)

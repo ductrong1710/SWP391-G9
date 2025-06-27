@@ -38,7 +38,10 @@ namespace Services.implements
                 .FirstOrDefaultAsync();
             if (lastRecord == null)
                 return "HR00001";
-            var lastNumber = int.Parse(lastRecord.HealthRecordID.Substring(2));
+            var lastId = lastRecord.HealthRecordID;
+            int lastNumber = 1;
+            if (lastId.Length > 2 && int.TryParse(lastId.Substring(2), out int parsed))
+                lastNumber = parsed;
             var nextNumber = lastNumber + 1;
             return "HR" + nextNumber.ToString("D5");
         }

@@ -16,35 +16,52 @@ const VaccinationManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [formData, setFormData] = useState({
-    ID: '',
     PlanName: '',
     ScheduledDate: '',
     Description: '',
-    Status: '',
-    CreatorID: ''
+    Status: 'Active',
   });
+  const [vaccineList, setVaccineList] = useState([]);
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (showCreateModal) {
+      apiClient.get('/VaccineType').then(res => {
+        setVaccineList(res.data);
+      });
+    }
+  }, [showCreateModal]);
+
   const fetchData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const userRole = getUserRole();
       if (userRole !== 'MedicalStaff') {
         navigate('/dashboard');
         return;
       }
-      const [plansResponse, studentsResponse] = await Promise.all([
-        apiClient.get('/VaccinationPlan'),
-        apiClient.get('/User/students')
-      ]);
-      setVaccinationPlans(plansResponse.data);
-      setStudents(studentsResponse.data);
-    } catch (error) {
-      setVaccinationPlans(getMockVaccinationPlans());
-      setStudents(getMockStudents());
+      // Fetch kế hoạch tiêm chủng
+      let plans = [];
+      try {
+        const plansResponse = await apiClient.get('/VaccinationPlan');
+        plans = plansResponse.data;
+      } catch (err) {
+        console.error('Lỗi lấy kế hoạch tiêm chủng:', err);
+      }
+      setVaccinationPlans(plans);
+
+      // Fetch students (nếu cần)
+      let students = [];
+      try {
+        const studentsResponse = await apiClient.get('/User/students');
+        students = studentsResponse.data;
+      } catch (err) {
+        console.error('Lỗi lấy danh sách học sinh:', err);
+      }
+      setStudents(students);
     } finally {
       setLoading(false);
     }
@@ -114,9 +131,13 @@ const VaccinationManagement = () => {
   };
 
   const filteredPlans = vaccinationPlans.filter(plan => {
-    const matchesSearch = plan.vaccineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         plan.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || plan.status === filterStatus;
+    const vaccineName = plan.vaccineName || plan.PlanName || '';
+    const description = plan.description || plan.Description || '';
+    const matchesSearch =
+      vaccineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      description.toLowerCase().includes(searchTerm.toLowerCase());
+    const status = plan.status || plan.Status || '';
+    const matchesStatus = filterStatus === 'all' || status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -150,16 +171,31 @@ const VaccinationManagement = () => {
     }
   };
 
-  const handleCreatePlan = async () => {
+  const handleCreatePlan = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true);
-      const newPlan = { ...formData };
+      const user = JSON.parse(localStorage.getItem('user'));
+      const CreatorID = user?.userID || user?.UserID || '';
+      if (!formData.PlanName || !CreatorID) {
+        alert('Vui lòng nhập đầy đủ tên kế hoạch và đảm bảo bạn đã đăng nhập!');
+        setLoading(false);
+        return;
+      }
+      const newPlan = {
+        PlanName: formData.PlanName.trim(),
+        ScheduledDate: formData.ScheduledDate ? new Date(formData.ScheduledDate).toISOString() : null,
+        Description: formData.Description,
+        Status: formData.Status,
+        CreatorID
+      };
+      console.log('Payload gửi lên:', newPlan);
       await apiClient.post('/VaccinationPlan', newPlan);
       setShowCreateModal(false);
       fetchData();
     } catch (error) {
       alert('Có lỗi khi tạo kế hoạch tiêm chủng!');
-      console.error('Error creating vaccination plan:', error);
+      console.error('Error creating vaccination plan:', error?.response?.data || error);
     } finally {
       setLoading(false);
     }
@@ -327,7 +363,7 @@ const VaccinationManagement = () => {
       {/* Create Plan Modal */}
       {showCreateModal && (
         <div className="modal-overlay">
-          <div className="create-plan-modal">
+          <div className="create-plan-modal" style={{ background: '#f4f8fb' }}>
             <div className="modal-header">
               <h3>Tạo kế hoạch tiêm chủng mới</h3>
               <button 
@@ -340,82 +376,53 @@ const VaccinationManagement = () => {
             <form onSubmit={handleCreatePlan}>
               <div className="modal-body">
                 <div className="form-group">
-                  <label>Tên vaccine:</label>
-                  <input
-                    type="text"
+                  <label>Tên kế hoạch (Tên vaccine):</label>
+                  <select
                     name="PlanName"
                     value={formData.PlanName}
                     onChange={handleInputChange}
-                    placeholder="Nhập tên vaccine..."
+                    required
+                  >
+                    <option value="">Chọn vaccine...</option>
+                    {vaccineList.map(v => (
+                      <option key={v.vaccineTypeID || v.VaccineTypeID} value={v.vaccineName || v.VaccineName}>{v.vaccineName || v.VaccineName}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Ngày dự kiến:</label>
+                  <input
+                    type="date"
+                    name="ScheduledDate"
+                    value={formData.ScheduledDate}
+                    onChange={handleInputChange}
                     required
                   />
                 </div>
-
                 <div className="form-group">
                   <label>Mô tả:</label>
                   <textarea
                     name="Description"
                     value={formData.Description}
                     onChange={handleInputChange}
-                    placeholder="Mô tả chi tiết về vaccine và mục đích tiêm chủng..."
+                    placeholder="Mô tả chi tiết về kế hoạch tiêm chủng..."
                     rows="3"
                     required
                   />
                 </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Ngày dự kiến:</label>
-                    <input
-                      type="date"
-                      name="ScheduledDate"
-                      value={formData.ScheduledDate}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Khối:</label>
-                    <select
-                      name="targetGrade"
-                      value={formData.targetGrade}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="">Chọn khối</option>
-                      <option value="6">Khối 6</option>
-                      <option value="7">Khối 7</option>
-                      <option value="8">Khối 8</option>
-                      <option value="9">Khối 9</option>
-                      <option value="10">Khối 10</option>
-                      <option value="11">Khối 11</option>
-                      <option value="12">Khối 12</option>
-                      <option value="Tất cả">Tất cả</option>
-                    </select>
-                  </div>
-                </div>
-
                 <div className="form-group">
-                  <label>Lớp cụ thể (tùy chọn):</label>
-                  <input
-                    type="text"
-                    name="targetClass"
-                    value={formData.targetClass}
+                  <label>Trạng thái:</label>
+                  <select
+                    name="Status"
+                    value={formData.Status}
                     onChange={handleInputChange}
-                    placeholder="Ví dụ: 10A1, 10A2, 11A1..."
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Ghi chú:</label>
-                  <textarea
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleInputChange}
-                    placeholder="Ghi chú bổ sung..."
-                    rows="2"
-                  />
+                    required
+                  >
+                    <option value="Active">Đang thực hiện</option>
+                    <option value="Pending">Chờ thực hiện</option>
+                    <option value="Completed">Hoàn thành</option>
+                    <option value="Cancelled">Đã hủy</option>
+                  </select>
                 </div>
               </div>
               <div className="modal-actions">

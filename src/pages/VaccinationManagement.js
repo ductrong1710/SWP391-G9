@@ -449,9 +449,11 @@ const VaccinationManagement = () => {
       {/* Details Modal */}
       {showDetailsModal && selectedPlan && (
         <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
-          <div className="details-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="vaccination-details-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Chi tiết kế hoạch - {selectedPlan.vaccineName}</h3>
+              <h3>
+                <i className="fas fa-syringe"></i> Chi tiết kế hoạch tiêm chủng
+              </h3>
               <button 
                 className="close-btn"
                 onClick={() => setShowDetailsModal(false)}
@@ -460,20 +462,29 @@ const VaccinationManagement = () => {
               </button>
             </div>
             <div className="modal-body">
+              <div className="vaccination-status-badge" data-status={selectedPlan.status}>
+                {getStatusText(selectedPlan.status)}
+              </div>
+              
+              <div className="vaccination-title-section">
+                <h2>{selectedPlan.vaccineName}</h2>
+                <p className="scheduled-date">
+                  <i className="far fa-calendar-alt"></i>
+                  {new Date(selectedPlan.scheduledDate).toLocaleDateString('vi-VN', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </p>
+              </div>
+
               <div className="detail-section">
-                <h4>Thông tin cơ bản</h4>
+                <h4><i className="fas fa-info-circle"></i> Thông tin cơ bản</h4>
                 <div className="detail-grid">
                   <div className="detail-item">
                     <label>Tên vaccine:</label>
-                    <span>{selectedPlan.vaccineName}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Ngày dự kiến:</label>
-                    <span>{new Date(selectedPlan.scheduledDate).toLocaleDateString('vi-VN')}</span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Trạng thái:</label>
-                    <span>{getStatusText(selectedPlan.status)}</span>
+                    <span className="highlight-value">{selectedPlan.vaccineName}</span>
                   </div>
                   <div className="detail-item">
                     <label>Người tạo:</label>
@@ -487,52 +498,88 @@ const VaccinationManagement = () => {
               </div>
 
               <div className="detail-section">
-                <h4>Mô tả</h4>
-                <p>{selectedPlan.description}</p>
+                <h4><i className="fas fa-align-left"></i> Mô tả</h4>
+                <div className="description-box">
+                  <p>{selectedPlan.description || "Không có mô tả"}</p>
+                </div>
               </div>
 
               <div className="detail-section">
-                <h4>Đối tượng</h4>
+                <h4><i className="fas fa-users"></i> Đối tượng tiêm chủng</h4>
                 <div className="detail-grid">
                   <div className="detail-item">
                     <label>Khối:</label>
-                    <span>{selectedPlan.targetGrade}</span>
+                    <span className="highlight-value">{selectedPlan.targetGrade || "Tất cả"}</span>
                   </div>
                   <div className="detail-item">
                     <label>Lớp:</label>
-                    <span>{selectedPlan.targetClass}</span>
+                    <span className="highlight-value">{selectedPlan.targetClass || "Tất cả"}</span>
                   </div>
                 </div>
               </div>
 
               <div className="detail-section">
-                <h4>Thống kê chi tiết</h4>
-                <div className="stats-detail">
-                  <div className="stat-card">
-                    <div className="stat-number">{selectedPlan.totalStudents}</div>
-                    <div className="stat-label">Tổng học sinh</div>
+                <h4><i className="fas fa-chart-pie"></i> Thống kê tiêm chủng</h4>
+                <div className="vaccination-stats">
+                  <div className="stat-card total">
+                    <div className="stat-icon">
+                      <i className="fas fa-users"></i>
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-number">{selectedPlan.totalStudents || 0}</div>
+                      <div className="stat-label">Tổng học sinh</div>
+                    </div>
                   </div>
+                  
                   <div className="stat-card confirmed">
-                    <div className="stat-number">{selectedPlan.confirmedCount}</div>
-                    <div className="stat-label">Đã xác nhận</div>
+                    <div className="stat-icon">
+                      <i className="fas fa-check-circle"></i>
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-number">{selectedPlan.confirmedCount || 0}</div>
+                      <div className="stat-label">Đã xác nhận</div>
+                    </div>
                   </div>
+                  
                   <div className="stat-card pending">
-                    <div className="stat-number">{selectedPlan.pendingCount}</div>
-                    <div className="stat-label">Chờ phản hồi</div>
+                    <div className="stat-icon">
+                      <i className="fas fa-clock"></i>
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-number">{selectedPlan.pendingCount || 0}</div>
+                      <div className="stat-label">Chờ phản hồi</div>
+                    </div>
                   </div>
+                  
                   <div className="stat-card completed">
-                    <div className="stat-number">{selectedPlan.completedCount}</div>
-                    <div className="stat-label">Đã tiêm</div>
+                    <div className="stat-icon">
+                      <i className="fas fa-syringe"></i>
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-number">{selectedPlan.completedCount || 0}</div>
+                      <div className="stat-label">Đã tiêm</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {selectedPlan.notes && (
                 <div className="detail-section">
-                  <h4>Ghi chú</h4>
-                  <p>{selectedPlan.notes}</p>
+                  <h4><i className="fas fa-sticky-note"></i> Ghi chú</h4>
+                  <div className="notes-box">
+                    <p>{selectedPlan.notes}</p>
+                  </div>
                 </div>
               )}
+              
+              <div className="detail-actions">
+                <button className="action-btn view-students" onClick={() => navigate(`/vaccination-plan/${selectedPlan.id}/students`)}>
+                  <i className="fas fa-users"></i> Xem danh sách học sinh
+                </button>
+                <button className="action-btn record-results" onClick={() => navigate(`/vaccination-plan/${selectedPlan.id}/record`)}>
+                  <i className="fas fa-clipboard-check"></i> Ghi nhận kết quả
+                </button>
+              </div>
             </div>
           </div>
         </div>

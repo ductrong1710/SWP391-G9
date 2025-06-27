@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj": {}
+    "D:\\SUM25\\SWP391\\code\\backend\\Services\\Services.csproj": {}
   },
   "projects": {
-    "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
+    "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj",
+        "projectUniqueName": "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj",
         "projectName": "Businessobjects",
-        "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj",
-        "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\obj\\",
+        "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj",
+        "packagesPath": "C:\\Users\\phamt\\.nuget\\packages\\",
+        "outputPath": "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\ductr\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\phamt\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -43,8 +37,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -81,40 +74,34 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.411/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj": {
+    "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\Repositories.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
+        "projectUniqueName": "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\Repositories.csproj",
         "projectName": "Repositories",
-        "projectPath": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj",
-        "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\backend\\Repositories\\obj\\",
+        "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\Repositories.csproj",
+        "packagesPath": "C:\\Users\\phamt\\.nuget\\packages\\",
+        "outputPath": "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\ductr\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\phamt\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
+              "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj": {
+                "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj"
               }
             }
           }
@@ -128,8 +115,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -150,43 +136,37 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.411/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj": {
+    "D:\\SUM25\\SWP391\\code\\backend\\Services\\Services.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj",
+        "projectUniqueName": "D:\\SUM25\\SWP391\\code\\backend\\Services\\Services.csproj",
         "projectName": "Services",
-        "projectPath": "D:\\LEARNING\\Code\\backend\\Services\\Services.csproj",
-        "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-        "outputPath": "D:\\LEARNING\\Code\\backend\\Services\\obj\\",
+        "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Services\\Services.csproj",
+        "packagesPath": "C:\\Users\\phamt\\.nuget\\packages\\",
+        "outputPath": "D:\\SUM25\\SWP391\\code\\backend\\Services\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\ductr\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\phamt\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Businessobjects\\Businessobjects.csproj"
+              "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj": {
+                "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj"
               },
-              "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj": {
-                "projectPath": "D:\\LEARNING\\Code\\backend\\Repositories\\Repositories.csproj"
+              "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\Repositories.csproj": {
+                "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\Repositories.csproj"
               }
             }
           }
@@ -200,8 +180,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -222,7 +201,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.411/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

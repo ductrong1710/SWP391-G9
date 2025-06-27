@@ -49,6 +49,12 @@ namespace BackEnd.Controllers
         [HttpPost]
         public async Task<ActionResult<HealthRecord>> CreateHealthRecord(HealthRecord healthRecord)
         {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("[LOG] ModelState errors: " + string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
+                return BadRequest(ModelState);
+            }
+            Console.WriteLine("[LOG] POST /api/HealthRecord payload: " + System.Text.Json.JsonSerializer.Serialize(healthRecord));
             var createdHealthRecord = await _healthRecordService.CreateHealthRecordAsync(healthRecord);
             return Ok(createdHealthRecord);
         }

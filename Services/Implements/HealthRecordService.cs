@@ -1,16 +1,19 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
 using Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Services.implements
 {
     public class HealthRecordService : IHealthRecordService
     {
         private readonly IHealthRecordRepository _healthRecordRepository;
+        private readonly Businessobjects.Data.ApplicationDbContext _context;
 
-        public HealthRecordService(IHealthRecordRepository healthRecordRepository)
+        public HealthRecordService(IHealthRecordRepository healthRecordRepository, Businessobjects.Data.ApplicationDbContext context)
         {
             _healthRecordRepository = healthRecordRepository;
+            _context = context;
         }
 
         public async Task<IEnumerable<HealthRecord>> GetAllHealthRecordsAsync()
@@ -28,8 +31,21 @@ namespace Services.implements
             return await _healthRecordRepository.GetHealthRecordByStudentIdAsync(studentId);
         }
 
+        public async Task<string> GenerateNextHealthRecordIDAsync()
+        {
+            var lastRecord = await _context.HealthRecords
+                .OrderByDescending(r => r.HealthRecordID)
+                .FirstOrDefaultAsync();
+            if (lastRecord == null)
+                return "HR00001";
+            var lastNumber = int.Parse(lastRecord.HealthRecordID.Substring(2));
+            var nextNumber = lastNumber + 1;
+            return "HR" + nextNumber.ToString("D5");
+        }
+
         public async Task<HealthRecord> CreateHealthRecordAsync(HealthRecord healthRecord)
         {
+            healthRecord.HealthRecordID = await GenerateNextHealthRecordIDAsync();
             await _healthRecordRepository.CreateHealthRecordAsync(healthRecord);
             return healthRecord;
         }

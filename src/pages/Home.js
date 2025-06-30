@@ -23,7 +23,7 @@ const Home = () => {
       <section id="home" className="hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1 className="hero-title">Giải pháp y tế toàn diện cho cộng đồng</h1>
+          <h1 className="hero-title">Giải pháp toàn diện cho cộng đồng</h1>
           <p className="hero-desc">
             HealthConnect kết nối bạn với dịch vụ chăm sóc sức khỏe chất lượng cao,
             từ khám bệnh đến tiêm chủng và quản lý hồ sơ y tế.

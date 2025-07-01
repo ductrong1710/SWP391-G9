@@ -14,7 +14,8 @@ namespace Businessobjects.Models
         [Column("Date_Of_Birth")]
         public DateTime? DateOfBirth { get; set; }
         public string? Sex { get; set; }
-        public string? Class { get; set; }
+        [Column("ClassID")]
+        public string? ClassID { get; set; }
         public string? Phone { get; set; }
         [Required]
         [Column("UserID")]

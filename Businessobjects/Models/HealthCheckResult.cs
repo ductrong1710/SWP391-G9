@@ -24,7 +24,10 @@ namespace Businessobjects.Models
         public string? Conclusion { get; set; }
         public DateTime? CheckUpDate { get; set; }
         public string? Checker { get; set; }
-        public bool? ConsultationRecommended { get; set; }
-        public DateTime? ConsultationAppointmentDate { get; set; }
+        public bool? NeedToContactParent { get; set; }
+        public DateTime? FollowUpDate { get; set; }
+        public string? Status { get; set; }
+        public string? HealthFacility { get; set; }
+        public string? CheckupType { get; set; }
     }
 }

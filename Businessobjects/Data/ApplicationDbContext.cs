@@ -28,9 +28,30 @@ namespace Businessobjects.Data
         public DbSet<VaccinationConsultation> VaccinationConsultations { get; set; }
         public DbSet<VaccinationHealthCheck> VaccinationHealthChecks { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<SchoolClass> SchoolClasses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Map entity to correct table names in database
+            modelBuilder.Entity<User>().ToTable("Users");
+            modelBuilder.Entity<Profile>().ToTable("Profile");
+            modelBuilder.Entity<HealthRecord>().ToTable("Health_Record");
+            modelBuilder.Entity<MedicalSupply>().ToTable("Medical_Supply");
+            modelBuilder.Entity<Medication>().ToTable("Medication");
+            modelBuilder.Entity<Role>().ToTable("Role");
+            modelBuilder.Entity<MedicationSubmissionForm>().ToTable("Medication_Submission_Form");
+            modelBuilder.Entity<PeriodicHealthCheckPlan>().ToTable("Periodic_Health_Check_Plan");
+            modelBuilder.Entity<HealthCheckConsentForm>().ToTable("Health_Check_Consent_Form");
+            modelBuilder.Entity<HealthCheckResult>().ToTable("Health_Check_Result");
+            modelBuilder.Entity<VaccineType>().ToTable("Vaccine_Type");
+            modelBuilder.Entity<VaccinationPlan>().ToTable("Vaccination_Plan");
+            modelBuilder.Entity<VaccinationConsentForm>().ToTable("Vaccination_Consent_Form");
+            modelBuilder.Entity<VaccinationResult>().ToTable("Vaccination_Result");
+            modelBuilder.Entity<MedicationReceipt>().ToTable("Medication_Receipt");
+            modelBuilder.Entity<VaccinationConsultation>().ToTable("Vaccination_Consultation");
+            modelBuilder.Entity<VaccinationHealthCheck>().ToTable("Vaccination_Health_Check");
+            modelBuilder.Entity<Notification>().ToTable("Notification");
+
             base.OnModelCreating(modelBuilder);
 
             // Configure existing relationships
@@ -170,14 +191,6 @@ namespace Businessobjects.Data
                 .WithOne()
                 .HasForeignKey<HealthCheckResult>(r => r.HealthCheckConsentID)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<HealthCheckResult>()
-                .Property(r => r.Height)
-                .HasColumnType("decimal(5,2)");
-
-            modelBuilder.Entity<HealthCheckResult>()
-                .Property(r => r.Weight)
-                .HasColumnType("decimal(5,2)");
         }
 
         private void SeedData(ModelBuilder modelBuilder)

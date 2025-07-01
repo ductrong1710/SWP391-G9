@@ -11,10 +11,12 @@ namespace BackEnd.Controllers
     public class HealthCheckConsentFormController : ControllerBase
     {
         private readonly IHealthCheckConsentFormService _consentFormService;
+        private readonly IHealthCheckResultService _resultService;
 
-        public HealthCheckConsentFormController(IHealthCheckConsentFormService consentFormService)
+        public HealthCheckConsentFormController(IHealthCheckConsentFormService consentFormService, IHealthCheckResultService resultService)
         {
             _consentFormService = consentFormService;
+            _resultService = resultService;
         }
 
         // GET: api/HealthCheckConsentForm
@@ -95,6 +97,55 @@ namespace BackEnd.Controllers
         {
             await _consentFormService.DeleteConsentFormAsync(id);
             return NoContent();
+        }
+
+        // Xác nhận đồng ý cho học sinh tham gia kiểm tra định kỳ
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> ApproveConsentForm(string id)
+        {
+            var consentForm = await _consentFormService.GetConsentFormByIdAsync(id);
+            if (consentForm == null)
+                return NotFound();
+            consentForm.ConsentStatus = "Approved";
+            consentForm.ResponseTime = DateTime.Now;
+            await _consentFormService.UpdateConsentFormAsync(id, consentForm);
+            return Ok(consentForm);
+        }
+
+        public class DenyConsentFormRequest
+        {
+            public string? Reason { get; set; }
+        }
+
+        // Từ chối cho học sinh tham gia kiểm tra định kỳ
+        [HttpPost("{id}/deny")]
+        public async Task<IActionResult> DenyConsentForm(string id, [FromBody] DenyConsentFormRequest request)
+        {
+            var consentForm = await _consentFormService.GetConsentFormByIdAsync(id);
+            if (consentForm == null)
+                return NotFound();
+            consentForm.ConsentStatus = "Denied";
+            consentForm.ResponseTime = DateTime.Now;
+            consentForm.ReasonForDenial = request?.Reason;
+            await _consentFormService.UpdateConsentFormAsync(id, consentForm);
+            return Ok(consentForm);
+        }
+
+        // Lấy lịch sử kiểm tra sức khỏe định kỳ của học sinh, kèm kết quả khám nếu có
+        [HttpGet("student/{studentId}/history")]
+        public async Task<ActionResult<IEnumerable<object>>> GetHealthCheckHistoryWithResult(string studentId)
+        {
+            var consentForms = await _consentFormService.GetConsentFormsByStudentIdAsync(studentId);
+            var result = new List<object>();
+            foreach (var form in consentForms)
+            {
+                var healthResult = await _resultService.GetHealthCheckResultByConsentIdAsync(form.ID);
+                result.Add(new {
+                    ConsentForm = form,
+                    HealthCheckResult = healthResult
+                });
+            }
+            return Ok(result);
         }
     }
 }

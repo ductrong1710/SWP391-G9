@@ -3,6 +3,8 @@ using Businessobjects.Models;
 using Services.interfaces;
 using Repositories.Interfaces;
 using System.Threading.Tasks;
+using Services.Interfaces;
+using System.Linq;
 
 namespace BackEnd.Controllers
 {
@@ -12,11 +14,15 @@ namespace BackEnd.Controllers
     {
         private readonly IUserService _userService;
         private readonly IRoleRepository _roleRepository;
+        private readonly IProfileService _profileService;
+        private readonly ISchoolClassService _schoolClassService;
 
-        public AuthController(IUserService userService, IRoleRepository roleRepository)
+        public AuthController(IUserService userService, IRoleRepository roleRepository, IProfileService profileService, ISchoolClassService schoolClassService)
         {
             _userService = userService;
             _roleRepository = roleRepository;
+            _profileService = profileService;
+            _schoolClassService = schoolClassService;
         }
 
         [HttpPost("login")]
@@ -41,13 +47,31 @@ namespace BackEnd.Controllers
             
             System.Console.WriteLine($"--- Login successful for user: {loginRequest.Username} ---");
 
-            // Tạo response object với thông tin user và role
+            // Lấy thông tin lớp học nếu có
+            var profile = await _profileService.GetProfileByUserIdAsync(user.UserID);
+            object? classInfo = null;
+            if (profile != null && !string.IsNullOrEmpty(profile.ClassID))
+            {
+                var allClasses = await _schoolClassService.GetAllSchoolClassesAsync();
+                var schoolClass = allClasses.FirstOrDefault(c => c.ClassID == profile.ClassID);
+                if (schoolClass != null)
+                {
+                    classInfo = new {
+                        ClassID = schoolClass.ClassID,
+                        ClassName = schoolClass.ClassName,
+                        Grade = schoolClass.Grade
+                    };
+                }
+            }
+
+            // Tạo response object với thông tin user, role và class
             var response = new
             {
                 UserID = user.UserID,
                 Username = user.Username,
                 RoleID = user.RoleID,
-                RoleType = user.Role?.RoleType ?? "Unknown"
+                RoleType = user.Role?.RoleType ?? "Unknown",
+                Class = classInfo
             };
 
             return Ok(response);

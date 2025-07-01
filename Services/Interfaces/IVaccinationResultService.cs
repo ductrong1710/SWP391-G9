@@ -11,5 +11,6 @@ namespace Services.interfaces
         Task<VaccinationResult> CreateVaccinationResultAsync(VaccinationResult result);
         Task UpdateVaccinationResultAsync(string id, VaccinationResult result);
         Task DeleteVaccinationResultAsync(string id);
+        Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByStudentAsync(string studentId);
     }
 }

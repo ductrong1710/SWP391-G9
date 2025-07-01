@@ -36,7 +36,6 @@ D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\Businessobjects.Genera
 D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\Businessobjects.AssemblyInfoInputs.cache
 D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\Businessobjects.AssemblyInfo.cs
 D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\Businessobjects.csproj.CoreCompileInputs.cache
-D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\Businessobjects.sourcelink.json
 D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\Businessobjects.dll
 D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\refint\Businessobjects.dll
 D:\LEARNING\Code\backend\Businessobjects\obj\Debug\net8.0\Businessobjects.pdb

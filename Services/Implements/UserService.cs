@@ -53,5 +53,10 @@ namespace Services.implements
 
             await _userRepository.DeleteUserAsync(id);
         }
+
+        public async Task<IEnumerable<User>> GetChildrenByParentIdAsync(string parentId)
+        {
+            return await _userRepository.GetChildrenByParentIdAsync(parentId);
+        }
     }
 }

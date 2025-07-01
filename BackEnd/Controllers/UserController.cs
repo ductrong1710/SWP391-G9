@@ -62,5 +62,15 @@ namespace BackEnd.Controllers
             await _userService.DeleteUserAsync(id);
             return NoContent();
         }
+
+        // GET: api/User/parent/{parentId}/children
+        [HttpGet("parent/{parentId}/children")]
+        public async Task<ActionResult<IEnumerable<User>>> GetChildrenByParent(string parentId)
+        {
+            var children = await _userService.GetChildrenByParentIdAsync(parentId);
+            if (children == null || !children.Any())
+                return NotFound();
+            return Ok(children);
+        }
     }
 }

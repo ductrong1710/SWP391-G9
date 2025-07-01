@@ -114,5 +114,88 @@ namespace BackEnd.Controllers
             await _planService.DeleteVaccinationPlanAsync(id);
             return NoContent();
         }
+
+        // Gửi thông báo kế hoạch tiêm chủng đến phụ huynh
+        [HttpPost("{id}/send-notifications")]
+        public async Task<IActionResult> SendNotifications(string id)
+        {
+            // Lấy kế hoạch tiêm chủng
+            var plan = await _planService.GetVaccinationPlanByIdAsync(id);
+            if (plan == null)
+                return NotFound();
+
+            // Lấy danh sách học sinh theo grade
+            var dbContext = HttpContext.RequestServices.GetService(typeof(Businessobjects.Data.ApplicationDbContext)) as Businessobjects.Data.ApplicationDbContext;
+            List<Businessobjects.Models.Profile> students;
+            if (plan.Grade == null || plan.Grade == "Toàn trường")
+            {
+                students = dbContext.Profiles.Where(p => p.ClassID != null).ToList();
+            }
+            else
+            {
+                int gradeNum = int.Parse(plan.Grade);
+                int start = (gradeNum - 6) * 10 + 1;
+                int end = start + 9;
+                var classIds = Enumerable.Range(start, 10)
+                    .Select(i => $"CL{(i).ToString("D4")}")
+                    .ToList();
+                students = dbContext.Profiles.Where(p => p.ClassID != null && classIds.Contains(p.ClassID)).ToList();
+            }
+
+            // Lấy danh sách ParentID từ bảng Health_Record
+            var studentUserIds = students.Select(s => s.UserID).ToList();
+            var parentIds = dbContext.HealthRecords
+                .Where(hr => studentUserIds.Contains(hr.StudentID))
+                .Select(hr => hr.ParentID)
+                .Distinct()
+                .ToList();
+
+            var notifiedParents = new HashSet<string>();
+            foreach (var parentId in parentIds)
+            {
+                // Lấy danh sách học sinh của phụ huynh này
+                var studentIds = dbContext.HealthRecords
+                    .Where(hr => hr.ParentID == parentId && studentUserIds.Contains(hr.StudentID))
+                    .Select(hr => hr.StudentID)
+                    .ToList();
+                foreach (var studentId in studentIds)
+                {
+                    var studentProfile = dbContext.Profiles.FirstOrDefault(p => p.UserID == studentId);
+                    var studentName = studentProfile?.Name ?? "học sinh";
+                    var message = $"Kế hoạch tiêm chủng '{plan.PlanName}' đã được cập nhật. Vui lòng xác nhận cho <b>{studentName}</b>.";
+                    // Lấy consent form theo planId và studentId
+                    var consentForm = dbContext.VaccinationConsentForms.FirstOrDefault(cf => cf.VaccinationPlanID == plan.ID && cf.StudentID == studentId);
+                    if (consentForm == null)
+                    {
+                        // Tạo mới consent form nếu chưa có
+                        consentForm = new Businessobjects.Models.VaccinationConsentForm
+                        {
+                            ID = Guid.NewGuid().ToString().Substring(0, 6).ToUpper(),
+                            VaccinationPlanID = plan.ID,
+                            StudentID = studentId,
+                            ParentID = parentId,
+                            ConsentStatus = null,
+                            ResponseTime = null,
+                            ReasonForDenial = null
+                        };
+                        dbContext.VaccinationConsentForms.Add(consentForm);
+                        dbContext.SaveChanges();
+                    }
+                    var notification = new Notification
+                    {
+                        NotificationID = Guid.NewGuid().ToString(),
+                        UserID = parentId,
+                        Title = "Xác nhận kế hoạch tiêm chủng",
+                        Message = message,
+                        CreatedAt = DateTime.Now,
+                        IsRead = false,
+                        ConsentFormID = consentForm.ID
+                    };
+                    await _notificationService.CreateNotificationAsync(notification);
+                }
+                notifiedParents.Add(parentId);
+            }
+            return Ok(new { message = "Notifications sent!" });
+        }
     }
 }

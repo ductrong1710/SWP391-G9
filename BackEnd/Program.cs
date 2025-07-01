@@ -30,6 +30,7 @@ builder.Services.AddScoped<IVaccinationPlanRepository, VaccinationPlanRepository
 builder.Services.AddScoped<IVaccinationConsentFormRepository, VaccinationConsentFormRepository>();
 builder.Services.AddScoped<IVaccinationResultRepository, VaccinationResultRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<ISchoolClassRepository, SchoolClassRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -47,8 +48,13 @@ builder.Services.AddScoped<IVaccinationPlanService, VaccinationPlanService>();
 builder.Services.AddScoped<IVaccinationConsentFormService, VaccinationConsentFormService>();
 builder.Services.AddScoped<IVaccinationResultService, VaccinationResultService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ISchoolClassService, SchoolClassService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

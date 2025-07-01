@@ -9,5 +9,6 @@ namespace Services.interfaces
         Task<User> CreateUserAsync(User user);
         Task UpdateUserAsync(string id, User user);
         Task DeleteUserAsync(string id);
+        Task<IEnumerable<User>> GetChildrenByParentIdAsync(string parentId);
     }
 }

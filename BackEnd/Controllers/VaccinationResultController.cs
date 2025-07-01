@@ -55,6 +55,14 @@ namespace BackEnd.Controllers
             return Ok(results);
         }
 
+        // GET: api/VaccinationResult/student/{studentId}
+        [HttpGet("student/{studentId}")]
+        public async Task<ActionResult<IEnumerable<VaccinationResult>>> GetVaccinationResultsByStudent(string studentId)
+        {
+            var results = await _resultService.GetVaccinationResultsByStudentAsync(studentId);
+            return Ok(results);
+        }
+
         // POST: api/VaccinationResult
         [HttpPost]
         public async Task<ActionResult<VaccinationResult>> CreateVaccinationResult(VaccinationResult result)

@@ -57,5 +57,19 @@ namespace Repositories.Implements
         {
             return await _context.Users.AnyAsync(u => u.UserID == id);
         }
+
+        public async Task<IEnumerable<User>> GetChildrenByParentIdAsync(string parentId)
+        {
+            // Truy vấn bảng HealthRecord để lấy StudentID theo ParentID
+            var studentIds = await _context.HealthRecords
+                .Where(r => r.ParentID == parentId)
+                .Select(r => r.StudentID)
+                .Distinct()
+                .ToListAsync();
+
+            return await _context.Users
+                .Where(u => studentIds.Contains(u.UserID))
+                .ToListAsync();
+        }
     }
 }

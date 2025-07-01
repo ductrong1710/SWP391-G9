@@ -356,7 +356,6 @@ D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\BackEnd.AssemblyInfo.cs
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\BackEnd.csproj.CoreCompileInputs.cache
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\BackEnd.MvcApplicationPartsAssemblyInfo.cs
 D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\BackEnd.MvcApplicationPartsAssemblyInfo.cache
-D:\LEARNING\Code\backend\BackEnd\obj\Debug\net8.0\BackEnd.sourcelink.json
 D:\LEARNING\Code\backend\BackEnd\bin\Debug\net8.0\appsettings.Development.json
 D:\LEARNING\Code\backend\BackEnd\bin\Debug\net8.0\appsettings.json
 D:\LEARNING\Code\backend\BackEnd\bin\Debug\net8.0\BackEnd.staticwebassets.endpoints.json

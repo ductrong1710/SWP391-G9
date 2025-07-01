@@ -38,7 +38,6 @@ D:\LEARNING\Code\backend\Services\obj\Debug\net8.0\Services.GeneratedMSBuildEdit
 D:\LEARNING\Code\backend\Services\obj\Debug\net8.0\Services.AssemblyInfoInputs.cache
 D:\LEARNING\Code\backend\Services\obj\Debug\net8.0\Services.AssemblyInfo.cs
 D:\LEARNING\Code\backend\Services\obj\Debug\net8.0\Services.csproj.CoreCompileInputs.cache
-D:\LEARNING\Code\backend\Services\obj\Debug\net8.0\Services.sourcelink.json
 D:\LEARNING\Code\backend\Services\bin\Debug\net8.0\Services.deps.json
 D:\LEARNING\Code\backend\Services\bin\Debug\net8.0\Services.dll
 D:\LEARNING\Code\backend\Services\bin\Debug\net8.0\Services.pdb

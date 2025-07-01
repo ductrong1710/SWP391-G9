@@ -16,12 +16,13 @@ namespace Businessobjects.Models
         public DateTime? ScheduledDate { get; set; }
         public string? Description { get; set; }
         public string? Status { get; set; }
+        public string? Grade { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
         [Required]
         [Column("CreatorID")]
         [StringLength(6, ErrorMessage = "CreatorID must be 6 characters.")]
         public string CreatorID { get; set; } = null!;
         [ForeignKey("CreatorID")]
-        [JsonIgnore]
         public User? Creator { get; set; }
         
         [JsonIgnore]

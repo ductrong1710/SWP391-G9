@@ -59,6 +59,23 @@ namespace Services.implements
             if (existingForm != null)
                 throw new InvalidOperationException("A consent form already exists for this student and vaccination plan");
 
+            if (string.IsNullOrEmpty(form.ID))
+            {
+                var allForms = await _consentFormRepository.GetAllVaccinationConsentFormsAsync();
+                int maxNum = 0;
+                foreach (var f in allForms)
+                {
+                    if (f.ID != null && f.ID.StartsWith("VCF") && f.ID.Length == 6)
+                    {
+                        if (int.TryParse(f.ID.Substring(3), out int num))
+                        {
+                            if (num > maxNum) maxNum = num;
+                        }
+                    }
+                }
+                form.ID = $"VCF{(maxNum + 1).ToString("D3")}";
+            }
+
             await _consentFormRepository.CreateVaccinationConsentFormAsync(form);
             return form;
         }

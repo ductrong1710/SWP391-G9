@@ -100,5 +100,19 @@ namespace BackEnd.Controllers
             await _consentFormService.DeleteVaccinationConsentFormAsync(id);
             return NoContent();
         }
+
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> ApproveConsentForm(string id)
+        {
+            var form = await _consentFormService.GetVaccinationConsentFormByIdAsync(id);
+            if (form == null)
+                return NotFound();
+
+            form.ConsentStatus = "Approved";
+            form.ResponseTime = DateTime.Now;
+            await _consentFormService.UpdateVaccinationConsentFormAsync(id, form);
+
+            return Ok(new { message = "Consent form approved!" });
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Businessobjects.Models
     {
         [Key]
         [Column("ID")]
-        public string ID { get; set; } = null!;
+        public string? ID { get; set; }
         [Required]
         [Column("ConsentFormID")]
         public string ConsentFormID { get; set; } = null!;

@@ -19,6 +19,7 @@ namespace Repositories.Implements
             return await _context.VaccinationPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
+                .ThenInclude(cf => cf.Student)
                 .ToListAsync();
         }
 
@@ -27,6 +28,7 @@ namespace Repositories.Implements
             return await _context.VaccinationPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
+                .ThenInclude(cf => cf.Student)
                 .FirstOrDefaultAsync(p => p.ID == id);
         }
 
@@ -35,6 +37,7 @@ namespace Repositories.Implements
             return await _context.VaccinationPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
+                .ThenInclude(cf => cf.Student)
                 .Where(p => p.CreatorID == creatorId)
                 .ToListAsync();
         }
@@ -44,6 +47,7 @@ namespace Repositories.Implements
             return await _context.VaccinationPlans
                 .Include(p => p.Creator)
                 .Include(p => p.ConsentForms)
+                .ThenInclude(cf => cf.Student)
                 .Where(p => p.ScheduledDate > DateTime.Now)
                 .OrderBy(p => p.ScheduledDate)
                 .ToListAsync();

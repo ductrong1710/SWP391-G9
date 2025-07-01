@@ -34,7 +34,6 @@ D:\LEARNING\Code\backend\Repositories\obj\Debug\net8.0\Repositories.GeneratedMSB
 D:\LEARNING\Code\backend\Repositories\obj\Debug\net8.0\Repositories.AssemblyInfoInputs.cache
 D:\LEARNING\Code\backend\Repositories\obj\Debug\net8.0\Repositories.AssemblyInfo.cs
 D:\LEARNING\Code\backend\Repositories\obj\Debug\net8.0\Repositories.csproj.CoreCompileInputs.cache
-D:\LEARNING\Code\backend\Repositories\obj\Debug\net8.0\Repositories.sourcelink.json
 D:\LEARNING\Code\backend\Repositories\bin\Debug\net8.0\Repositories.deps.json
 D:\LEARNING\Code\backend\Repositories\bin\Debug\net8.0\Repositories.dll
 D:\LEARNING\Code\backend\Repositories\bin\Debug\net8.0\Repositories.pdb

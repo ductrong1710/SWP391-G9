@@ -24,5 +24,7 @@ namespace Businessobjects.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public bool IsRead { get; set; } = false;
+
+        public string? ConsentFormID { get; set; }
     }
 } 

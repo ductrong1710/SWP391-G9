@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     setAuthError(null);
     setLoading(true);
     try {
-      const response = await apiClient.post('/api/Auth/login', { username, password });
+      const response = await apiClient.post('/Auth/login', { username, password });
       const userData = response.data;
       // Trong thực tế, backend nên trả về token. Ở đây ta dùng tạm dummy token.
       const token = "dummy-jwt-token";

@@ -62,7 +62,7 @@ const RecordProcess = () => {
     const fetchStudentsForClass = async () => {
       if (addClass) {
         try {
-          const response = await apiClient.get(`/api/students?className=${addClass}`);
+          const response = await apiClient.get(`/students?className=${addClass}`);
           // Lọc ra những học sinh chưa có hồ sơ
           const studentIdsWithRecords = new Set(records.map(r => r.studentId));
           const students = response.data.filter(s => !studentIdsWithRecords.has(s.studentId));

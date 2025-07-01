@@ -18,6 +18,9 @@ import SendMedicine from './pages/SendMedicine';
 import RecordProcess from './pages/RecordProcess';
 import DocumentsBlog from './pages/DocumentsBlog';
 import Notifications from './pages/Notifications';
+import VaccinationPlanStudents from './pages/VaccinationPlanStudents';
+import VaccinationPlanRecord from './pages/VaccinationPlanRecord';
+import MedicalHistory from './pages/MedicalHistory';
 
 function App() {
   const location = useLocation();
@@ -33,7 +36,8 @@ function App() {
     '/send-medicine',
     '/record-process',
     '/documents-blog',
-    '/notifications'
+    '/notifications',
+    '/medical-history'
   ];
   
   // Define routes where Navbar and Footer should be hidden
@@ -103,6 +107,13 @@ function App() {
               <Route path="/notifications" element={
                 <div className="page-wrapper">
                   <Notifications />
+                </div>
+              } />
+              <Route path="/vaccination-plan/:id/students" element={<VaccinationPlanStudents />} />
+              <Route path="/vaccination-plan/:id/record" element={<VaccinationPlanRecord />} />
+              <Route path="/medical-history" element={
+                <div className="page-wrapper">
+                  <MedicalHistory />
                 </div>
               } />
             </Routes>

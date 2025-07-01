@@ -15,13 +15,28 @@ const VaccinationManagement = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState({
     PlanName: '',
     ScheduledDate: '',
     Description: '',
     Status: 'Active',
+    Grade: 'Toàn trường',
+  });
+  const [editFormData, setEditFormData] = useState({
+    id: '',
+    PlanName: '',
+    ScheduledDate: '',
+    Description: '',
+    Status: '',
+    Grade: 'Toàn trường',
   });
   const [vaccineList, setVaccineList] = useState([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [planToNotify, setPlanToNotify] = useState(null);
+  const [notifyLoading, setNotifyLoading] = useState(false);
+  const [notifyMessage, setNotifyMessage] = useState('');
+  const gradeOptions = ['Toàn trường', '6', '7', '8', '9'];
 
   useEffect(() => {
     fetchData();
@@ -34,6 +49,14 @@ const VaccinationManagement = () => {
       });
     }
   }, [showCreateModal]);
+
+  useEffect(() => {
+    if (showEditModal && vaccineList.length === 0) {
+      apiClient.get('/VaccineType').then(res => {
+        setVaccineList(res.data);
+      });
+    }
+  }, [showEditModal]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -111,7 +134,8 @@ const VaccinationManagement = () => {
         ScheduledDate: formData.ScheduledDate ? new Date(formData.ScheduledDate).toISOString() : null,
         Description: formData.Description,
         Status: formData.Status,
-        CreatorID
+        CreatorID,
+        Grade: formData.Grade,
       };
       console.log('Payload gửi lên:', newPlan);
       await apiClient.post('/VaccinationPlan', newPlan);
@@ -138,13 +162,96 @@ const VaccinationManagement = () => {
     }));
   };
 
-  const handleSendNotifications = async (planId) => {
+  const handleOpenNotifyModal = (plan) => {
+    setPlanToNotify(plan);
+    setShowConfirmModal(true);
+    setNotifyMessage('');
+  };
+
+  const handleSendNotificationsConfirmed = async () => {
+    if (!planToNotify) return;
+    setNotifyLoading(true);
+    setNotifyMessage('');
+    try {
+      await apiClient.post(`/VaccinationPlan/${planToNotify.id}/send-notifications`);
+      setNotifyMessage('Gửi thông báo thành công!');
+      setTimeout(() => {
+        setShowConfirmModal(false);
+        setPlanToNotify(null);
+        setNotifyMessage('');
+      }, 1200);
+    } catch (error) {
+      setNotifyMessage('Gửi thông báo thất bại!');
+    } finally {
+      setNotifyLoading(false);
+    }
+  };
+
+  const normalize = str => (str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+  const handleEditPlan = (plan) => {
+    console.log('plan object:', plan);
+    const setEditData = (vaccineListData) => {
+      console.log('plan.planName:', plan.PlanName);
+      console.log('vaccineList:', vaccineListData.map(v => v.vaccineName || v.VaccineName));
+      let matchedVaccine = '';
+      if (vaccineListData.length > 0) {
+        const found = vaccineListData.find(
+          v => normalize(v.vaccineName || v.VaccineName) === normalize(plan.PlanName)
+        );
+        matchedVaccine = found ? (found.vaccineName || found.VaccineName) : plan.PlanName;
+      } else {
+        matchedVaccine = plan.PlanName;
+      }
+      setEditFormData({
+        id: plan.id,
+        PlanName: matchedVaccine,
+        ScheduledDate: plan.scheduledDate ? plan.scheduledDate.slice(0, 10) : '',
+        Description: plan.description,
+        Status: plan.status,
+        Grade: plan.grade || 'Toàn trường',
+      });
+      setShowEditModal(true);
+    };
+
+    if (vaccineList.length === 0) {
+      apiClient.get('/VaccineType').then(res => {
+        setVaccineList(res.data);
+        setEditData(res.data);
+      });
+    } else {
+      setEditData(vaccineList);
+    }
+  };
+
+  const handleUpdatePlan = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true);
-      await apiClient.post(`/VaccinationPlan/${planId}/send-notifications`);
-      // Update plan status or show success message
+      // Lấy CreatorID từ selectedPlan, nếu không có thì lấy từ user đăng nhập
+      let CreatorID = selectedPlan?.creatorID || selectedPlan?.CreatorID || '';
+      if (!CreatorID) {
+        const user = JSON.parse(localStorage.getItem('user'));
+        CreatorID = user?.userID || user?.UserID || '';
+      }
+      if (Array.isArray(CreatorID)) {
+        CreatorID = CreatorID[0] || '';
+      }
+      console.log('CreatorID gửi lên:', CreatorID);
+      await apiClient.put(`/VaccinationPlan/${editFormData.id}`, {
+        PlanName: editFormData.PlanName,
+        ScheduledDate: editFormData.ScheduledDate ? new Date(editFormData.ScheduledDate).toISOString() : null,
+        Description: editFormData.Description,
+        Status: editFormData.Status,
+        ID: editFormData.id,
+        CreatorID,
+        Grade: editFormData.Grade,
+      });
+      setShowEditModal(false);
+      fetchData();
     } catch (error) {
-      console.error('Error sending notifications:', error);
+      alert('Có lỗi khi cập nhật kế hoạch!');
+      console.error('Error updating plan:', error?.response?.data || error);
     } finally {
       setLoading(false);
     }
@@ -157,6 +264,11 @@ const VaccinationManagement = () => {
       </div>
     );
   }
+
+  const totalStudents = selectedPlan?.ConsentForms?.length || 0;
+  const confirmedCount = selectedPlan?.ConsentForms?.filter(f => f.ConsentStatus === "Approved").length || 0;
+  const pendingCount = selectedPlan?.ConsentForms?.filter(f => !f.ConsentStatus).length || 0;
+  const completedCount = selectedPlan?.ConsentForms?.filter(f => f.VaccinationResult != null).length || 0;
 
   return (
     <div className="vaccination-management-container">
@@ -205,7 +317,7 @@ const VaccinationManagement = () => {
           <div key={plan.id} className="vaccination-plan-card">
             <div className="plan-header">
               <div className="plan-title">
-                <h3>{plan.vaccineName}</h3>
+                <h3>{plan.PlanName}</h3>
                 <span 
                   className="status-badge"
                   style={{ backgroundColor: getStatusColor(plan.status) }}
@@ -227,7 +339,7 @@ const VaccinationManagement = () => {
 
               <div className="plan-target">
                 <h4>Đối tượng</h4>
-                <p><strong>Khối:</strong> {plan.targetGrade}</p>
+                <p><strong>Khối:</strong> {plan.grade || 'Toàn trường'}</p>
                 <p><strong>Lớp:</strong> {plan.targetClass}</p>
               </div>
 
@@ -261,16 +373,21 @@ const VaccinationManagement = () => {
                   <i className="fas fa-eye"></i>
                   Xem chi tiết
                 </button>
-                
-                {plan.status === 'Active' && plan.pendingCount > 0 && (
-                  <button 
-                    className="send-notifications-btn"
-                    onClick={() => handleSendNotifications(plan.id)}
-                  >
-                    <i className="fas fa-bell"></i>
-                    Gửi thông báo
-                  </button>
-                )}
+                <button
+                  className="edit-btn"
+                  onClick={() => handleEditPlan(plan)}
+                >
+                  <i className="fas fa-edit"></i>
+                  Chỉnh sửa
+                </button>
+                <button
+                  className="send-notifications-btn"
+                  onClick={() => handleOpenNotifyModal(plan)}
+                  disabled={notifyLoading}
+                >
+                  <i className="fas fa-bell"></i>
+                  Gửi thông báo
+                </button>
               </div>
             </div>
           </div>
@@ -348,6 +465,19 @@ const VaccinationManagement = () => {
                     <option value="Cancelled">Đã hủy</option>
                   </select>
                 </div>
+                <div className="form-group">
+                  <label>Khối:</label>
+                  <select
+                    name="Grade"
+                    value={formData.Grade}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    {gradeOptions.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className="modal-actions">
                 <button 
@@ -391,7 +521,7 @@ const VaccinationManagement = () => {
               </div>
               
               <div className="vaccination-title-section">
-                <h2>{selectedPlan.vaccineName}</h2>
+                <h2>{selectedPlan.PlanName}</h2>
                 <p className="scheduled-date">
                   <i className="far fa-calendar-alt"></i>
                   {new Date(selectedPlan.scheduledDate).toLocaleDateString('vi-VN', {
@@ -408,11 +538,11 @@ const VaccinationManagement = () => {
                 <div className="detail-grid">
                   <div className="detail-item">
                     <label>Tên vaccine:</label>
-                    <span className="highlight-value">{selectedPlan.vaccineName}</span>
+                    <span className="highlight-value">{selectedPlan.PlanName}</span>
                   </div>
                   <div className="detail-item">
                     <label>Người tạo:</label>
-                    <span>{selectedPlan.createdBy}</span>
+                    <span>{selectedPlan?.Creator?.Username || "Không rõ"}</span>
                   </div>
                   <div className="detail-item">
                     <label>Ngày tạo:</label>
@@ -433,7 +563,7 @@ const VaccinationManagement = () => {
                 <div className="detail-grid">
                   <div className="detail-item">
                     <label>Khối:</label>
-                    <span className="highlight-value">{selectedPlan.targetGrade || "Tất cả"}</span>
+                    <span className="highlight-value">{selectedPlan.grade || 'Toàn trường'}</span>
                   </div>
                   <div className="detail-item">
                     <label>Lớp:</label>
@@ -450,7 +580,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-users"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{selectedPlan.totalStudents || 0}</div>
+                      <div className="stat-number">{totalStudents}</div>
                       <div className="stat-label">Tổng học sinh</div>
                     </div>
                   </div>
@@ -460,7 +590,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-check-circle"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{selectedPlan.confirmedCount || 0}</div>
+                      <div className="stat-number">{confirmedCount}</div>
                       <div className="stat-label">Đã xác nhận</div>
                     </div>
                   </div>
@@ -470,7 +600,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-clock"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{selectedPlan.pendingCount || 0}</div>
+                      <div className="stat-number">{pendingCount}</div>
                       <div className="stat-label">Chờ phản hồi</div>
                     </div>
                   </div>
@@ -480,7 +610,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-syringe"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{selectedPlan.completedCount || 0}</div>
+                      <div className="stat-number">{completedCount}</div>
                       <div className="stat-label">Đã tiêm</div>
                     </div>
                   </div>
@@ -497,13 +627,134 @@ const VaccinationManagement = () => {
               )}
               
               <div className="detail-actions">
-                <button className="action-btn view-students" onClick={() => navigate(`/vaccination-plan/${selectedPlan.id}/students`)}>
+                <button className="action-btn view-students" onClick={() => {
+                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.ConsentStatus === "Approved").map(f => f.Student);
+                  navigate(`/vaccination-plan/${selectedPlan.id}/students`, { state: { students: confirmedStudents } });
+                }}>
                   <i className="fas fa-users"></i> Xem danh sách học sinh
                 </button>
-                <button className="action-btn record-results" onClick={() => navigate(`/vaccination-plan/${selectedPlan.id}/record`)}>
+                <button className="action-btn record-results" onClick={() => {
+                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.ConsentStatus === "Approved").map(f => f.Student);
+                  navigate(`/vaccination-plan/${selectedPlan.id}/record`, { state: { students: confirmedStudents } });
+                }}>
                   <i className="fas fa-clipboard-check"></i> Ghi nhận kết quả
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Plan Modal */}
+      {showEditModal && (
+        <div className="modal-overlay">
+          <div className="edit-plan-modal" style={{ background: '#f4f8fb', width: '540px', maxWidth: '95%' }}>
+            <div className="modal-header">
+              <h3>Chỉnh sửa kế hoạch tiêm chủng</h3>
+              <button
+                className="close-btn"
+                onClick={() => setShowEditModal(false)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <form onSubmit={handleUpdatePlan}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Tên kế hoạch (Tên vaccine):</label>
+                  <select
+                    name="PlanName"
+                    value={editFormData.PlanName ?? ""}
+                    onChange={e => setEditFormData({ ...editFormData, PlanName: e.target.value })}
+                    required
+                  >
+                    <option value="">Chọn vaccine...</option>
+                    {vaccineList.map(v => (
+                      <option key={v.id} value={v.vaccineName || v.VaccineName}>{v.vaccineName || v.VaccineName}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Ngày dự kiến:</label>
+                  <input
+                    type="date"
+                    name="ScheduledDate"
+                    value={editFormData.ScheduledDate ?? ""}
+                    onChange={e => setEditFormData({ ...editFormData, ScheduledDate: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Mô tả:</label>
+                  <textarea
+                    name="Description"
+                    value={editFormData.Description ?? ""}
+                    onChange={e => setEditFormData({ ...editFormData, Description: e.target.value })}
+                    rows="3"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Trạng thái:</label>
+                  <select
+                    name="Status"
+                    value={editFormData.Status ?? ""}
+                    onChange={e => setEditFormData({ ...editFormData, Status: e.target.value })}
+                    required
+                  >
+                    <option value="Active">Đang thực hiện</option>
+                    <option value="Pending">Chờ thực hiện</option>
+                    <option value="Completed">Hoàn thành</option>
+                    <option value="Cancelled">Đã hủy</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Khối:</label>
+                  <select
+                    name="Grade"
+                    value={editFormData.Grade}
+                    onChange={e => setEditFormData({ ...editFormData, Grade: e.target.value })}
+                    required
+                  >
+                    {gradeOptions.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Modal */}
+      {showConfirmModal && planToNotify && (
+        <div className="modal-overlay">
+          <div className="confirm-modal" style={{ background: '#fff', padding: 24, borderRadius: 8, maxWidth: 400, margin: '120px auto' }}>
+            <h3>Xác nhận gửi thông báo</h3>
+            <p>Bạn có chắc chắn muốn gửi thông báo kế hoạch <b>{planToNotify.PlanName}</b> đến phụ huynh không?</p>
+            {notifyMessage && <div style={{ color: notifyMessage.includes('thành công') ? 'green' : 'red', marginBottom: 8 }}>{notifyMessage}</div>}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button className="cancel-btn" onClick={() => setShowConfirmModal(false)} disabled={notifyLoading}>Hủy</button>
+              <button className="submit-btn" onClick={handleSendNotificationsConfirmed} disabled={notifyLoading}>
+                {notifyLoading ? 'Đang gửi...' : 'Xác nhận'}
+              </button>
             </div>
           </div>
         </div>

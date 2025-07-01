@@ -79,7 +79,7 @@ const HealthCheckManagement = () => {
         if (filters.status) params.append('status', filters.status);
         
         // Gọi API backend lấy health checks với các tham số lọc
-        const response = await apiClient.get(`/api/HealthCheckResult?${params.toString()}`);
+        const response = await apiClient.get(`/HealthCheckResult?${params.toString()}`);
         setHealthChecks(response.data);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu khám sức khỏe:", error);
@@ -189,7 +189,7 @@ const HealthCheckManagement = () => {
       notes: formData.notes
     };
     try {
-      await apiClient.post('/api/HealthCheckResult', dataToSend);
+      await apiClient.post('/HealthCheckResult', dataToSend);
       alert('Đã lên lịch khám sức khỏe thành công!');
       setShowForm(false);
       setEditingHealthCheckId(null);
@@ -292,7 +292,7 @@ const HealthCheckManagement = () => {
     if (id === 'className' && value) {
       try {
         console.log(`Loading students for class ${value}`);
-        const response = await apiClient.get(`/api/SchoolClass/${value}/students`);
+        const response = await apiClient.get(`/SchoolClass/${value}/students`);
         const students = response.data;
         console.log(`Found ${students.length} students for class ${value}:`, students);
         setClassStudents(students);
@@ -332,14 +332,14 @@ const HealthCheckManagement = () => {
     try {
       console.log("Gửi thông báo cho studentId:", studentId);
       // Lấy Health_Record để lấy ParentID
-      const healthRecordRes = await apiClient.get(`/api/HealthRecord/student/${studentId}`);
+      const healthRecordRes = await apiClient.get(`/HealthRecord/student/${studentId}`);
       const healthRecord = healthRecordRes.data;
       if (!healthRecord || !healthRecord.parentID) {
         console.warn(`Không tìm thấy ParentID cho học sinh ${studentId}`);
         return;
       }
       // Gửi notification
-      await apiClient.post('/api/Notification', {
+      await apiClient.post('/Notification', {
         userId: healthRecord.parentID,
         title: 'Thông báo lịch khám sức khỏe',
         message: `Học sinh có mã ${studentId} đã được lên lịch khám sức khỏe vào ngày ${checkupDate}. Vui lòng kiểm tra lịch trên hệ thống.`
@@ -362,7 +362,7 @@ const HealthCheckManagement = () => {
       studentIds: selectedStudents
     };
     try {
-      await apiClient.post('/api/HealthCheckResult/batch', batchData);
+      await apiClient.post('/HealthCheckResult/batch', batchData);
       // Gửi thông báo song song cho tất cả phụ huynh liên quan (lọc studentId hợp lệ)
       await Promise.all(
         selectedStudents
@@ -433,7 +433,7 @@ const HealthCheckManagement = () => {
   // Khi mở modal batch schedule, gọi API lấy danh sách lớp:
   useEffect(() => {
     if (showBatchForm) {
-      apiClient.get('/api/SchoolClass')
+      apiClient.get('/SchoolClass')
         .then(res => setAvailableClasses(res.data))
         .catch(() => setAvailableClasses([]));
     }

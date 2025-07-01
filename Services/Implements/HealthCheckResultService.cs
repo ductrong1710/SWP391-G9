@@ -66,11 +66,11 @@ namespace Services.implements
             if (result.CheckUpDate > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for check-up date");
 
-            if (result.ConsultationRecommended == true && !result.ConsultationAppointmentDate.HasValue)
-                throw new InvalidOperationException("Consultation appointment date is required when consultation is recommended");
+            if (result.NeedToContactParent == true && !result.FollowUpDate.HasValue)
+                throw new InvalidOperationException("Follow-up date is required when parent contact is needed");
 
-            if (result.ConsultationAppointmentDate.HasValue && result.ConsultationAppointmentDate.Value <= DateTime.Today)
-                throw new InvalidOperationException("Consultation appointment date must be in the future");
+            if (result.FollowUpDate.HasValue && result.FollowUpDate.Value <= DateTime.Today)
+                throw new InvalidOperationException("Follow-up date must be in the future");
 
             await _resultRepository.CreateHealthCheckResultAsync(result);
             return result;
@@ -91,11 +91,11 @@ namespace Services.implements
             if (result.CheckUpDate > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for check-up date");
 
-            if (result.ConsultationRecommended == true && !result.ConsultationAppointmentDate.HasValue)
-                throw new InvalidOperationException("Consultation appointment date is required when consultation is recommended");
+            if (result.NeedToContactParent == true && !result.FollowUpDate.HasValue)
+                throw new InvalidOperationException("Follow-up date is required when parent contact is needed");
 
-            if (result.ConsultationAppointmentDate.HasValue && result.ConsultationAppointmentDate.Value <= DateTime.Today)
-                throw new InvalidOperationException("Consultation appointment date must be in the future");
+            if (result.FollowUpDate.HasValue && result.FollowUpDate.Value <= DateTime.Today)
+                throw new InvalidOperationException("Follow-up date must be in the future");
 
             await _resultRepository.UpdateHealthCheckResultAsync(result);
         }

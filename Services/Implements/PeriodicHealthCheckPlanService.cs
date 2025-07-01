@@ -2,16 +2,25 @@ using Businessobjects.Models;
 using Repositories.Interfaces;
 using Services.interfaces;
 using Services.Interfaces; // Add this using directive
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Services.implements
 {
     public class PeriodicHealthCheckPlanService : IPeriodicHealthCheckPlanService
     {
         private readonly IPeriodicHealthCheckPlanRepository _planRepository;
+        private readonly ISchoolClassService _classService;
+        private readonly IHealthCheckConsentFormService _consentFormService;
+        private readonly IHealthRecordService _healthRecordService;
 
-        public PeriodicHealthCheckPlanService(IPeriodicHealthCheckPlanRepository planRepository)
+        public PeriodicHealthCheckPlanService(IPeriodicHealthCheckPlanRepository planRepository, ISchoolClassService classService, IHealthCheckConsentFormService consentFormService, IHealthRecordService healthRecordService)
         {
             _planRepository = planRepository;
+            _classService = classService;
+            _consentFormService = consentFormService;
+            _healthRecordService = healthRecordService;
         }
 
         public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetAllPlansAsync()
@@ -37,6 +46,7 @@ namespace Services.implements
         public async Task<PeriodicHealthCheckPlan> CreatePlanAsync(PeriodicHealthCheckPlan plan)
         {
             await _planRepository.CreatePlanAsync(plan);
+            // Nếu cần tạo consent form cho học sinh, hãy truyền danh sách classId từ nơi gọi vào service này (hoặc xử lý ở controller)
             return plan;
         }
 

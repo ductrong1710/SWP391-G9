@@ -2834,35 +2834,42 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\phamt\\.nuget\\packages\\": {}
+    "C:\\Users\\ASUS\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\SUM25\\SWP391\\code\\backend\\Services\\Services.csproj",
+      "projectUniqueName": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Services\\Services.csproj",
       "projectName": "Services",
-      "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Services\\Services.csproj",
-      "packagesPath": "C:\\Users\\phamt\\.nuget\\packages\\",
-      "outputPath": "D:\\SUM25\\SWP391\\code\\backend\\Services\\obj\\",
+      "projectPath": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Services\\Services.csproj",
+      "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Services\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\phamt\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj": {
-              "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Businessobjects\\Businessobjects.csproj"
+            "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj": {
+              "projectPath": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj"
             },
-            "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\Repositories.csproj": {
-              "projectPath": "D:\\SUM25\\SWP391\\code\\backend\\Repositories\\Repositories.csproj"
+            "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Repositories\\Repositories.csproj": {
+              "projectPath": "C:\\Users\\ASUS\\Downloads\\SWP391-G9-BackEnd\\Repositories\\Repositories.csproj"
             }
           }
         }
@@ -2876,7 +2883,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
@@ -2897,7 +2905,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.411/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -66,9 +66,9 @@ namespace Services.implements
             Console.WriteLine($"[LOG] FindProfileByNameAndClassAsync - normalized: name: '{nameNormalized}', class: '{classNormalized}'");
             return await _context.Profiles
                 .FirstOrDefaultAsync(p =>
-                    p.Name != null && p.Class != null &&
+                    p.Name != null && p.ClassID != null &&
                     p.Name.Trim().ToLower() == nameNormalized &&
-                    p.Class.Trim().ToLower() == classNormalized
+                    p.ClassID.Trim().ToLower() == classNormalized
                 );
         }
     }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import { getHealthCheckHistoryWithResult } from '../../services/healthCheckService';
 
 const ParentDashboard = () => {
   const navigate = useNavigate();
@@ -11,10 +12,18 @@ const ParentDashboard = () => {
     medicalHistory: 15,
     medicationSubmissions: 5
   });
+  const [studentId, setStudentId] = useState('');
+  const [history, setHistory] = useState([]);
 
   const handleNavigate = (path) => {
     navigate(path);
   };
+
+  useEffect(() => {
+    if (studentId) {
+      getHealthCheckHistoryWithResult(studentId).then(res => setHistory(res.data));
+    }
+  }, [studentId]);
 
   return (
     <div className="dashboard-layout">
@@ -202,6 +211,45 @@ const ParentDashboard = () => {
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* History Section */}
+          <section className="history-section">
+            <h2 className="section-title">Lịch sử kiểm tra sức khỏe định kỳ</h2>
+            <div style={{marginBottom: 16}}>
+              <label>Mã học sinh: </label>
+              <input
+                type="text"
+                value={studentId}
+                onChange={e => setStudentId(e.target.value)}
+                placeholder="Nhập mã học sinh..."
+                style={{marginLeft: 8}}
+              />
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Kế hoạch</th>
+                  <th>Ngày phản hồi</th>
+                  <th>Trạng thái</th>
+                  <th>Kết quả khám</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((item, idx) => (
+                  <tr key={idx}>
+                    <td>{item.ConsentForm?.HealthCheckPlan?.PlanName}</td>
+                    <td>{item.ConsentForm?.ResponseTime ? new Date(item.ConsentForm.ResponseTime).toLocaleDateString() : ''}</td>
+                    <td>{item.ConsentForm?.ConsentStatus}</td>
+                    <td>
+                      {item.HealthCheckResult
+                        ? (item.HealthCheckResult.ResultStatus === 'Completed' ? 'Hoàn thành' : 'Theo dõi sau khám')
+                        : 'Chưa có kết quả'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </section>
         </main>
       </div>

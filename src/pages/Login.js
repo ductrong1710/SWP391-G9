@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
@@ -8,8 +8,10 @@ const Login = () => {
     username: '',
     password: ''
   });
-  const [passwordVisible, setPasswordVisible] = useState(false);  const [error, setError] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const usernameInputRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated, authError } = useAuth();
@@ -50,6 +52,12 @@ const Login = () => {
       navigate('/login', { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (usernameInputRef.current) {
+      usernameInputRef.current.focus();
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -105,8 +113,9 @@ const Login = () => {
               placeholder="Nhập tên đăng nhập" 
               required 
               autoComplete="username"
-              value={credentials.username}
+              value={credentials.username ?? ""}
               onChange={handleChange}
+              ref={usernameInputRef}
             />
           </div>
           <div className="form-group">
@@ -120,7 +129,7 @@ const Login = () => {
                 placeholder="Nhập mật khẩu" 
                 required 
                 autoComplete="current-password"
-                value={credentials.password}
+                value={credentials.password ?? ""}
                 onChange={handleChange}
               />
               <button 
@@ -133,7 +142,11 @@ const Login = () => {
             </div>
           </div>
           {error && <div className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>}
-          <Link to="/forgot-password" className="forgot-link">Quên tên đăng nhập hoặc mật khẩu?</Link>          <button type="submit" className="submit-btn">Đăng nhập</button>
+          <Link to="/forgot-password" className="forgot-link">Quên tên đăng nhập hoặc mật khẩu?</Link>
+          <button type="submit" className="submit-btn" disabled={isLoading}>
+            {isLoading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{marginRight: '8px'}}></span> : null}
+            Đăng nhập
+          </button>
           <Link to="/register" className="create-link">Chưa có tài khoản? Tạo tài khoản ngay.</Link>
           <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.95rem', color: '#555' }}>
             Hỗ trợ trực tuyến có thể được tìm thấy trong <Link to="/help" className="support-link">Trợ giúp tài khoản</Link>.

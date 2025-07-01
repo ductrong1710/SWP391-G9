@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Cấu hình axios instance với base URL của backend API
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5284/api', // Đã thêm /api để đúng với route backend
+  baseURL: 'http://localhost:5284', // Xóa /api khỏi base URL
   headers: {
     'Content-Type': 'application/json'
   },

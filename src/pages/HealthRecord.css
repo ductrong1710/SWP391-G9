@@ -16,6 +16,11 @@
   --hover-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
 }
 
+/* Add this at the top for system font consistency */
+body, .main-container, .main-content, .health-record-container, .health-declaration-form {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
 .main-container {
   margin-left: 280px;
   min-height: 100vh;

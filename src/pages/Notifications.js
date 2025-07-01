@@ -12,7 +12,7 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get(`/Notification/user/${userID}`);
+      const res = await apiClient.get(`/api/Notification/user/${userID}`);
       setNotifications(res.data);
     } catch (err) {
       setNotifications([]);
@@ -27,7 +27,7 @@ const Notifications = () => {
 
   const handleMarkAsRead = async (notificationID) => {
     try {
-      await apiClient.post(`/Notification/mark-as-read/${notificationID}`);
+      await apiClient.post(`/api/Notification/mark-as-read/${notificationID}`);
       // Cập nhật lại danh sách sau khi đánh dấu đã đọc
       fetchNotifications();
     } catch (err) {
@@ -46,7 +46,7 @@ const Notifications = () => {
       ) : (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {notifications.map(n => (
-            <li key={n.notificationID} style={{
+            <li key={n.id} style={{
               background: n.isRead ? '#f0f0f0' : '#e6f7ff',
               marginBottom: 12,
               padding: 16,

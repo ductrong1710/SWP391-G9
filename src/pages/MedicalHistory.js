@@ -16,155 +16,53 @@ const MedicalHistory = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const userRole = getUserRole();
-      
+      const params = new URLSearchParams({
+        year: filterYear,
+        type: filterType,
+      });
+
+      let endpoint = '';
       if (userRole === 'Parent') {
-        // Fetch medical history for parent's children
-        const [historyResponse, childrenResponse] = await Promise.all([
-          apiClient.get(`/HealthCheckResult/parent/${user.UserID}/history`),
-          apiClient.get(`/User/parent/${user.UserID}/children`)
-        ]);
-        const mappedHistory = (historyResponse.data || []).map(mapBackendToFrontend);
-        setMedicalHistory(mappedHistory);
-        setChildren(childrenResponse.data);
+        if (selectedChild !== 'all') {
+          params.append('studentId', selectedChild);
+        }
+        endpoint = `/HealthCheckResult/parent/${user.UserID}/history`;
+        
+        // Fetch children list only once or if it's not available
+        if (children.length === 0) {
+          const childrenResponse = await apiClient.get(`/User/parent/${user.UserID}/children`);
+          setChildren(childrenResponse.data);
+        }
+
       } else if (userRole === 'Student') {
-        // Fetch medical history for student
-        const historyResponse = await apiClient.get(`/HealthCheckResult/student/${user.UserID}/history`);
-        const mappedHistory = (historyResponse.data || []).map(mapBackendToFrontend);
-        setMedicalHistory(mappedHistory);
-        setChildren([]);
+        endpoint = `/HealthCheckResult/student/${user.UserID}/history`;
       } else {
         navigate('/dashboard');
         return;
       }
+      
+      const historyResponse = await apiClient.get(`${endpoint}?${params.toString()}`);
+      const mappedHistory = (historyResponse.data || []).map(mapBackendToFrontend);
+      setMedicalHistory(mappedHistory);
+
     } catch (error) {
-      setMedicalHistory(getMockMedicalHistory());
-      if (getUserRole() === 'Parent') {
-        setChildren(getMockChildren());
-      }
+      console.error("Lỗi khi tải lịch sử y tế:", error);
+      setMedicalHistory([]); // Clear data on error
+      setChildren([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getMockMedicalHistory = () => {
-    return [
-      {
-        id: 1,
-        childId: 1,
-        childName: 'Nguyễn Văn An',
-        className: '10A1',
-        checkupDate: '2024-12-15',
-        checkupType: 'Periodic',
-        doctor: 'BS. Trần Thị Bình',
-        status: 'Completed',
-        result: {
-          height: '165cm',
-          weight: '55kg',
-          bloodPressure: '120/80',
-          heartRate: '72',
-          temperature: '36.5',
-          vision: '10/10',
-          hearing: 'Bình thường',
-          dental: 'Tốt',
-          skin: 'Bình thường',
-          respiratory: 'Bình thường',
-          cardiovascular: 'Bình thường',
-          gastrointestinal: 'Bình thường',
-          musculoskeletal: 'Bình thường',
-          neurological: 'Bình thường',
-          notes: 'Sức khỏe tốt, không có vấn đề gì đặc biệt',
-          recommendations: 'Duy trì chế độ ăn uống và tập luyện hiện tại',
-          followUpRequired: false,
-          followUpDate: null,
-          followUpReason: null
-        }
-      },
-      {
-        id: 2,
-        childId: 1,
-        childName: 'Nguyễn Văn An',
-        className: '10A1',
-        checkupDate: '2024-06-15',
-        checkupType: 'Periodic',
-        doctor: 'BS. Lê Văn Cường',
-        status: 'Completed',
-        result: {
-          height: '163cm',
-          weight: '53kg',
-          bloodPressure: '118/78',
-          heartRate: '70',
-          temperature: '36.6',
-          vision: '10/10',
-          hearing: 'Bình thường',
-          dental: 'Tốt',
-          skin: 'Bình thường',
-          respiratory: 'Bình thường',
-          cardiovascular: 'Bình thường',
-          gastrointestinal: 'Bình thường',
-          musculoskeletal: 'Bình thường',
-          neurological: 'Bình thường',
-          notes: 'Sức khỏe tốt, tăng trưởng bình thường',
-          recommendations: 'Tiếp tục chế độ dinh dưỡng và tập luyện',
-          followUpRequired: false,
-          followUpDate: null,
-          followUpReason: null
-        }
-      },
-      {
-        id: 3,
-        childId: 2,
-        childName: 'Nguyễn Thị Bình',
-        className: '8A2',
-        checkupDate: '2024-12-10',
-        checkupType: 'Special',
-        doctor: 'BS. Phạm Thị Dung',
-        status: 'Completed',
-        result: {
-          height: '155cm',
-          weight: '48kg',
-          bloodPressure: '115/75',
-          heartRate: '75',
-          temperature: '37.2',
-          vision: '9/10',
-          hearing: 'Bình thường',
-          dental: 'Cần chăm sóc',
-          skin: 'Bình thường',
-          respiratory: 'Bình thường',
-          cardiovascular: 'Bình thường',
-          gastrointestinal: 'Bình thường',
-          musculoskeletal: 'Bình thường',
-          neurological: 'Bình thường',
-          notes: 'Học sinh có vấn đề nhẹ về răng miệng, cần chăm sóc thêm',
-          recommendations: 'Đánh răng đều đặn, khám răng định kỳ',
-          followUpRequired: true,
-          followUpDate: '2025-01-15',
-          followUpReason: 'Kiểm tra lại tình trạng răng miệng'
-        }
-      }
-    ];
-  };
-
-  const getMockChildren = () => {
-    return [
-      { id: 1, name: 'Nguyễn Văn An', className: '10A1' },
-      { id: 2, name: 'Nguyễn Thị Bình', className: '8A2' }
-    ];
-  };
-
-  const filteredHistory = medicalHistory.filter(record => {
-    const childMatch = selectedChild === 'all' || record.childId === parseInt(selectedChild);
-    const yearMatch = new Date(record.checkupDate).getFullYear() === filterYear;
-    const typeMatch = filterType === 'all' || record.checkupType === filterType;
-    return childMatch && yearMatch && typeMatch;
-  });
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    }
+  }, [user, selectedChild, filterYear, filterType]);
 
   const getTypeColor = (type) => {
     switch (type) {
@@ -238,23 +136,44 @@ const MedicalHistory = () => {
     return { category: 'Béo phì', color: '#e53e3e' };
   };
 
-  const mapBackendToFrontend = (record) => ({
-    id: record.id || record.ID,
-    healthCheckConsentID: record.healthCheckConsentID || record.HealthCheckConsentID,
-    height: record.height || record.Height,
-    weight: record.weight || record.Weight,
-    bloodPressure: record.bloodPressure || record.BloodPressure,
-    heartRate: record.heartRate || record.HeartRate,
-    eyesight: record.eyesight || record.Eyesight,
-    hearing: record.hearing || record.Hearing,
-    oralHealth: record.oralHealth || record.OralHealth,
-    spine: record.spine || record.Spine,
-    conclusion: record.conclusion || record.Conclusion,
-    checkUpDate: record.checkUpDate || record.CheckUpDate,
-    checker: record.checker || record.Checker,
-    consultationRecommended: record.consultationRecommended || record.ConsultationRecommended,
-    consultationAppointmentDate: record.consultationAppointmentDate || record.ConsultationAppointmentDate
-  });
+  const mapBackendToFrontend = (record) => {
+    const checkupDate = record.healthCheck?.date || record.healthCheckResult?.date || record.date;
+    const student = record.healthCheck?.student || record.student;
+
+    return {
+      id: record.id || record.ID,
+      childId: student?.id || student?.ID,
+      childName: student?.name || 'N/A',
+      className: student?.class || 'N/A',
+      checkupDate: checkupDate ? new Date(checkupDate).toISOString().split('T')[0] : 'N/A',
+      checkupType: record.healthCheck?.checkupType || 'N/A',
+      doctor: record.healthCheck?.doctorName || 'N/A',
+      status: record.resultStatus || 'N/A',
+      result: {
+        height: record.height || 'N/A',
+        weight: record.weight || 'N/A',
+        bloodPressure: record.bloodPressure || 'N/A',
+        heartRate: record.heartRate || 'N/A',
+        temperature: record.temperature || 'N/A',
+        vision: record.eyesight || 'N/A',
+        hearing: record.hearing || 'N/A',
+        dental: record.oralHealth || 'N/A',
+        skin: record.dermatology || 'N/A',
+        respiratory: 'N/A', // Map these if available
+        cardiovascular: 'N/A',
+        gastrointestinal: 'N/A',
+        musculoskeletal: record.musculoskeletal || 'N/A',
+        neurological: 'N/A',
+        notes: record.notes || 'Không có',
+        recommendations: record.recommendations || 'Không có',
+        followUpRequired: record.followUpRequired || false,
+        followUpDate: record.followUpDate ? new Date(record.followUpDate).toISOString().split('T')[0] : null,
+        followUpReason: 'N/A' // Map if available
+      }
+    };
+  };
+
+  const uniqueYears = [...new Set(medicalHistory.map(r => new Date(r.checkupDate).getFullYear()))];
 
   if (loading) {
     return (
@@ -277,7 +196,7 @@ const MedicalHistory = () => {
           <div className="filter-group">
             <label>Con em:</label>
             <select 
-              value={selectedChild} 
+              value={selectedChild ?? ""} 
               onChange={(e) => setSelectedChild(e.target.value)}
             >
               <option value="all">Tất cả con em</option>
@@ -293,10 +212,10 @@ const MedicalHistory = () => {
         <div className="filter-group">
           <label>Năm:</label>
           <select 
-            value={filterYear} 
+            value={filterYear ?? ""} 
             onChange={(e) => setFilterYear(parseInt(e.target.value))}
           >
-            {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
+            {uniqueYears.sort((a, b) => b - a).map(year => (
               <option key={year} value={year}>{year}</option>
             ))}
           </select>
@@ -305,7 +224,7 @@ const MedicalHistory = () => {
         <div className="filter-group">
           <label>Loại kiểm tra:</label>
           <select 
-            value={filterType} 
+            value={filterType ?? ""} 
             onChange={(e) => setFilterType(e.target.value)}
           >
             <option value="all">Tất cả loại</option>
@@ -323,7 +242,7 @@ const MedicalHistory = () => {
             <i className="fas fa-stethoscope"></i>
           </div>
           <div className="stat-content">
-            <div className="stat-number">{filteredHistory.length}</div>
+            <div className="stat-number">{medicalHistory.length}</div>
             <div className="stat-label">Tổng số lần kiểm tra</div>
           </div>
         </div>
@@ -334,7 +253,7 @@ const MedicalHistory = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">
-              {filteredHistory.filter(r => r.status === 'Completed').length}
+              {medicalHistory.filter(r => r.status === 'Completed').length}
             </div>
             <div className="stat-label">Đã hoàn thành</div>
           </div>
@@ -346,7 +265,7 @@ const MedicalHistory = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">
-              {filteredHistory.filter(r => r.result?.followUpRequired).length}
+              {medicalHistory.filter(r => r.result?.followUpRequired).length}
             </div>
             <div className="stat-label">Cần theo dõi</div>
           </div>
@@ -355,7 +274,7 @@ const MedicalHistory = () => {
 
       {/* Medical History List */}
       <div className="history-list">
-        {filteredHistory.map((record) => {
+        {medicalHistory.map((record) => {
           const bmi = calculateBMI(record.result?.height, record.result?.weight);
           const bmiCategory = getBMICategory(bmi);
           
@@ -525,7 +444,7 @@ const MedicalHistory = () => {
           );
         })}
 
-        {filteredHistory.length === 0 && (
+        {medicalHistory.length === 0 && (
           <div className="no-results">
             <i className="fas fa-stethoscope"></i>
             <p>Không tìm thấy lịch sử kiểm tra nào</p>

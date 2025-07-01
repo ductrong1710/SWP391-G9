@@ -3,82 +3,6 @@ import './RecordProcess.css';
 import apiClient from '../services/apiClient';
 
 const RecordProcess = () => {
-  // Mock data cho hồ sơ y tế từng học sinh
-  const mockRecords = useMemo(() => [
-    {
-      id: 1,
-      studentName: 'Nguyễn Văn An',
-      studentId: 'SV2022001',
-      class: '10A1',
-      lastUpdated: '2025-06-10',
-      status: 'Đã cập nhật',
-      doctorName: 'Dr. Amanda',
-      summary: 'Đã tiêm chủng đầy đủ, không bệnh nền.',
-      attachments: ['hoso_1.pdf']
-    },
-    {
-      id: 2,
-      studentName: 'Trần Thị Bình',
-      studentId: 'SV2022045',
-      class: '11A2',
-      lastUpdated: '2025-06-09',
-      status: 'Chưa cập nhật',
-      doctorName: 'Dr. James',
-      summary: 'Cần bổ sung giấy khám sức khỏe.',
-      attachments: []
-    },
-    {
-      id: 3,
-      studentName: 'Lê Minh Cường',
-      studentId: 'SV2022078',
-      class: '10A3',
-      lastUpdated: '2025-06-08',
-      status: 'Đã cập nhật',
-      doctorName: 'Dr. Sarah',
-      summary: 'Có tiền sử dị ứng nhẹ.',
-      attachments: ['hoso_3.pdf']
-    },
-    {
-      id: 4,
-      studentName: 'Phạm Thị Dung',
-      studentId: 'SV2022012',
-      class: '10A1',
-      lastUpdated: '2025-06-07',
-      status: 'Đã cập nhật',
-      doctorName: 'Dr. Robert',
-      summary: 'Đã cập nhật đầy đủ thông tin.',
-      attachments: ['hoso_4.pdf']
-    }
-  ], []);
-
-  // Danh sách học sinh mẫu cho từng lớp
-  const studentsByClass = useMemo(() => ({
-    '10A1': [
-      { studentId: 'SV2022001', studentName: 'Nguyễn Văn An' },
-      { studentId: 'SV2022012', studentName: 'Phạm Thị Dung' },
-      { studentId: 'SV2022013', studentName: 'Lê Thị Hạnh' }
-    ],
-    '10A2': [
-      { studentId: 'SV2022020', studentName: 'Trần Văn Bình' },
-      { studentId: 'SV2022021', studentName: 'Ngô Thị Mai' }
-    ],
-    '10A3': [
-      { studentId: 'SV2022078', studentName: 'Lê Minh Cường' }
-    ],
-    '11A1': [
-      { studentId: 'SV2022100', studentName: 'Phạm Văn Hòa' }
-    ],
-    '11A2': [
-      { studentId: 'SV2022045', studentName: 'Trần Thị Bình' }
-    ],
-    '12A1': [
-      { studentId: 'SV2023001', studentName: 'Nguyễn Văn Nam' }
-    ],
-    '12A2': [
-      { studentId: 'SV2023002', studentName: 'Lê Thị Lan' }
-    ]
-  }), []);
-
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -97,46 +21,62 @@ const RecordProcess = () => {
     summary: '',
     attachments: []
   });
+  const [availableStudents, setAvailableStudents] = useState([]);
   const [addClass, setAddClass] = useState('');
   const [addStudentId, setAddStudentId] = useState('');
 
-  // Lọc danh sách hồ sơ
-  const getFilteredRecords = () => {
-    return records.filter(record => {
-      if (filters.grade && !record.class.startsWith(filters.grade)) return false;
-      if (filters.className && record.class !== filters.className) return false;
-      if (filters.status && record.status !== filters.status) return false;
-      return true;
-    });
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filters.grade) params.append('grade', filters.grade);
+      if (filters.className) params.append('className', filters.className);
+      if (filters.status) params.append('status', filters.status);
+      
+      const response = await apiClient.get(`/HealthRecord?${params.toString()}`);
+      setRecords(response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải hồ sơ:", error);
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Gọi API backend lấy records
-        const response = await apiClient.get('/HealthCheck');
-        setRecords(response.data);
-      } catch (error) {
-        // Nếu lỗi, fallback về mock data
-        setRecords(mockRecords);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
-  }, [mockRecords]);
+  }, [filters]);
 
   useEffect(() => {
     if (showDetail && selectedRecord) {
       setEditData({
         summary: selectedRecord.summary,
         status: selectedRecord.status,
-        attachments: [...selectedRecord.attachments],
+        attachments: selectedRecord.attachments ? [...selectedRecord.attachments] : [],
       });
       setEditMode(false);
     }
   }, [showDetail, selectedRecord]);
+
+  useEffect(() => {
+    const fetchStudentsForClass = async () => {
+      if (addClass) {
+        try {
+          const response = await apiClient.get(`/api/students?className=${addClass}`);
+          // Lọc ra những học sinh chưa có hồ sơ
+          const studentIdsWithRecords = new Set(records.map(r => r.studentId));
+          const students = response.data.filter(s => !studentIdsWithRecords.has(s.studentId));
+          setAvailableStudents(students);
+        } catch (error) {
+          console.error(`Lỗi khi tải học sinh lớp ${addClass}:`, error);
+          setAvailableStudents([]);
+        }
+      } else {
+        setAvailableStudents([]);
+      }
+    };
+    fetchStudentsForClass();
+  }, [addClass, records]);
 
   // Handler
   const handleViewDetails = (record) => {
@@ -149,11 +89,10 @@ const RecordProcess = () => {
   };
 
   const handleApplyFilters = () => {
-    setRecords(getFilteredRecords());
+    fetchData();
   };
   const handleResetFilters = () => {
     setFilters({ grade: '', className: '', status: '' });
-    setRecords(mockRecords);
   };
 
   const handleEditChange = (e) => {
@@ -172,12 +111,16 @@ const RecordProcess = () => {
     const newAttachments = editData.attachments.filter((_, i) => i !== idx);
     setEditData((prev) => ({ ...prev, attachments: newAttachments }));
   };
-  const handleSaveEdit = () => {
-    setRecords((prev) => prev.map(r =>
-      r.id === selectedRecord.id ? { ...r, ...editData } : r
-    ));
-    setSelectedRecord((prev) => prev ? { ...prev, ...editData } : prev);
-    setEditMode(false);
+  const handleSaveEdit = async () => {
+    if (!selectedRecord) return;
+    try {
+      await apiClient.put(`/HealthRecord/${selectedRecord.id}`, editData);
+      setEditMode(false);
+      fetchData(); // Tải lại dữ liệu
+    } catch (error) {
+      console.error('Lỗi khi cập nhật hồ sơ:', error);
+      alert('Cập nhật hồ sơ thất bại.');
+    }
   };
   const handleAddChange = (e) => {
     const { name, value } = e.target;
@@ -195,33 +138,16 @@ const RecordProcess = () => {
     const newAttachments = addData.attachments.filter((_, i) => i !== idx);
     setAddData((prev) => ({ ...prev, attachments: newAttachments }));
   };
-  const handleSaveAdd = () => {
-    setRecords((prev) => [
-      ...prev,
-      {
-        ...addData,
-        id: prev.length ? Math.max(...prev.map(r => r.id)) + 1 : 1
-      }
-    ]);
-    setShowAddModal(false);
-    setAddData({
-      studentName: '',
-      studentId: '',
-      class: '',
-      doctorName: '',
-      lastUpdated: new Date().toISOString().slice(0,10),
-      status: 'Chưa cập nhật',
-      summary: '',
-      attachments: []
-    });
+  const handleSaveAdd = async () => {
+    try {
+      await apiClient.post('/HealthRecord', addData);
+      setShowAddModal(false);
+      fetchData(); // Tải lại dữ liệu
+    } catch (error) {
+      console.error('Lỗi khi thêm hồ sơ:', error);
+      alert('Thêm hồ sơ thất bại.');
+    }
   };
-
-  const availableStudents = useMemo(() => {
-    if (!addClass) return [];
-    const all = studentsByClass[addClass] || [];
-    // Lọc học sinh đã có hồ sơ
-    return all.filter(s => !records.some(r => r.studentId === s.studentId));
-  }, [addClass, records, studentsByClass]);
 
   // Card tổng quan
   const total = records.length;
@@ -245,17 +171,19 @@ const RecordProcess = () => {
   };
 
   const handleAddClassChange = (e) => {
-    setAddClass(e.target.value);
+    const newClass = e.target.value;
+    setAddClass(newClass);
     setAddStudentId('');
-    setAddData((prev) => ({ ...prev, class: e.target.value, studentId: '', studentName: '' }));
+    setAddData((prev) => ({ ...prev, class: newClass, studentId: '', studentName: '' }));
   };
+  
   const handleAddStudentChange = (e) => {
     const studentId = e.target.value;
+    const student = availableStudents.find(s => s.studentId === studentId);
     setAddStudentId(studentId);
-    const student = (studentsByClass[addClass] || []).find(s => s.studentId === studentId);
     setAddData((prev) => ({
       ...prev,
-      studentId,
+      studentId: studentId,
       studentName: student ? student.studentName : ''
     }));
   };
@@ -309,7 +237,7 @@ const RecordProcess = () => {
                 <select 
                   id="grade" 
                   className="form-select"
-                  value={filters.grade}
+                  value={filters.grade ?? ""}
                   onChange={e => setFilters({...filters, grade: e.target.value})}
                 >
                   <option value="">Chọn khối</option>
@@ -322,7 +250,7 @@ const RecordProcess = () => {
                 <select 
                   id="className" 
                   className="form-select"
-                  value={filters.className}
+                  value={filters.className ?? ""}
                   onChange={e => setFilters({...filters, className: e.target.value})}
                 >
                   <option value="">Chọn lớp</option>
@@ -339,7 +267,7 @@ const RecordProcess = () => {
                 <select 
                   id="status" 
                   className="form-select"
-                  value={filters.status}
+                  value={filters.status ?? ""}
                   onChange={e => setFilters({...filters, status: e.target.value})}
                 >
                   <option value="">Trạng thái</option>
@@ -462,7 +390,7 @@ const RecordProcess = () => {
                     <strong>Tóm tắt:</strong> {!editMode ? (
                       selectedRecord.summary
                     ) : (
-                      <textarea className="form-control" name="summary" value={editData.summary} onChange={handleEditChange} rows={3} />
+                      <textarea className="form-control" name="summary" value={editData.summary ?? ""} onChange={handleEditChange} rows={3} />
                     )}
                   </div>
                   <div className="mb-3">
@@ -472,7 +400,7 @@ const RecordProcess = () => {
                         {selectedRecord.attachments.length > 0 ? (
                           selectedRecord.attachments.map((file, idx) => (
                             <li key={idx}>
-                              <button type="button" className="btn btn-link p-0" style={{textDecoration: 'underline'}}>{file}</button>
+                              <button type="button" className="btn btn-link p-0" style={{textDecoration: 'underline'}}>{file ?? ""}</button>
                             </li>
                           ))
                         ) : (
@@ -483,7 +411,7 @@ const RecordProcess = () => {
                       <div>
                         {editData.attachments.map((file, idx) => (
                           <div className="input-group mb-2" key={idx}>
-                            <input type="text" className="form-control" value={file} onChange={e => handleAttachmentChange(e, idx)} placeholder="Tên file..." />
+                            <input type="text" className="form-control" value={file ?? ""} onChange={e => handleAttachmentChange(e, idx)} placeholder="Tên file..." />
                             <button className="btn btn-danger" type="button" onClick={() => handleRemoveAttachment(idx)}>&times;</button>
                           </div>
                         ))}
@@ -520,16 +448,20 @@ const RecordProcess = () => {
                 <div className="modal-body">
                   <div className="mb-3">
                     <label className="form-label">Chọn lớp</label>
-                    <select className="form-select" value={addClass} onChange={handleAddClassChange}>
+                    <select className="form-select" value={addClass ?? ""} onChange={handleAddClassChange}>
                       <option value="">Chọn lớp</option>
-                      {Object.keys(studentsByClass).map(cls => (
-                        <option key={cls} value={cls}>{cls}</option>
-                      ))}
+                      <option value="10A1">10A1</option>
+                      <option value="10A2">10A2</option>
+                      <option value="10A3">10A3</option>
+                      <option value="11A1">11A1</option>
+                      <option value="11A2">11A2</option>
+                      <option value="12A1">12A1</option>
+                      <option value="12A2">12A2</option>
                     </select>
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Chọn học sinh</label>
-                    <select className="form-select" value={addStudentId} onChange={handleAddStudentChange} disabled={!addClass}>
+                    <select className="form-select" value={addStudentId ?? ""} onChange={handleAddStudentChange} disabled={!addClass}>
                       <option value="">Chọn học sinh</option>
                       {availableStudents.map(s => (
                         <option key={s.studentId} value={s.studentId}>{s.studentName} ({s.studentId})</option>
@@ -538,24 +470,24 @@ const RecordProcess = () => {
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Bác sĩ phụ trách</label>
-                    <input type="text" className="form-control" name="doctorName" value={addData.doctorName} onChange={handleAddChange} />
+                    <input type="text" className="form-control" name="doctorName" value={addData.doctorName ?? ""} onChange={handleAddChange} />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Trạng thái</label>
-                    <select className="form-select" name="status" value={addData.status} onChange={handleAddChange}>
+                    <select className="form-select" name="status" value={addData.status ?? ""} onChange={handleAddChange}>
                       <option value="Đã cập nhật">Đã cập nhật</option>
                       <option value="Chưa cập nhật">Chưa cập nhật</option>
                     </select>
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Tóm tắt</label>
-                    <textarea className="form-control" name="summary" value={addData.summary} onChange={handleAddChange} rows={3} />
+                    <textarea className="form-control" name="summary" value={addData.summary ?? ""} onChange={handleAddChange} rows={3} />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Tệp đính kèm</label>
                     {addData.attachments.map((file, idx) => (
                       <div className="input-group mb-2" key={idx}>
-                        <input type="text" className="form-control" value={file} onChange={e => handleAddAttachmentChangeAdd(e, idx)} placeholder="Tên file..." />
+                        <input type="text" className="form-control" value={file ?? ""} onChange={e => handleAddAttachmentChangeAdd(e, idx)} placeholder="Tên file..." />
                         <button className="btn btn-danger" type="button" onClick={() => handleRemoveAddAttachment(idx)}>&times;</button>
                       </div>
                     ))}

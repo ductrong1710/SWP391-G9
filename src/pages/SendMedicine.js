@@ -8,82 +8,6 @@ const SendMedicine = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Sử dụng useMemo để tránh tạo lại mockMedicines mỗi khi component render
-  const mockMedicines = useMemo(() => {
-    return [
-      {
-        id: 1,
-        patientName: 'Nguyễn Văn An',
-        patientId: 'SV2022001',
-        class: '10A1',
-        medicineName: 'Paracetamol',
-        dosage: '500mg',
-        frequency: 'Ngày 3 lần',
-        duration: '5 ngày',
-        dateOrdered: '2025-06-15',
-        status: 'Đã gửi',
-        deliveryAddress: 'Phòng Y tế Trường',
-        specialInstructions: 'Uống sau khi ăn. Học sinh bị sốt nhẹ.'
-      },
-      {
-        id: 2,
-        patientName: 'Trần Thị Bình',
-        patientId: 'SV2022045',
-        class: '11A2',
-        medicineName: 'Vitamin C',
-        dosage: '1000mg',
-        frequency: 'Ngày 1 lần',
-        duration: '30 ngày',
-        dateOrdered: '2025-06-10',
-        status: 'Đang xử lý',
-        deliveryAddress: 'Phòng Y tế Trường',
-        specialInstructions: 'Uống vào buổi sáng. Tăng cường sức đề kháng.'
-      },
-      {
-        id: 3,
-        patientName: 'Lê Minh Cường',
-        patientId: 'SV2022078',
-        class: '10A3',
-        medicineName: 'Amoxicillin',
-        dosage: '500mg',
-        frequency: 'Ngày 2 lần',
-        duration: '7 ngày',
-        dateOrdered: '2025-06-12',
-        status: 'Đã gửi',
-        deliveryAddress: 'Phòng Y tế Trường',
-        specialInstructions: 'Uống trước khi ăn 30 phút. Học sinh bị viêm họng.'
-      },
-      {
-        id: 4,
-        patientName: 'Phạm Thị Dung',
-        patientId: 'SV2022012',
-        class: '10A1',
-        medicineName: 'Cetirizine',
-        dosage: '10mg',
-        frequency: 'Ngày 1 lần',
-        duration: '10 ngày',
-        dateOrdered: '2025-05-20',
-        status: 'Đã gửi',
-        deliveryAddress: 'Phòng Y tế Trường',
-        specialInstructions: 'Uống trước khi đi ngủ. Học sinh bị dị ứng phấn hoa.'
-      },
-      {
-        id: 5,
-        patientName: 'Hoàng Văn Em',
-        patientId: 'SV2022034',
-        class: '10A1',
-        medicineName: 'Ibuprofen',
-        dosage: '400mg',
-        frequency: 'Ngày 2 lần',
-        duration: '3 ngày',
-        dateOrdered: '2025-06-15',
-        status: 'Đang xử lý',
-        deliveryAddress: 'Phòng Y tế Trường',
-        specialInstructions: 'Uống sau khi ăn. Học sinh bị đau cơ sau giờ thể dục.'
-      }
-    ];
-  }, []);
-
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMedicine, setSelectedMedicine] = useState(null);  const [showForm, setShowForm] = useState(false);
@@ -122,48 +46,31 @@ const SendMedicine = () => {
       });
     }
   }, [isAuthenticated, authLoading, navigate]);
-  // Load mock data
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        // Gọi API backend lấy medicines
-        const response = await apiClient.get('/Medicine');
+        const params = new URLSearchParams();
+        if (filters.grade) params.append('grade', filters.grade);
+        if (filters.className) params.append('className', filters.className);
+        if (filters.status) params.append('status', filters.status);
+        
+        const response = await apiClient.get(`/MedicationSubmission?${params.toString()}`);
         setMedicines(response.data);
       } catch (error) {
-        setMedicines(mockMedicines);
+        console.error("Lỗi khi tải dữ liệu gửi thuốc:", error);
+        setMedicines([]);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [mockMedicines]);
+  }, [filters]);
 
   // Handler for new medicine request (individual)
   const handleNewMedicine = () => {
     setShowForm(true);
-  };
-
-  // Lọc danh sách thuốc
-  const getFilteredMedicines = () => {
-    return medicines.filter(medicine => {
-      // Lọc theo khối (ví dụ: '10', '11', '12')
-      if (filters.grade && !medicine.class.startsWith(filters.grade)) {
-        return false;
-      }
-      
-      // Lọc theo lớp cụ thể
-      if (filters.className && medicine.class !== filters.className) {
-        return false;
-      }
-      
-      // Lọc theo trạng thái
-      if (filters.status && medicine.status !== filters.status) {
-        return false;
-      }
-      
-      return true;
-    });
   };
 
   // Handlers
@@ -187,16 +94,26 @@ const SendMedicine = () => {
     }));
   };
 
-  const handleSubmitForm = (e) => {
+  const handleSubmitForm = async (e) => {
     e.preventDefault();
-    // Trong ứng dụng thực tế, gửi dữ liệu đến API
-    // Hiện tại, chỉ đóng form
-    setShowForm(false);
-    alert('Gửi thuốc thành công!');
+    setLoading(true);
+    try {
+      await apiClient.post('/MedicationSubmission', formData);
+      setShowForm(false);
+      alert('Yêu cầu gửi thuốc đã được tạo thành công!');
+      // Tải lại dữ liệu
+      setFilters(prev => ({...prev}));
+    } catch (error) {
+      console.error('Lỗi khi gửi yêu cầu thuốc:', error);
+      alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
+    }
   };  
 
   const handleApplyFilters = () => {
-    setMedicines(getFilteredMedicines());
+    // useEffect lo việc fetch lại dữ liệu khi filter thay đổi
+    console.log("Applying filters:", filters);
   };
 
   const handleResetFilters = () => {
@@ -205,7 +122,6 @@ const SendMedicine = () => {
       className: '',
       status: ''
     });
-    setMedicines(mockMedicines);
   };
 
   const handleExportToExcel = () => {
@@ -278,7 +194,7 @@ const SendMedicine = () => {
                 <select 
                   id="grade" 
                   className="form-select"
-                  value={filters.grade}
+                  value={filters.grade ?? ""}
                   onChange={(e) => setFilters({...filters, grade: e.target.value})}
                 >
                   <option value="">Chọn khối</option>
@@ -291,7 +207,7 @@ const SendMedicine = () => {
                 <select 
                   id="className" 
                   className="form-select"
-                  value={filters.className}
+                  value={filters.className ?? ""}
                   onChange={(e) => setFilters({...filters, className: e.target.value})}
                 >
                   <option value="">Chọn lớp</option>

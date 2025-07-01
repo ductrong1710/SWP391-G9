@@ -25,7 +25,7 @@ const VaccinationManagement = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [searchTerm, filterStatus]);
 
   useEffect(() => {
     if (showCreateModal) {
@@ -44,102 +44,26 @@ const VaccinationManagement = () => {
         return;
       }
       // Fetch kế hoạch tiêm chủng
-      let plans = [];
-      try {
-        const plansResponse = await apiClient.get('/VaccinationPlan');
-        plans = plansResponse.data;
-      } catch (err) {
-        console.error('Lỗi lấy kế hoạch tiêm chủng:', err);
-      }
-      setVaccinationPlans(plans);
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (filterStatus !== 'all') params.append('status', filterStatus);
+
+      const plansResponse = await apiClient.get(`/VaccinationPlan?${params.toString()}`);
+      setVaccinationPlans(plansResponse.data);
 
       // Fetch students (nếu cần)
-      let students = [];
-      try {
-        const studentsResponse = await apiClient.get('/User/students');
-        students = studentsResponse.data;
-      } catch (err) {
-        console.error('Lỗi lấy danh sách học sinh:', err);
-      }
-      setStudents(students);
+      // Giữ lại nếu bạn có logic khác cần danh sách toàn bộ học sinh
+      // Nếu không, có thể xóa.
+      // const studentsResponse = await apiClient.get('/User/students');
+      // setStudents(studentsResponse.data);
+    } catch (err) {
+      console.error('Lỗi lấy dữ liệu tiêm chủng:', err);
+      // Fallback to empty array on error
+      setVaccinationPlans([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const getMockVaccinationPlans = () => {
-    return [
-      {
-        id: 1,
-        vaccineName: 'Vaccine COVID-19',
-        description: 'Tiêm chủng COVID-19 cho học sinh lớp 10-12',
-        scheduledDate: '2024-12-20',
-        targetClass: '10A1, 10A2, 11A1, 11A2, 12A1, 12A2',
-        targetGrade: '10-12',
-        status: 'Active',
-        totalStudents: 180,
-        confirmedCount: 156,
-        pendingCount: 24,
-        completedCount: 0,
-        notes: 'Tiêm chủng định kỳ theo kế hoạch của Bộ Y tế',
-        createdDate: '2024-12-01',
-        createdBy: 'BS. Trần Thị Bình'
-      },
-      {
-        id: 2,
-        vaccineName: 'Vaccine Cúm',
-        description: 'Tiêm chủng cúm mùa cho toàn trường',
-        scheduledDate: '2024-12-25',
-        targetClass: 'Tất cả các lớp',
-        targetGrade: 'Tất cả',
-        status: 'Active',
-        totalStudents: 2456,
-        confirmedCount: 1890,
-        pendingCount: 566,
-        completedCount: 0,
-        notes: 'Tiêm chủng hàng năm để phòng ngừa cúm mùa',
-        createdDate: '2024-12-05',
-        createdBy: 'BS. Lê Văn Cường'
-      },
-      {
-        id: 3,
-        vaccineName: 'Vaccine Viêm gan B',
-        description: 'Tiêm chủng viêm gan B cho học sinh lớp 6',
-        scheduledDate: '2024-12-30',
-        targetClass: '6A1, 6A2, 6A3, 6A4',
-        targetGrade: '6',
-        status: 'Completed',
-        totalStudents: 120,
-        confirmedCount: 118,
-        pendingCount: 2,
-        completedCount: 118,
-        notes: 'Tiêm chủng bổ sung cho học sinh mới',
-        createdDate: '2024-11-20',
-        createdBy: 'BS. Phạm Thị Dung'
-      }
-    ];
-  };
-
-  const getMockStudents = () => {
-    return [
-      { id: 1, fullName: 'Nguyễn Văn An', className: '10A1', grade: '10' },
-      { id: 2, fullName: 'Trần Thị Bình', className: '10A1', grade: '10' },
-      { id: 3, fullName: 'Lê Minh Cường', className: '11A1', grade: '11' },
-      { id: 4, fullName: 'Phạm Thị Dung', className: '11A1', grade: '11' },
-      { id: 5, fullName: 'Hoàng Văn Em', className: '12A1', grade: '12' }
-    ];
-  };
-
-  const filteredPlans = vaccinationPlans.filter(plan => {
-    const vaccineName = plan.vaccineName || plan.PlanName || '';
-    const description = plan.description || plan.Description || '';
-    const matchesSearch =
-      vaccineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      description.toLowerCase().includes(searchTerm.toLowerCase());
-    const status = plan.status || plan.Status || '';
-    const matchesStatus = filterStatus === 'all' || status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -248,14 +172,14 @@ const VaccinationManagement = () => {
           <input
             type="text"
             placeholder="Tìm kiếm theo tên vaccine hoặc mô tả..."
-            value={searchTerm}
+            value={searchTerm ?? ""}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         
         <div className="filter-controls">
           <select
-            value={filterStatus}
+            value={filterStatus ?? ""}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
             <option value="all">Tất cả trạng thái</option>
@@ -277,7 +201,7 @@ const VaccinationManagement = () => {
 
       {/* Vaccination Plans List */}
       <div className="vaccination-plans-list">
-        {filteredPlans.map((plan) => (
+        {vaccinationPlans.map((plan) => (
           <div key={plan.id} className="vaccination-plan-card">
             <div className="plan-header">
               <div className="plan-title">
@@ -352,7 +276,7 @@ const VaccinationManagement = () => {
           </div>
         ))}
 
-        {filteredPlans.length === 0 && (
+        {vaccinationPlans.length === 0 && (
           <div className="no-results">
             <i className="fas fa-syringe"></i>
             <p>Không tìm thấy kế hoạch tiêm chủng nào</p>
@@ -379,13 +303,13 @@ const VaccinationManagement = () => {
                   <label>Tên kế hoạch (Tên vaccine):</label>
                   <select
                     name="PlanName"
-                    value={formData.PlanName}
+                    value={formData.PlanName ?? ""}
                     onChange={handleInputChange}
                     required
                   >
                     <option value="">Chọn vaccine...</option>
                     {vaccineList.map(v => (
-                      <option key={v.vaccineTypeID || v.VaccineTypeID} value={v.vaccineName || v.VaccineName}>{v.vaccineName || v.VaccineName}</option>
+                      <option key={v.id} value={v.vaccineName || v.VaccineName}>{v.vaccineName || v.VaccineName}</option>
                     ))}
                   </select>
                 </div>
@@ -394,7 +318,7 @@ const VaccinationManagement = () => {
                   <input
                     type="date"
                     name="ScheduledDate"
-                    value={formData.ScheduledDate}
+                    value={formData.ScheduledDate ?? ""}
                     onChange={handleInputChange}
                     required
                   />
@@ -403,7 +327,7 @@ const VaccinationManagement = () => {
                   <label>Mô tả:</label>
                   <textarea
                     name="Description"
-                    value={formData.Description}
+                    value={formData.Description ?? ""}
                     onChange={handleInputChange}
                     placeholder="Mô tả chi tiết về kế hoạch tiêm chủng..."
                     rows="3"
@@ -414,7 +338,7 @@ const VaccinationManagement = () => {
                   <label>Trạng thái:</label>
                   <select
                     name="Status"
-                    value={formData.Status}
+                    value={formData.Status ?? ""}
                     onChange={handleInputChange}
                     required
                   >

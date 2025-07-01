@@ -389,4 +389,81 @@
   .record-actions {
     justify-content: center;
   }
+}
+
+.health-check-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.health-check-container.loading,
+.health-check-container.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 4rem;
+}
+
+.health-check-container.error {
+  color: #d9534f;
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+}
+
+.health-check-container h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 1rem;
+}
+
+.health-check-list {
+  list-style-type: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.health-check-item {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.health-check-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.health-check-item h2 {
+  font-size: 1.25rem;
+  color: #007bff;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.health-check-item p {
+  font-size: 1rem;
+  color: #555;
+  margin: 0.5rem 0;
+}
+
+.health-check-item p strong {
+  color: #333;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #777;
+  margin-top: 3rem;
 } 

@@ -75,8 +75,8 @@ namespace Repositories.Implements
                     .ThenInclude(c => c.Student)
                 .Include(r => r.HealthCheckConsent)
                     .ThenInclude(c => c.HealthCheckPlan)
-                .Where(r => r.ConsultationRecommended == true && r.ConsultationAppointmentDate >= DateTime.Today)
-                .OrderBy(r => r.ConsultationAppointmentDate)
+                .Where(r => r.NeedToContactParent == true && r.FollowUpDate >= DateTime.Today)
+                .OrderBy(r => r.FollowUpDate)
                 .ToListAsync();
         }
 

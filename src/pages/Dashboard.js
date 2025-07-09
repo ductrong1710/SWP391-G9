@@ -26,7 +26,7 @@ const Dashboard = () => {
   
   // Xử lý đăng xuất
   const handleLogout = () => {
-    if (window.confirm('Bạn có chắc chắn muốn đăng ?')) {
+    if (window.confirm('Bạn có chắc chắn muốn ?')) {
       logout();
       navigate('/login');
     }

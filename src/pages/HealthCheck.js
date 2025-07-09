@@ -35,19 +35,33 @@ const HealthCheck = () => {
   }
 
   return (
-    <div className="health-check-container">
-      <h1>Danh sách Lịch khám sức khỏe</h1>
+    <div className="health-check-plan-list">
+      <h1 className="plan-list-title">Danh sách Kế hoạch kiểm tra sức khỏe định kỳ</h1>
       {healthChecks.length > 0 ? (
-        <ul className="health-check-list">
+        <div className="plan-list">
           {healthChecks.map((check) => (
-            <li key={check.id} className="health-check-item">
-              <h2>{check.patientName} - {check.class}</h2>
-              <p><strong>Ngày khám:</strong> {new Date(check.date).toLocaleDateString()}</p>
-              <p><strong>Loại khám:</strong> {check.checkupType}</p>
-              <p><strong>Trạng thái:</strong> {check.status}</p>
-            </li>
+            <div className="plan-card" key={check.id}>
+              <div className="plan-header">
+                <span className="plan-title">{check.planName || check.patientName}</span>
+                <span className="plan-date">
+                  <i className="fa fa-calendar" /> {new Date(check.date).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="plan-content">
+                <b>Nội dung:</b> {check.checkupContent || check.checkupType}
+              </div>
+              <div className="plan-footer">
+                <span><b>Lớp:</b> {check.className || check.class}</span>
+                <span><b>Trạng thái:</b> {check.status}</span>
+              </div>
+              <div className="plan-actions">
+                <button className="btn-view"><i className="fa fa-eye" /> Xem</button>
+                <button className="btn-edit"><i className="fa fa-edit" /> Sửa</button>
+                <button className="btn-notify"><i className="fa fa-bell" /> Gửi thông báo</button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
         <p className="no-data">Không có dữ liệu khám sức khỏe.</p>
       )}

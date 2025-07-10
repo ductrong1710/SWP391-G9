@@ -244,6 +244,91 @@ const MedicalHistory = () => {
 
   const uniqueYears = [...new Set(medicalHistory.map(r => new Date(r.checkupDate).getFullYear()))];
 
+  // Thêm component bảng kết quả tạm thời cho phụ huynh
+  const tempFields = [
+    { label: 'Chiều cao', key: 'height' },
+    { label: 'Cân nặng', key: 'weight' },
+    { label: 'Huyết áp', key: 'bloodPressure' },
+    { label: 'Nhịp tim', key: 'heartRate' },
+    { label: 'Thị lực', key: 'vision' },
+    { label: 'Thính lực', key: 'hearing' },
+    { label: 'Răng miệng', key: 'dental' },
+    { label: 'Cột sống', key: 'musculoskeletal' },
+    { label: 'Kết luận', key: 'notes' },
+    { label: 'Ngày khám', key: 'checkupDate' },
+    { label: 'Người khám', key: 'doctor' },
+    { label: 'Trạng thái', key: 'status' },
+  ];
+  function ParentHealthResultTableTemp({ planName, childName }) {
+    return (
+      <div className="history-card">
+        <div className="history-header">
+          <div className="history-title">
+            <h3>Kiểm tra - {childName || 'Học sinh'}</h3>
+            <span className="type-badge" style={{ backgroundColor: '#d69e2e' }}>Định kỳ</span>
+            <span className="status-badge" style={{ backgroundColor: '#d69e2e' }}>Đang đợi kết quả</span>
+          </div>
+          <div className="history-date">
+            <i className="fas fa-calendar"></i> -
+          </div>
+        </div>
+        <div className="history-content">
+          <div className="basic-info">
+            <h4>Thông tin cơ bản</h4>
+            <div className="info-grid">
+              <div className="info-item">
+                <span className="info-label">Học sinh:</span>
+                <span className="info-value">{childName || 'Học sinh'}</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Kế hoạch:</span>
+                <span className="info-value">{planName || '-'}</span>
+              </div>
+            </div>
+          </div>
+          <table className="table table-bordered" style={{ marginTop: 12, marginBottom: 12 }}>
+            <tbody>
+              {tempFields.map(f => (
+                <tr key={f.key}>
+                  <td><b>{f.label}</b></td>
+                  <td>Đang đợi kết quả</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  // Thêm component TempConsentPlanList:
+  function TempConsentPlanList({ children }) {
+    const [consentPlans, setConsentPlans] = useState([]);
+    useEffect(() => {
+      async function fetchConsentPlans() {
+        let allPlans = [];
+        for (const child of children) {
+          try {
+            const res = await apiClient.get(`/HealthCheckConsentForm/student/${child.id || child.userID || child.UserID}`);
+            // Lọc các kế hoạch đã đồng ý
+            const agreed = (res.data || []).filter(f => f.consentStatus === 'Đồng ý' || f.statusID === 1);
+            allPlans = allPlans.concat(agreed.map(plan => ({ planName: plan.healthCheckPlan?.planName, childName: child.name })));
+          } catch {}
+        }
+        setConsentPlans(allPlans);
+      }
+      fetchConsentPlans();
+    }, [children]);
+    if (consentPlans.length === 0) return <div className="no-results"><i className="fas fa-stethoscope"></i><p>Không tìm thấy lịch sử kiểm tra nào</p></div>;
+    return (
+      <>
+        {consentPlans.map((p, idx) => (
+          <ParentHealthResultTableTemp key={idx} planName={p.planName} childName={p.childName} />
+        ))}
+      </>
+    );
+  }
+
   if (loading) {
     return (
       <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f6ff' }}>
@@ -278,7 +363,7 @@ const MedicalHistory = () => {
                 >
                   <option value="all">Tất cả con em</option>
                   {children.map(child => (
-                    <option key={child.id} value={child.id}>
+                    <option key={child.id || child.userID || child.UserID} value={child.id}>
                       {child.name} - {child.className}
                     </option>
                   ))}
@@ -357,7 +442,7 @@ const MedicalHistory = () => {
               const bmiCategory = getBMICategory(bmi);
               
               return (
-                <div key={record.id} className="history-card">
+                <div key={record.id || record.ID || record._id} className="history-card">
                   <div className="history-header">
                     <div className="history-title">
                       <h3>Kiểm tra - {record.childName || 'Học sinh'}</h3>
@@ -549,12 +634,8 @@ const MedicalHistory = () => {
               );
             })}
 
-            {medicalHistory.length === 0 && (
-              <div className="no-results">
-                {console.log('Không tìm thấy lịch sử kiểm tra nào, medicalHistory:', medicalHistory)}
-                <i className="fas fa-stethoscope"></i>
-                <p>Không tìm thấy lịch sử kiểm tra nào</p>
-              </div>
+            {medicalHistory.length === 0 && getUserRole() === 'Parent' && (
+              <TempConsentPlanList children={children} />
             )}
           </div>
 

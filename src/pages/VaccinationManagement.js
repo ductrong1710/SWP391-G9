@@ -38,6 +38,12 @@ const VaccinationManagement = () => {
   const [notifyMessage, setNotifyMessage] = useState('');
   const gradeOptions = ['Toàn trường', '6', '7', '8', '9'];
 
+  // Thống kê
+  const totalStudents = vaccinationPlans.reduce((sum, plan) => sum + (plan.totalStudents || 0), 0);
+  const completed = vaccinationPlans.reduce((sum, plan) => sum + (plan.completedStudents || 0), 0);
+  const pending = vaccinationPlans.reduce((sum, plan) => sum + (plan.pendingStudents || 0), 0);
+  const totalRounds = vaccinationPlans.length;
+
   useEffect(() => {
     fetchData();
   }, [searchTerm, filterStatus]);
@@ -125,7 +131,7 @@ const VaccinationManagement = () => {
       const user = JSON.parse(localStorage.getItem('user'));
       const CreatorID = user?.userID || user?.UserID || '';
       if (!formData.PlanName || !CreatorID) {
-        alert('Vui lòng nhập đầy đủ tên kế hoạch và đảm bảo bạn đã đăng nhập!');
+        setNotifyMessage('Vui lòng nhập đầy đủ tên kế hoạch và đảm bảo bạn đã đăng nhập!');
         setLoading(false);
         return;
       }
@@ -142,7 +148,7 @@ const VaccinationManagement = () => {
       setShowCreateModal(false);
       fetchData();
     } catch (error) {
-      alert('Có lỗi khi tạo kế hoạch tiêm chủng!');
+      setNotifyMessage('Có lỗi khi tạo kế hoạch tiêm chủng!');
       console.error('Error creating vaccination plan:', error?.response?.data || error);
     } finally {
       setLoading(false);
@@ -250,7 +256,7 @@ const VaccinationManagement = () => {
       setShowEditModal(false);
       fetchData();
     } catch (error) {
-      alert('Có lỗi khi cập nhật kế hoạch!');
+      setNotifyMessage('Có lỗi khi cập nhật kế hoạch!');
       console.error('Error updating plan:', error?.response?.data || error);
     } finally {
       setLoading(false);
@@ -265,16 +271,52 @@ const VaccinationManagement = () => {
     );
   }
 
-  const totalStudents = selectedPlan?.ConsentForms?.length || 0;
-  const confirmedCount = selectedPlan?.ConsentForms?.filter(f => f.ConsentStatus === "Approved").length || 0;
-  const pendingCount = selectedPlan?.ConsentForms?.filter(f => !f.ConsentStatus).length || 0;
-  const completedCount = selectedPlan?.ConsentForms?.filter(f => f.VaccinationResult != null).length || 0;
-
   return (
     <div className="vaccination-management-container">
       <div className="vaccination-header">
         <h1>Quản lý tiêm chủng</h1>
         <p>Lên kế hoạch và quản lý tiêm chủng cho học sinh</p>
+        {notifyMessage && <div className="notification-message">{notifyMessage}</div>}
+      </div>
+
+      {/* Thống kê */}
+      <div className="row mb-4">
+        <div className="col-md-3">
+          <div className="card health-stat-card">
+            <div className="card-body">
+              <h5 className="card-title">Tổng số học sinh</h5>
+              <p className="card-number">{totalStudents}</p>
+              <p className="card-text">Đã đăng ký tiêm</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="card health-stat-card">
+            <div className="card-body">
+              <h5 className="card-title">Đã tiêm</h5>
+              <p className="card-number">{completed}</p>
+              <p className="card-text">Học sinh</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="card health-stat-card">
+            <div className="card-body">
+              <h5 className="card-title">Chờ tiêm</h5>
+              <p className="card-number">{pending}</p>
+              <p className="card-text">Học sinh</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="card health-stat-card">
+            <div className="card-body">
+              <h5 className="card-title">Đợt tiêm</h5>
+              <p className="card-number">{totalRounds.toString().padStart(2, '0')}</p>
+              <p className="card-text">Năm học hiện tại</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -590,8 +632,8 @@ const VaccinationManagement = () => {
                       <i className="fas fa-check-circle"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{confirmedCount}</div>
-                      <div className="stat-label">Đã xác nhận</div>
+                      <div className="stat-number">{completed}</div>
+                      <div className="stat-label">Đã tiêm</div>
                     </div>
                   </div>
                   
@@ -600,7 +642,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-clock"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{pendingCount}</div>
+                      <div className="stat-number">{pending}</div>
                       <div className="stat-label">Chờ phản hồi</div>
                     </div>
                   </div>
@@ -610,7 +652,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-syringe"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{completedCount}</div>
+                      <div className="stat-number">{completed}</div>
                       <div className="stat-label">Đã tiêm</div>
                     </div>
                   </div>
@@ -628,13 +670,13 @@ const VaccinationManagement = () => {
               
               <div className="detail-actions">
                 <button className="action-btn view-students" onClick={() => {
-                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.ConsentStatus === "Approved").map(f => f.Student);
+                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.StatusID === 1 || f.ConsentStatus === "Approved").map(f => f.Student);
                   navigate(`/vaccination-plan/${selectedPlan.id}/students`, { state: { students: confirmedStudents } });
                 }}>
                   <i className="fas fa-users"></i> Xem danh sách học sinh
                 </button>
                 <button className="action-btn record-results" onClick={() => {
-                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.ConsentStatus === "Approved").map(f => f.Student);
+                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.StatusID === 1 || f.ConsentStatus === "Approved").map(f => f.Student);
                   navigate(`/vaccination-plan/${selectedPlan.id}/record`, { state: { students: confirmedStudents } });
                 }}>
                   <i className="fas fa-clipboard-check"></i> Ghi nhận kết quả

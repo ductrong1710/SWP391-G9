@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import './HealthCheckManagement.css';
 import apiClient from '../services/apiClient';
 import { getApprovedStudents, getResultByConsent } from '../services/healthCheckService';
+import HealthCheckResultForm from '../components/HealthCheckResultForm';
 
 const HealthCheckManagement = () => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user: currentUser } = useAuth();
   const navigate = useNavigate();
   
-  const [healthChecks, setHealthChecks] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHealthCheck, setSelectedHealthCheck] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -24,23 +25,24 @@ const HealthCheckManagement = () => {
     notes: '',
     status: 'Đã lên lịch',
     NeedToContactParent: false,
-    followUpDate: ''
+    followUpDate: '',
+    creatorID: ''
   });
   
   // Thêm state cho các bộ lọc
   const [filters, setFilters] = useState({
-    grade: '',
-    className: '',
-    status: ''
+    scheduleDate: '',
+    creatorId: '',
+    className: ''
   });
     // State cho danh sách lớp đã chọn để đặt lịch hàng loạt
   const defaultBatchFormData = {
-    className: '',
-    checkupDate: new Date().toISOString().split('T')[0],
-    checkupType: 'Khám sức khỏe định kỳ', 
-    doctorName: '',
-    healthFacility: 'Phòng Y tế Trường',
-    notes: ''
+    PlanName: '', // Tên kế hoạch
+    ClassID: '', // Mã lớp
+    CheckupDate: new Date().toISOString().split('T')[0], // Ngày khám
+    CheckupContent: 'Khám sức khỏe định kỳ', // Nội dung khám mặc định
+    Status: 'Đã lên lịch', // Trạng thái
+    Notes: '' // Ghi chú
   };
   const [batchFormData, setBatchFormData] = useState(defaultBatchFormData);
   
@@ -55,6 +57,56 @@ const HealthCheckManagement = () => {
   
   // Thêm state cho danh sách lớp có thể chọn
   const [availableClasses, setAvailableClasses] = useState([]);
+  const [availableCreators, setAvailableCreators] = useState([]);
+  
+  // Thêm state cho danh sách consent form của kế hoạch đang xem
+  const [consentForms, setConsentForms] = useState([]);
+  const [showReason, setShowReason] = useState({}); // {studentId: true/false}
+  const [studentNames, setStudentNames] = useState({});
+  
+  // 1. Thêm biến kiểm tra trạng thái
+  const statusOptions = [
+    'Đã lên lịch',
+    'Đang thực hiện',
+    'Đã hoàn thành',
+    'Bị hủy',
+    'Dời lịch'
+  ];
+  const isEdit = !!editingHealthCheckId;
+  const isStatusLocked = ['Đang thực hiện', 'Đã hoàn thành', 'Dời lịch', 'Bị hủy'].includes(formData.status);
+  const isDateLocked = ['Đang thực hiện', 'Đã hoàn thành', 'Bị hủy'].includes(formData.status);
+  const isReschedule = formData.status === 'Dời lịch';
+  
+  // State lưu kết quả khám theo consentID
+  const [healthCheckResults, setHealthCheckResults] = useState({});
+  // State cho modal nhập kết quả
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultForm, setResultForm] = useState({
+    consentId: '',
+    Height: '',
+    Weight: '',
+    BloodPressure: '',
+    HeartRate: '',
+    Eyesight: '',
+    Hearing: '',
+    OralHealth: '',
+    Spine: '',
+    Conclusion: '',
+    CheckUpDate: new Date().toISOString().split('T')[0],
+    Checker: currentUser?.username || '',
+    NeedToContactParent: false,
+    FollowUpDate: '',
+    Status: 'Hoàn thành',
+    HealthFacility: 'Phòng Y tế Trường',
+    CheckupType: ''
+  });
+  
+  // State cho modal danh sách học sinh full màn hình
+  const [showStudentListModal, setShowStudentListModal] = useState(false);
+  
+  // State cho modal chi tiết lý do hoặc kết quả khám
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [detailModalContent, setDetailModalContent] = useState(null);
   
   useEffect(() => {
     // Kiểm tra xác thực
@@ -70,30 +122,30 @@ const HealthCheckManagement = () => {
   }, [isAuthenticated, authLoading, navigate]);
   
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const params = new URLSearchParams();
-        if (filters.grade) params.append('grade', filters.grade);
-        if (filters.className) params.append('className', filters.className);
-        if (filters.status) params.append('status', filters.status);
-        
-        // Gọi API backend lấy health checks với các tham số lọc
-        const response = await apiClient.get(`/HealthCheckResult?${params.toString()}`);
-        setHealthChecks(response.data);
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu khám sức khỏe:", error);
-        // Có thể set state lỗi để hiển thị thông báo cho người dùng
-        setHealthChecks([]); // Đảm bảo không còn mock data khi lỗi
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [filters]); // Chạy lại khi filters thay đổi
+    apiClient.get('/SchoolClass')
+      .then(res => {
+        const classes = res.data.map(cls => ({
+          ClassID: cls.ClassID || cls.classID || cls.id,
+          ClassName: cls.ClassName || cls.className || cls.name
+        }));
+        console.log('Danh sách lớp chuẩn hóa:', classes);
+        setAvailableClasses(classes);
+      })
+      .catch(() => setAvailableClasses([]));
+  }, []);
 
-  const handleViewDetails = (healthCheck) => {
+  useEffect(() => {
+    apiClient.get('/User').then(res => setAvailableCreators(res.data)).catch(() => setAvailableCreators([]));
+  }, []);
+
+  const handleViewDetails = async (healthCheck) => {
     setSelectedHealthCheck(healthCheck);
+    try {
+      const res = await apiClient.get(`/HealthCheckConsentForm/plan/${healthCheck.id}`);
+      setConsentForms(res.data || []);
+    } catch {
+      setConsentForms([]);
+    }
   };
 
   const handleCloseDetails = () => {
@@ -120,7 +172,7 @@ const HealthCheckManagement = () => {
     setEditingHealthCheckId(healthCheck.id);
     setFormData({
       studentId: healthCheck.studentId,
-      checkupDate: healthCheck.date,
+      checkupDate: healthCheck.scheduleDate ? healthCheck.scheduleDate.split('T')[0] : '',
       checkupType: healthCheck.checkupType,
       doctorName: healthCheck.doctorName,
       healthFacility: healthCheck.healthFacility,
@@ -160,40 +212,57 @@ const HealthCheckManagement = () => {
     });
   };
 
-  const handleSendNotification = (studentName, parentId) => {
-    if (!parentId) {
-      console.warn(`Không tìm thấy thông tin phụ huynh của học sinh ${studentName}. Không thể gửi thông báo.`);
-      alert(`Lỗi: Không tìm thấy thông tin phụ huynh của học sinh ${studentName} để gửi thông báo.`);
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    
+    // Kiểm tra các trường bắt buộc
+    if (!formData.studentId || !formData.checkupType || !formData.creatorID) {
+      alert('Vui lòng điền đầy đủ thông tin: Mã học sinh, Loại khám, và Người tạo!');
       return;
     }
     
-    const message = `Kính gửi phụ huynh học sinh ${studentName},\n\nNhà trường cần trao đổi về kết quả kiểm tra sức khỏe gần đây của em. Vui lòng đăng nhập vào hệ thống hoặc liên hệ với phòng y tế để biết thêm chi tiết.\n\nTrân trọng,\nPhòng Y tế`;
-    
-    // Giả lập gửi thông báo
-    console.log(`--- GỬI THÔNG BÁO TỚI TÀI KHOẢN PHỤ HUYNH (ID: ${parentId}) ---`);
-    console.log(message);
-    console.log(`-------------------------------------------------`);
-    
-    alert(`Đã gửi thông báo đến tài khoản phụ huynh (ID: ${parentId}).`);
-  };
-
-  const handleSubmitForm = async (e) => {
-    e.preventDefault();
-    const dataToSend = {
-      studentId: formData.studentId,
-      checkupDate: new Date(formData.checkupDate).toISOString().split('T')[0],
-      doctorName: formData.doctorName,
-      healthFacility: formData.healthFacility,
-      checkupType: formData.checkupType,
-      status: "Đã lên lịch",
-      notes: formData.notes
+    // Tạo dữ liệu cho kế hoạch khám sức khỏe định kỳ
+    let checkupDateToUse = formData.checkupDate;
+    if (formData.status === 'Dời lịch' && formData.newCheckupDate) {
+      checkupDateToUse = formData.newCheckupDate;
+    }
+    const planData = {
+      PlanName: `Khám ${formData.checkupType} - ${formData.studentId}`,
+      ScheduleDate: checkupDateToUse,
+      CheckupContent: 'Khám sức khỏe định kỳ',
+      Status: "Đã lên lịch",
+      ClassID: null, // Không có lớp vì đây là khám cá nhân
+      CreatedDate: new Date().toISOString().split('T')[0],
+      CreatorID: formData.creatorID, // Lấy từ form
+      Notes: formData.notes || ''
     };
+    
     try {
-      await apiClient.post('/HealthCheckResult', dataToSend);
+      // Tạo kế hoạch khám sức khỏe định kỳ
+      const planResponse = await apiClient.post('/PeriodicHealthCheckPlan', planData);
+      console.log('Plan created:', planResponse.data);
+      
+      // Tạo kết quả khám sức khỏe
+      const resultData = {
+        ID: 0, // Thêm trường ID mặc định cho backend
+        studentId: formData.studentId,
+        checkupDate: checkupDateToUse,
+        doctorName: formData.doctorName,
+        healthFacility: formData.healthFacility,
+        checkupType: formData.checkupType,
+        status: "Đã lên lịch",
+        notes: formData.notes
+      };
+      
+      await apiClient.post('/HealthCheckResult', resultData);
+      
       alert('Đã lên lịch khám sức khỏe thành công!');
       setShowForm(false);
       setEditingHealthCheckId(null);
-      setFilters(currentFilters => ({...currentFilters}));
+      
+      // Refresh danh sách kế hoạch
+      const plansRes = await apiClient.get('/PeriodicHealthCheckPlan');
+      setPlans(plansRes.data);
     } catch (error) {
       console.error("Lỗi khi gửi dữ liệu:", error);
       alert('Đã xảy ra lỗi. Vui lòng thử lại.');
@@ -218,13 +287,13 @@ const HealthCheckManagement = () => {
   
   const handleResetFilters = () => {
     setFilters({
-      grade: '',
-      className: '',
-      status: ''
+      scheduleDate: '',
+      creatorId: '',
+      className: ''
     });
     setBatchFormData({
       ...defaultBatchFormData,
-      checkupDate: new Date().toISOString().split('T')[0], // Luôn lấy ngày hiện tại
+      CheckupDate: new Date().toISOString().split('T')[0], // Luôn lấy ngày hiện tại
     });
     
     setSelectedStudents([]);
@@ -237,7 +306,7 @@ const HealthCheckManagement = () => {
       
       // Focus vào dropdown lớp học khi form được hiển thị
       setTimeout(() => {
-        const classNameSelect = document.getElementById('className');
+        const classNameSelect = document.getElementById('ClassID');
         if (classNameSelect) {
           classNameSelect.focus();
         }
@@ -252,7 +321,7 @@ const HealthCheckManagement = () => {
     // Đảm bảo reset form với giá trị mặc định
     setBatchFormData({
       ...defaultBatchFormData,
-      checkupDate: new Date().toISOString().split('T')[0], // Luôn lấy ngày hiện tại
+      CheckupDate: new Date().toISOString().split('T')[0], // Luôn lấy ngày hiện tại
     });
     
     setSelectedStudents([]);
@@ -265,7 +334,7 @@ const HealthCheckManagement = () => {
       
       // Focus vào dropdown lớp học khi form được hiển thị
       setTimeout(() => {
-        const classNameSelect = document.getElementById('className');
+        const classNameSelect = document.getElementById('ClassID');
         if (classNameSelect) {
           classNameSelect.focus();
         }
@@ -289,11 +358,21 @@ const HealthCheckManagement = () => {
       return newData;
     });
     
-    if (id === 'className' && value) {
+    if (id === 'ClassID' && value) {
       try {
         console.log(`Loading students for class ${value}`);
         const response = await apiClient.get(`/SchoolClass/${value}/students`);
-        const students = response.data;
+        let students = response.data;
+        // Đảm bảo mỗi học sinh đều có trường UserID đúng (UserID là trường backend trả về)
+        students = students.map(s => ({
+          ...s,
+          UserID: s.UserID || s.userID || s.id || s.userid || ''
+        }));
+        // Nếu có học sinh nào không có UserID, log cảnh báo
+        const missingId = students.filter(s => !s.UserID);
+        if (missingId.length > 0) {
+          console.warn('Một số học sinh không có UserID:', missingId);
+        }
         console.log(`Found ${students.length} students for class ${value}:`, students);
         setClassStudents(students);
         setSelectedStudents([]);
@@ -306,6 +385,7 @@ const HealthCheckManagement = () => {
   };
   
   const handleStudentSelection = (studentId) => {
+    if (!studentId) return; // Bỏ qua nếu ID không hợp lệ
     setSelectedStudents(prev => {
       if (prev.includes(studentId)) {
         return prev.filter(id => id !== studentId);
@@ -316,74 +396,138 @@ const HealthCheckManagement = () => {
   };
   
   const handleSelectAllStudents = () => {
-    if (selectedStudents.length === classStudents.length) {
+    // Chỉ chọn các UserID hợp lệ, không rỗng
+    const validIds = classStudents.map(student => student.UserID).filter(id => !!id);
+    if (selectedStudents.length === validIds.length) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents(classStudents.map(student => student.UserID));
-    }
-  };
-  
-  // Hàm gửi thông báo cho phụ huynh dựa vào StudentID
-  const notifyParent = async (studentId, checkupDate) => {
-    if (!studentId) {
-      console.warn("studentId bị undefined, bỏ qua gửi thông báo.");
-      return;
-    }
-    try {
-      console.log("Gửi thông báo cho studentId:", studentId);
-      // Lấy Health_Record để lấy ParentID
-      const healthRecordRes = await apiClient.get(`/HealthRecord/student/${studentId}`);
-      const healthRecord = healthRecordRes.data;
-      if (!healthRecord || !healthRecord.parentID) {
-        console.warn(`Không tìm thấy ParentID cho học sinh ${studentId}`);
-        return;
-      }
-      // Gửi notification
-      await apiClient.post('/Notification', {
-        userId: healthRecord.parentID,
-        title: 'Thông báo lịch khám sức khỏe',
-        message: `Học sinh có mã ${studentId} đã được lên lịch khám sức khỏe vào ngày ${checkupDate}. Vui lòng kiểm tra lịch trên hệ thống.`
-      });
-      console.log(`Đã gửi thông báo cho phụ huynh ${healthRecord.parentID}`);
-    } catch (error) {
-      console.error('Lỗi khi gửi thông báo cho phụ huynh:', error);
+      setSelectedStudents(validIds);
     }
   };
   
   const handleSubmitBatchForm = async (e) => {
     e.preventDefault();
-    console.log("Batch form submitted with data:", batchFormData, "Selected students:", selectedStudents);
-    if (selectedStudents.length === 0) {
+    // Lọc bỏ các studentId bị undefined/null/rỗng
+    const validStudentIds = selectedStudents.filter(id => !!id);
+    console.log("Batch form submitted with data:", batchFormData, "Selected students:", validStudentIds);
+    if (validStudentIds.length === 0) {
       alert('Vui lòng chọn ít nhất một học sinh!');
       return;
     }
-    const batchData = {
-      ...batchFormData,
-      studentIds: selectedStudents
-    };
-    try {
-      await apiClient.post('/HealthCheckResult/batch', batchData);
-      // Gửi thông báo song song cho tất cả phụ huynh liên quan (lọc studentId hợp lệ)
-      await Promise.all(
-        selectedStudents
-          .filter(studentId => !!studentId)
-          .map(studentId => notifyParent(studentId, batchFormData.checkupDate))
-      );
-      setFilters(currentFilters => ({...currentFilters}));
-      setShowBatchForm(false);
-      alert(`Đã lên lịch khám sức khỏe cho ${selectedStudents.length} học sinh!`);
-    } catch (error) {
-      console.error("Lỗi khi tạo lịch khám hàng loạt:", error);
-      alert('Đã xảy ra lỗi khi tạo lịch khám hàng loạt. Vui lòng thử lại.');
+    
+    // Kiểm tra các trường bắt buộc
+    if (!batchFormData.PlanName || !batchFormData.ClassID) {
+      alert('Vui lòng điền đầy đủ thông tin: Tên kế hoạch, Lớp!');
+      return;
     }
-  };    // Hàm xử lý xuất file Excel
+    
+    // Kiểm tra xem có User đang đăng nhập không
+    if (!currentUser || !currentUser.userID) {
+      alert('Không tìm thấy thông tin người dùng đang đăng nhập!');
+      return;
+    }
+    
+    console.log('Current user:', currentUser); // Thêm log để debug
+    console.log('Current user ID:', currentUser.userID); // Thêm log để debug
+    
+    const studentsWithParent = await Promise.all(validStudentIds.map(async (studentId) => {
+      try {
+        const res = await apiClient.get(`/HealthRecord/student/${studentId}`);
+        if (res.data && res.data.parentID) {
+          return { studentId, parentId: res.data.parentID };
+        }
+      } catch (err) {
+        console.warn(`Không tìm thấy ParentID cho học sinh ${studentId}`);
+      }
+      return null;
+    }));
+    // Lọc ra các học sinh có ParentID hợp lệ
+    const validStudents = studentsWithParent.filter(s => s && s.parentId);
+    if (validStudents.length === 0) {
+      alert('Không tìm thấy ParentID hợp lệ cho bất kỳ học sinh nào!');
+      return;
+    }
+    // Gửi batch với danh sách học sinh và ParentID hợp lệ
+    const batchData = {
+      PlanName: batchFormData.PlanName,
+      ClassID: batchFormData.ClassID,
+      CheckupDate: batchFormData.CheckupDate,
+      CheckupContent: 'Khám sức khỏe định kỳ',
+      Status: batchFormData.Status,
+      CreatorID: currentUser.userID, // Thêm lại CreatorID từ User đang đăng nhập
+      Notes: batchFormData.Notes,
+      StudentIds: validStudents.map(s => s.studentId)
+    };
+    
+    console.log('=== BATCH DATA DEBUG ===');
+    console.log('Current user:', currentUser);
+    console.log('Current user ID:', currentUser.userID);
+    console.log('Batch form data:', batchFormData);
+    console.log('Valid students:', validStudents);
+    console.log('Sending batch data:', batchData);
+    console.log('CreatorID being sent:', currentUser.userID);
+    console.log('StudentIds being sent:', batchData.StudentIds);
+    console.log('=== END BATCH DATA DEBUG ===');
+    
+    // Test endpoint first - use existing endpoint
+    try {
+      console.log('Testing with existing endpoint...');
+      const testResponse = await apiClient.get('/HealthCheckResult');
+      console.log('Test endpoint response:', testResponse.data);
+    } catch (testError) {
+      console.error('Test endpoint failed:', testError.response?.data);
+    }
+    
+    // Test simple endpoint
+    try {
+      console.log('Testing simple endpoint...');
+      const simpleResponse = await apiClient.post('/HealthCheckResult/batch-simple', batchData);
+      console.log('Simple endpoint response:', simpleResponse.data);
+    } catch (simpleError) {
+      console.error('Simple endpoint failed:', simpleError.response?.data);
+    }
+    
+    try {
+      const response = await apiClient.post('/HealthCheckResult/batch', batchData);
+      console.log('Batch response:', response.data);
+      
+      // Refresh danh sách kế hoạch
+      const plansRes = await apiClient.get('/PeriodicHealthCheckPlan');
+      setPlans(plansRes.data);
+      
+      setShowBatchForm(false);
+      alert(`Đã tạo kế hoạch khám sức khỏe cho ${validStudents.length} học sinh!`);
+    } catch (error) {
+      console.error("=== BATCH ERROR DEBUG ===");
+      console.error("Full error object:", error);
+      console.error("Error response:", error.response);
+      console.error("Error response data:", error.response?.data);
+      console.error("Error response status:", error.response?.status);
+      console.error("Error message:", error.message);
+      console.error("=== END BATCH ERROR DEBUG ===");
+      
+      // Hiển thị thông báo lỗi cụ thể từ backend
+      let errorMessage = 'Đã xảy ra lỗi khi tạo lịch khám hàng loạt. Vui lòng thử lại.';
+      
+      if (error.response && error.response.data) {
+        if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        } else if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        }
+      }
+      
+      alert(errorMessage);
+    }
+  };
+    // Hàm xử lý xuất file Excel
   const handleExportToExcel = () => {
     // Trong thực tế, bạn sẽ sử dụng thư viện như XLSX hoặc ExcelJS để xuất Excel
     console.log("Exporting health checks to Excel...");
     
     // Giả lập xuất Excel
     const today = new Date().toLocaleDateString('vi-VN');
-    alert(`Đã xuất danh sách khám sức khỏe ${healthChecks.length} học sinh thành công! (demo_export_${today}.xlsx)`);
+    alert(`Đã xuất danh sách khám sức khỏe ${plans.length} học sinh thành công! (demo_export_${today}.xlsx)`);
   };
   
   // Hàm xử lý nhập danh sách từ file Excel
@@ -430,17 +574,242 @@ const HealthCheckManagement = () => {
     }
   }, [showBatchForm]);
   
-  // Khi mở modal batch schedule, gọi API lấy danh sách lớp:
+  // Đảm bảo load danh sách lớp khi mở modal xem chi tiết
   useEffect(() => {
-    if (showBatchForm) {
+    if (selectedHealthCheck && availableClasses.length === 0) {
       apiClient.get('/SchoolClass')
-        .then(res => setAvailableClasses(res.data))
+        .then(res => {
+          const classes = res.data.map(cls => ({
+            ClassID: cls.ClassID || cls.classID || cls.id,
+            ClassName: cls.ClassName || cls.className || cls.name
+          }));
+          console.log('Danh sách lớp chuẩn hóa:', classes);
+          setAvailableClasses(classes);
+        })
         .catch(() => setAvailableClasses([]));
     }
-  }, [showBatchForm]);
+  }, [selectedHealthCheck, availableClasses.length]);
   
   console.log('classStudents:', classStudents);
   
+  // Lọc danh sách kế hoạch theo filters
+  const filteredPlans = plans.filter(plan => {
+    const matchDate = !filters.scheduleDate || (plan.scheduleDate && plan.scheduleDate.startsWith(filters.scheduleDate));
+    const matchCreator = !filters.creatorId || (plan.creatorID && plan.creatorID.toLowerCase().includes(filters.creatorId.toLowerCase()));
+    const matchClass = !filters.className || (plan.classID && plan.classID.toLowerCase().includes(filters.className.toLowerCase()));
+    return matchDate && matchCreator && matchClass;
+  });
+  
+  // Thêm log trước khi render danh sách kế hoạch
+  console.log('filteredPlans:', filteredPlans);
+  filteredPlans.forEach((plan, idx) => {
+    console.log(`Plan[${idx}]:`, plan);
+  });
+  
+  // Lọc chỉ lấy user có RoleType là MedicalStaff hoặc Admin cho dropdown người tạo
+  const filteredCreators = availableCreators.filter(user => {
+    const role = user.RoleType || user.roleType || user.Role?.RoleType || user.role?.roleType;
+    return role === 'MedicalStaff' || role === 'Admin';
+  });
+  
+  // Thêm hàm này vào đầu component HealthCheckManagement
+  const getClassName = (plan) => {
+    if (plan.className) return plan.className;
+    if (plan.ClassName) return plan.ClassName;
+    const cls = availableClasses.find(c => String(c.ClassID) === String(plan.classID || plan.ClassID));
+    return cls ? cls.ClassName : '---';
+  };
+  
+  // Thêm hàm này vào đầu component HealthCheckManagement
+  const getCreatorName = (creatorId) => {
+    const user = availableCreators.find(u => u.userID === creatorId);
+    return user ? user.username : creatorId;
+  };
+  
+  // Thêm hàm gửi thông báo cho toàn bộ phụ huynh của kế hoạch
+  const handleSendNotificationsForPlan = async (plan) => {
+    const confirmed = window.confirm('Bạn có chắc chắn muốn gửi thông báo xác nhận đến tất cả phụ huynh của kế hoạch này?');
+    if (!confirmed) return;
+    try {
+      await apiClient.post(`/PeriodicHealthCheckPlan/${plan.id}/send-notifications`);
+      alert('Đã gửi thông báo đến tất cả phụ huynh của lớp!');
+    } catch (error) {
+      alert('Có lỗi khi gửi thông báo!');
+      console.error('Lỗi gửi thông báo:', error);
+    }
+  };
+  
+  useEffect(() => {
+    if (consentForms.length > 0) {
+      const missingIds = consentForms
+        .map(f => f.studentID)
+        .filter(id => id && !studentNames[id]);
+      if (missingIds.length > 0) {
+        Promise.all(missingIds.map(id =>
+          apiClient.get(`/Profile/user/${id}`).then(res => ({ id, name: res.data?.name || id })).catch(() => ({ id, name: id }))
+        )).then(results => {
+          const nameMap = {};
+          results.forEach(({ id, name }) => { nameMap[id] = name; });
+          setStudentNames(prev => ({ ...prev, ...nameMap }));
+        });
+      }
+    }
+  }, [consentForms]);
+  
+  // Fetch danh sách kế hoạch khám sức khỏe khi vào trang
+  useEffect(() => {
+    setLoading(true);
+    apiClient.get('/PeriodicHealthCheckPlan')
+      .then(res => {
+        setPlans(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setPlans([]);
+        setLoading(false);
+        console.error('Lỗi khi tải danh sách kế hoạch:', err);
+      });
+  }, []);
+  
+  // Hàm mở modal nhập kết quả
+  const handleOpenResultModal = async (form) => {
+    let result = healthCheckResults[form.id] || healthCheckResults[form.consentId];
+    if (typeof result === 'undefined') {
+      await fetchResultForConsent(form.id || form.consentId);
+      result = healthCheckResults[form.id || form.consentId];
+    }
+    const consentId = form.id || form.consentId;
+    setResultForm({
+      consentId: consentId,
+      Height: '',
+      Weight: '',
+      BloodPressure: '',
+      HeartRate: '',
+      Eyesight: '',
+      Hearing: '',
+      OralHealth: '',
+      Spine: '',
+      Conclusion: '',
+      CheckUpDate: new Date().toISOString().split('T')[0],
+      Checker: currentUser?.username || '',
+      NeedToContactParent: false,
+      FollowUpDate: '',
+      Status: 'Hoàn thành',
+      HealthFacility: 'Phòng Y tế Trường',
+      CheckupType: form.checkupType || form.CheckupType || ''
+    });
+    setShowStudentListModal(false); // Đóng modal danh sách học sinh
+    setShowResultModal(true);       // Mở modal nhập kết quả
+    console.log('DEBUG resultForm:', {
+      consentId: consentId,
+      CheckupType: form.checkupType || form.CheckupType || '',
+      form
+    });
+  };
+  const handleCloseResultModal = () => setShowResultModal(false);
+  const handleResultInputChange = (e) => {
+    const { id, value, type, checked } = e.target;
+    setResultForm(prev => ({ ...prev, [id]: type === 'checkbox' ? checked : value }));
+  };
+  // Gửi kết quả khám
+  const handleSubmitResult = async (e) => {
+    e.preventDefault();
+    const data = {
+      HealthCheckConsentID: resultForm.consentId,
+      Height: resultForm.Height,
+      Weight: resultForm.Weight,
+      BloodPressure: resultForm.BloodPressure,
+      HeartRate: resultForm.HeartRate,
+      Eyesight: resultForm.Eyesight,
+      Hearing: resultForm.Hearing,
+      OralHealth: resultForm.OralHealth,
+      Spine: resultForm.Spine,
+      Conclusion: resultForm.Conclusion,
+      CheckUpDate: resultForm.CheckUpDate,
+      Checker: resultForm.Checker,
+      NeedToContactParent: resultForm.NeedToContactParent,
+      FollowUpDate: resultForm.FollowUpDate,
+      Status: resultForm.Status,
+      HealthFacility: resultForm.HealthFacility,
+      CheckupType: resultForm.CheckupType
+    };
+    try {
+      await apiClient.post('/HealthCheckResult', data);
+      if (resultForm.Status === 'Cần theo dõi' && resultForm.NeedToContactParent) {
+        // Gửi thông báo cho phụ huynh
+        const consent = consentForms.find(f => f.id === resultForm.consentId);
+        if (consent && consent.parentID) {
+          await apiClient.post('/Notification', {
+            userId: consent.parentID,
+            title: 'Thông báo theo dõi sức khỏe học sinh',
+            message: `Học sinh có mã ${consent.studentID} cần phụ huynh đến trường để trao đổi về kết quả khám sức khỏe.`
+          });
+        }
+      }
+      alert('Đã lưu kết quả khám!');
+      setShowResultModal(false);
+      fetchResultForConsent(resultForm.consentId);
+    } catch (err) {
+      alert('Lỗi khi lưu kết quả khám!');
+    }
+  };
+  // Hàm fetch kết quả khám cho 1 consentID
+  const fetchResultForConsent = async (consentId) => {
+    try {
+      const res = await apiClient.get(`/HealthCheckResult/consent/${consentId}`);
+      setHealthCheckResults(prev => ({ ...prev, [consentId]: res.data }));
+    } catch {
+      setHealthCheckResults(prev => ({ ...prev, [consentId]: null }));
+    }
+  };
+  // Khi mở chi tiết kế hoạch, fetch kết quả khám cho các consent đã đồng ý
+  useEffect(() => {
+    if (selectedHealthCheck && consentForms.length > 0) {
+      const approved = consentForms.filter(f => f.consentStatus === 'Đồng ý');
+      approved.forEach(f => fetchResultForConsent(f.id));
+    }
+    // eslint-disable-next-line
+  }, [selectedHealthCheck, consentForms]);
+  
+  useEffect(() => {
+    if (showStudentListModal && consentForms.length > 0) {
+      const approved = consentForms.filter(f => f.consentStatus === 'Đồng ý');
+      approved.forEach(f => {
+        if (!healthCheckResults[f.id]) {
+          fetchResultForConsent(f.id);
+        }
+      });
+    }
+    // eslint-disable-next-line
+  }, [showStudentListModal, consentForms]);
+  
+  // Thêm log khi render danh sách kế hoạch
+  console.log('DEBUG plans:', plans);
+  console.log('DEBUG availableClasses:', availableClasses);
+  console.log('DEBUG availableCreators:', availableCreators);
+
+  // Thêm hàm mapping trạng thái đồng ý
+  function getConsentStatusText(status, statusId) {
+    if (statusId) {
+      switch (statusId) {
+        case 1:
+          return 'Đồng ý';
+        case 2:
+          return 'Từ chối';
+        case 3:
+          return 'Chờ phản hồi';
+        default:
+          return 'Chưa phản hồi';
+      }
+    }
+    
+    if (!status) return 'Chờ phản hồi';
+    if (status === 'Approved' || status === 'Đồng ý') return 'Đồng ý';
+    if (status === 'Denied' || status === 'Từ chối') return 'Từ chối';
+    if (status === 'Đang chờ ý kiến' || status === 'Pending') return 'Đang chờ ý kiến';
+    return status;
+  }
+
   return (
     <div className="health-check-management-container">
       <div className="container py-4">        <div className="d-flex justify-content-between align-items-center mb-4">
@@ -460,7 +829,7 @@ const HealthCheckManagement = () => {
             <div className="card health-stat-card">
               <div className="card-body">
                 <h5 className="card-title">Tổng số học sinh</h5>
-                <p className="card-number">{healthChecks.length}</p>
+                <p className="card-number">{plans.length}</p>
                 <p className="card-text">Đã đăng ký khám</p>
               </div>
             </div>
@@ -469,7 +838,7 @@ const HealthCheckManagement = () => {
             <div className="card health-stat-card">
               <div className="card-body">
                 <h5 className="card-title">Đã khám</h5>
-                <p className="card-number">{healthChecks.filter(check => check.status === 'Hoàn thành').length}</p>
+                <p className="card-number">{plans.filter(check => check.status === 'Hoàn thành').length}</p>
                 <p className="card-text">Học sinh</p>
               </div>
             </div>
@@ -478,7 +847,7 @@ const HealthCheckManagement = () => {
             <div className="card health-stat-card">
               <div className="card-body">
                 <h5 className="card-title">Chờ khám</h5>
-                <p className="card-number">{healthChecks.filter(check => check.status === 'Đã lên lịch').length}</p>
+                <p className="card-number">{plans.filter(check => check.status === 'Đã lên lịch').length}</p>
                 <p className="card-text">Học sinh</p>
               </div>
             </div>
@@ -487,7 +856,7 @@ const HealthCheckManagement = () => {
             <div className="card health-stat-card">
               <div className="card-body">
                 <h5 className="card-title">Đợt khám</h5>
-                <p className="card-number">02</p>
+                <p className="card-number">{plans.length.toString().padStart(2, '0')}</p>
                 <p className="card-text">Học kỳ 2, 2024-2025</p>
               </div>
             </div>
@@ -496,62 +865,51 @@ const HealthCheckManagement = () => {
 
         <div className="card mb-4">
           <div className="card-body">
-            <h5 className="card-title mb-3">Lọc danh sách học sinh</h5>
+            <h5 className="card-title mb-3">Lọc danh sách kế hoạch</h5>
             <div className="row">
-              <div className="col-md-3 mb-2">
-                <select 
-                  id="grade" 
+              <div className="col-md-4 mb-2">
+                <input
+                  type="date"
+                  id="scheduleDate"
+                  className="form-control"
+                  value={filters.scheduleDate}
+                  onChange={e => setFilters(prev => ({ ...prev, scheduleDate: e.target.value }))}
+                  placeholder="Chọn ngày khám"
+                />
+              </div>
+              <div className="col-md-4 mb-2">
+                <select
+                  id="creatorId"
                   className="form-select"
-                  value={filters.grade ?? ""}
-                  onChange={handleFilterChange}
+                  value={filters.creatorId}
+                  onChange={e => setFilters(prev => ({ ...prev, creatorId: e.target.value }))}
                 >
-                  <option key="empty" value="">Chọn khối</option>
-                  <option key="10" value="10">Khối 10</option>
-                  <option key="11" value="11">Khối 11</option>
-                  <option key="12" value="12">Khối 12</option>
+                  <option value="">Chọn người tạo</option>
+                  {filteredCreators.map(user => (
+                    <option key={user.UserID || user.userID} value={user.UserID || user.userID}>
+                      {user.FullName || user.fullName || user.Username || user.username || user.UserID || user.userID}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <div className="col-md-3 mb-2">
-                <select 
-                  id="className" 
+              <div className="col-md-4 mb-2">
+                <select
+                  id="className"
                   className="form-select"
-                  value={filters.className ?? ""}
-                  onChange={handleFilterChange}
+                  value={filters.className}
+                  onChange={e => setFilters(prev => ({ ...prev, className: e.target.value }))}
                 >
-                  <option key="empty" value="">Chọn lớp</option>
-                  <option key="10A1" value="10A1">10A1</option>
-                  <option key="10A2" value="10A2">10A2</option>
-                  <option key="10A3" value="10A3">10A3</option>
-                  <option key="11A1" value="11A1">11A1</option>
-                  <option key="11A2" value="11A2">11A2</option>
-                  <option key="12A1" value="12A1">12A1</option>
-                  <option key="12A2" value="12A2">12A2</option>
+                  <option value="">Chọn lớp</option>
+                  {availableClasses.map(cls => (
+                    <option key={cls.ClassID || cls.classID} value={cls.ClassName || cls.className}>
+                      {cls.ClassName || cls.className}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <div className="col-md-3 mb-2">
-                <select 
-                  id="status" 
-                  className="form-select"
-                  value={filters.status ?? ""}
-                  onChange={handleFilterChange}
-                >
-                  <option key="empty" value="">Trạng thái</option>
-                  <option key="Hoàn thành" value="Hoàn thành">Đã khám</option>
-                  <option key="Đã lên lịch" value="Đã lên lịch">Chờ khám</option>
-                  <option key="Đang chờ kết quả" value="Đang chờ kết quả">Chờ kết quả</option>
-                  <option key="Đang theo dõi" value="Đang theo dõi">Đang theo dõi</option>
-                  <option key="Đã hủy" value="Đã hủy">Đã hủy</option>
-                </select>
-              </div>
-              <div className="col-md-3 mb-2">
-                <div className="d-flex">
-                  <button className="btn btn-primary flex-grow-1 me-2" onClick={handleApplyFilters}>
-                    <i className="fas fa-search me-2"></i>Lọc
-                  </button>
-                  <button className="btn btn-secondary" onClick={handleResetFilters}>
-                    <i className="fas fa-redo"></i>
-                  </button>
-                </div>
+              <div className="col-md-4 mb-2 d-flex align-items-end">
+                <button className="btn btn-primary me-2" onClick={handleApplyFilters}>Lọc</button>
+                <button className="btn btn-secondary" onClick={handleResetFilters}>Đặt lại</button>
               </div>
             </div>
           </div>
@@ -573,149 +931,129 @@ const HealthCheckManagement = () => {
             </div>
             <p className="mt-3">Đang tải dữ liệu khám sức khỏe...</p>
           </div>
-        ) : (          <div className="card">
-            <div className="card-body">
-              <div className="table-responsive">
-                <table className="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Mã học sinh</th>
-                      <th>Họ tên</th>
-                      <th>Lớp</th>
-                      <th>Ngày khám</th>
-                      <th>Loại khám</th>
-                      <th>Bác sĩ</th>
-                      <th>Trạng thái</th>
-                      <th>Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {healthChecks.length > 0 ? (
-                      healthChecks.map((healthCheck, idx) => (
-                        <tr key={healthCheck.id || `healthcheck-row-${idx}`}>
-                          <td>{healthCheck.id}</td>
-                          <td>{healthCheck.studentId}</td>
-                          <td>{healthCheck.patientName}</td>
-                          <td>{healthCheck.class}</td>
-                          <td>{healthCheck.date}</td>
-                          <td>{healthCheck.checkupType}</td>
-                          <td>{healthCheck.doctorName}</td>
-                          <td>
-                            <span className={`badge ${
-                              healthCheck.status === 'Hoàn thành' 
-                                ? 'bg-success' 
-                                : healthCheck.status === 'Đang chờ kết quả' 
-                                  ? 'bg-warning' 
-                                  : healthCheck.status === 'Đã hủy'
-                                    ? 'bg-danger'
-                                    : healthCheck.status === 'Đang theo dõi'
-                                      ? 'bg-info'
-                                      : 'bg-primary'
-                            }`}>
-                              {healthCheck.status}
-                            </span>
-                          </td>
-                          <td>
-                            <button 
-                              className="btn btn-sm btn-info me-2"
-                              onClick={() => handleViewDetails(healthCheck)}
-                            >
-                              <i className="fas fa-eye me-1"></i>Xem
-                            </button>
-                            {healthCheck.status !== 'Hoàn thành' && healthCheck.status !== 'Đã hủy' && (
-                              <button 
-                                className="btn btn-sm btn-secondary"
-                                onClick={() => handleEditHealthCheck(healthCheck)}
-                              >
-                                <i className="fas fa-edit me-1"></i>Sửa
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="9" className="text-center py-3">
-                          <p className="mb-0 text-muted">Không có dữ liệu khám sức khỏe nào phù hợp với điều kiện lọc</p>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+        ) : (          <div className="plans-list">
+            {filteredPlans.length > 0 ? (
+              filteredPlans.map((plan) => {
+                const className = getClassName(plan);
+                const creatorName = getCreatorName(plan.creatorID);
+                console.log('DEBUG plan:', plan, 'className:', className, 'creatorName:', creatorName);
+                return (
+                  <div key={plan.id} className="plan-card">
+                    <div className="plan-header">
+                      <div className="plan-title">
+                        <h3>{plan.planName}</h3>
+                        <span className="plan-date">
+                          <i className="fas fa-calendar"></i>
+                          {plan.scheduleDate ? new Date(plan.scheduleDate).toLocaleDateString('vi-VN') : ''}
+                        </span>
+                      </div>
+                      <div className="plan-meta">
+                        <span className="plan-class"><b>Lớp:</b> {className}</span>
+                        <span className="plan-creator"><b>Người tạo:</b> {creatorName}</span>
+                      </div>
+                    </div>
+                    <div className="plan-content">
+                      <div className="plan-description">
+                        <b>Nội dung:</b> {'Khám sức khỏe định kỳ'}
+                      </div>
+                      <div className="plan-actions mt-2">
+                        <button className="btn btn-info btn-sm me-2" onClick={() => handleViewDetails(plan)}>
+                          <i className="fas fa-eye"></i> Xem
+                        </button>
+                        <button className="btn btn-secondary btn-sm me-2" onClick={() => handleEditHealthCheck(plan)}>
+                          <i className="fas fa-edit"></i> Sửa
+                        </button>
+                        {plan.status === 'Đã lên lịch' && (
+                          <button className="btn btn-warning btn-sm" onClick={() => handleSendNotificationsForPlan(plan)}>
+                            <i className="fas fa-bell"></i> Gửi thông báo
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="no-results text-center my-5">
+                <i className="fas fa-notes-medical fa-3x mb-3" style={{color:'#bdbdbd'}}></i>
+                <p>Không tìm thấy kế hoạch khám sức khỏe nào</p>
               </div>
-            </div>
+            )}
           </div>
         )}        {/* Chi tiết lịch khám sức khỏe */}
         {selectedHealthCheck && (
-          <div className="modal show d-block" tabIndex="-1">
-            <div className="modal-dialog">
+          <div className="modal show d-block" tabIndex="-1" onClick={handleCloseDetails}>
+            <div className="modal-dialog" onClick={e => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Chi tiết khám sức khỏe học đường</h5>
+                  <h3>
+                    <i className="fas fa-notes-medical"></i> Chi tiết kế hoạch khám sức khỏe
+                  </h3>
                   <button type="button" className="btn-close" onClick={handleCloseDetails}></button>
                 </div>
                 <div className="modal-body">
-                  <div className="mb-3">
-                    <strong>Mã học sinh:</strong> {selectedHealthCheck.studentId}
+                  <div className="status-badge mb-2" style={{fontWeight:'bold'}}>
+                    {selectedHealthCheck.status}
                   </div>
                   <div className="mb-3">
-                    <strong>Họ tên:</strong> {selectedHealthCheck.patientName}
+                    <h2>{selectedHealthCheck.planName}</h2>
+                    <p className="scheduled-date">
+                      <i className="far fa-calendar-alt"></i>
+                      {selectedHealthCheck.scheduleDate ? new Date(selectedHealthCheck.scheduleDate).toLocaleDateString('vi-VN', {
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                      }) : ''}
+                    </p>
                   </div>
-                  <div className="mb-3">
-                    <strong>Lớp:</strong> {selectedHealthCheck.class}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Ngày khám:</strong> {selectedHealthCheck.date}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Loại khám:</strong> {selectedHealthCheck.checkupType}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Bác sĩ:</strong> {selectedHealthCheck.doctorName}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Cơ sở y tế:</strong> {selectedHealthCheck.healthFacility || 'Phòng Y tế Trường'}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Trạng thái:</strong> <span className={`badge ${
-                      selectedHealthCheck.status === 'Hoàn thành' 
-                        ? 'bg-success' 
-                        : selectedHealthCheck.status === 'Đang chờ kết quả' 
-                          ? 'bg-warning' 
-                          : selectedHealthCheck.status === 'Đã hủy'
-                            ? 'bg-danger'
-                            : selectedHealthCheck.status === 'Đang theo dõi'
-                              ? 'bg-info'
-                              : 'bg-primary'
-                    }`}>{selectedHealthCheck.status}</span>
-                  </div>
-                  <div className="mb-3">
-                    <strong>Kết quả:</strong> {selectedHealthCheck.results}
-                  </div>
-                  {selectedHealthCheck.followUpDate && (
-                    <div className="mb-3">
-                      <strong>Ngày tái khám:</strong> {selectedHealthCheck.followUpDate}
+                  <div className="detail-section mb-3">
+                    <h4><i className="fas fa-info-circle"></i> Thông tin cơ bản</h4>
+                    <div className="detail-grid">
+                      <div className="detail-item"><label>Tên kế hoạch:</label> <span className="highlight-value">{selectedHealthCheck.planName}</span></div>
+                      <div className="detail-item"><label>Người tạo:</label> <span>{getCreatorName(selectedHealthCheck.creatorID)}</span></div>
+                      <div className="detail-item"><label>Ngày tạo:</label> <span>{selectedHealthCheck.createdDate ? new Date(selectedHealthCheck.createdDate).toLocaleDateString('vi-VN') : ''}</span></div>
                     </div>
-                  )}
-                  {selectedHealthCheck.NeedToContactParent && (
-                    <div className="alert alert-warning mt-3">
-                      <i className="fas fa-exclamation-triangle me-2"></i>
-                      Cần liên hệ với phụ huynh.
+                  </div>
+                  <div className="detail-section mb-3">
+                    <h4><i className="fas fa-align-left"></i> Nội dung</h4>
+                    <div className="description-box">
+                      <p>Khám sức khỏe định kỳ</p>
                     </div>
-                  )}
+                  </div>
+                  <div className="detail-section mb-3">
+                    <h4><i className="fas fa-users"></i> Lớp</h4>
+                    <div className="detail-grid">
+                      <div className="detail-item"><span className="highlight-value">{getClassName(selectedHealthCheck)}</span></div>
+                    </div>
+                  </div>
+                  <div className="detail-section mb-3">
+                    <h4><i className="fas fa-chart-pie"></i> Thống kê đăng ký</h4>
+                    <div className="stats-grid">
+                      {/* Thống kê số học sinh đã đồng ý, chờ phản hồi, tổng số học sinh nếu có */}
+                      {/* Có thể fetch thêm nếu cần */}
+                      <div className="stat-item">
+                        <span className="stat-label">Tổng số học sinh:</span>
+                        <span className="stat-value">-</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Đã đồng ý:</span>
+                        <span className="stat-value">-</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Chờ phản hồi:</span>
+                        <span className="stat-value">-</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="detail-section mb-3">
+                    <h4><i className="fas fa-list"></i> Danh sách học sinh</h4>
+                    <div className="mb-3 d-flex justify-content-end">
+                      <button className="btn btn-outline-primary btn-sm" onClick={() => setShowStudentListModal(true)}>
+                        <i className="fas fa-list"></i> Xem danh sách học sinh
+                      </button>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                    </div>
+                  </div>
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={handleCloseDetails}>Đóng</button>
-                  {selectedHealthCheck.status !== 'Hoàn thành' && selectedHealthCheck.status !== 'Đã hủy' && (
-                    <button 
-                      type="button" 
-                      className="btn btn-primary" 
-                      onClick={() => handleUpdateResult(selectedHealthCheck)}
-                    >
-                      Cập nhật kết quả
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
@@ -729,139 +1067,90 @@ const HealthCheckManagement = () => {
                   <button type="button" className="btn-close" onClick={handleCancelForm}></button>
                 </div>
                 <div className="modal-body">
+                  {/* Hiển thị thông tin người tạo */}
+                  <div className="alert alert-info mb-3">
+                    <i className="fas fa-user me-2"></i>
+                    <strong>Người tạo:</strong> {currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định'}
+                  </div>
+                  
                   <form onSubmit={handleSubmitForm} className="individual-form">
                     <div className="row">
-                      <div className="col-md-4 mb-3">
-                        <label htmlFor="studentId" className="form-label">Mã học sinh</label>
-                        <input 
-                          type="text" 
-                          className="form-control" 
-                          id="studentId" 
-                          value={formData.studentId ?? ""}
-                          onChange={handleInputChange}
-                          required 
-                        />
+                      {!isEdit && (
+                        <div className="col-md-6 mb-3">
+                          <label htmlFor="studentId" className="form-label">Mã học sinh</label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            id="studentId" 
+                            value={formData.studentId ?? ""}
+                            onChange={handleInputChange}
+                            required 
+                          />
+                        </div>
+                      )}
+                      <div className={isEdit ? "col-md-12 mb-3" : "col-md-6 mb-3"}>
+                        <label htmlFor="checkupDate" className="form-label">
+                          {isReschedule ? 'Ngày dự khám mới' : (['Đang thực hiện', 'Đã hoàn thành'].includes(formData.status) ? 'Ngày khám' : 'Ngày dự khám')}
+                        </label>
                       </div>
                     </div>
                     
                     <div className="row">
+                      {!isEdit && (
+                        <div className="col-md-6 mb-3">
+                          <label htmlFor="checkupType" className="form-label">Loại khám</label>
+                          <select 
+                            className="form-select" 
+                            id="checkupType" 
+                            value={formData.checkupType ?? ""}
+                            onChange={handleInputChange}
+                            required
+                          >
+                            <option key="empty" value="">Chọn loại khám</option>
+                            <option key="Khám sức khỏe định kỳ" value="Khám sức khỏe định kỳ">Khám sức khỏe định kỳ</option>
+                            <option key="Khám mắt" value="Khám mắt">Khám mắt</option>
+                            <option key="Khám răng" value="Khám răng">Khám răng</option>
+                            <option key="Khám tai mũi họng" value="Khám tai mũi họng">Khám tai mũi họng</option>
+                            <option key="Sàng lọc cong vẹo cột sống" value="Sàng lọc cong vẹo cột sống">Sàng lọc cong vẹo cột sống</option>
+                            <option key="Đo chiều cao cân nặng" value="Đo chiều cao cân nặng">Đo chiều cao cân nặng</option>
+                            <option key="Xét nghiệm máu" value="Xét nghiệm máu">Xét nghiệm máu</option>
+                          </select>
+                        </div>
+                      )}
                       <div className="col-md-6 mb-3">
-                        <label htmlFor="checkupDate" className="form-label">Ngày khám</label>
-                        <input 
-                          type="date" 
+                        <label htmlFor="notes" className="form-label">Ghi chú (không bắt buộc)</label>
+                        <textarea 
                           className="form-control" 
-                          id="checkupDate" 
-                          value={formData.checkupDate ?? ""}
+                          id="notes" 
+                          rows="2"
+                          value={formData.notes ?? ""}
                           onChange={handleInputChange}
-                          min={!editingHealthCheckId ? new Date().toISOString().split('T')[0] : undefined}
-                          required={formData.status !== 'Đã hủy'}
-                          disabled={formData.status === 'Đã hủy'}
-                        />
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <label htmlFor="checkupType" className="form-label">Loại khám</label>
-                        <select 
-                          className="form-select" 
-                          id="checkupType" 
-                          value={formData.checkupType ?? ""}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option key="empty" value="">Chọn loại khám</option>
-                          <option key="Khám sức khỏe định kỳ" value="Khám sức khỏe định kỳ">Khám sức khỏe định kỳ</option>
-                          <option key="Khám mắt" value="Khám mắt">Khám mắt</option>
-                          <option key="Khám răng" value="Khám răng">Khám răng</option>
-                          <option key="Khám tai mũi họng" value="Khám tai mũi họng">Khám tai mũi họng</option>
-                          <option key="Sàng lọc cong vẹo cột sống" value="Sàng lọc cong vẹo cột sống">Sàng lọc cong vẹo cột sống</option>
-                          <option key="Đo chiều cao cân nặng" value="Đo chiều cao cân nặng">Đo chiều cao cân nặng</option>
-                          <option key="Xét nghiệm máu" value="Xét nghiệm máu">Xét nghiệm máu</option>
-                        </select>
+                          placeholder="Nhập ghi chú nếu cần"
+                        ></textarea>
                       </div>
                     </div>
                     
-                    {editingHealthCheckId && (
+                    {/* Dropdown trạng thái chỉ cho phép sửa khi edit */}
+                    {isEdit && (
                       <div className="row">
                         <div className="col-md-6 mb-3">
-                          <label htmlFor="doctorName" className="form-label">Bác sĩ khám</label>
-                          <select 
-                            className="form-select" 
-                            id="doctorName" 
-                            value={formData.doctorName ?? ""}
+                          <label htmlFor="status" className="form-label">Trạng thái</label>
+                          <select
+                            className="form-select"
+                            id="status"
+                            value={formData.status}
                             onChange={handleInputChange}
-                            required
                           >
-                            <option key="empty" value="">Chọn bác sĩ</option>
-                            <option key="BS. Trần Thị Hương" value="BS. Trần Thị Hương">BS. Trần Thị Hương</option>
-                            <option key="BS. Phạm Văn Minh" value="BS. Phạm Văn Minh">BS. Phạm Văn Minh</option>
-                            <option key="BS. Nguyễn Thị Lan" value="BS. Nguyễn Thị Lan">BS. Nguyễn Thị Lan</option>
-                            <option key="BS. Lê Thành Nam" value="BS. Lê Thành Nam">BS. Lê Thành Nam</option>
-                          </select>
-                        </div>
-                        <div className="col-md-6 mb-3">
-                          <label htmlFor="healthFacility" className="form-label">Cơ sở y tế</label>
-                          <select 
-                            className="form-select" 
-                            id="healthFacility" 
-                            value={formData.healthFacility ?? ""}
-                            onChange={handleInputChange}
-                            required
-                          >
-                            <option key="empty" value="">Chọn cơ sở y tế</option>
-                            <option key="Phòng Y tế Trường" value="Phòng Y tế Trường">Phòng Y tế Trường</option>
-                            <option key="Trạm Y tế Phường" value="Trạm Y tế Phường">Trạm Y tế Phường</option>
-                            <option key="Bệnh viện Đa khoa Quận" value="Bệnh viện Đa khoa Quận">Bệnh viện Đa khoa Quận</option>
-                            <option key="Bệnh viện Đa khoa Tỉnh" value="Bệnh viện Đa khoa Tỉnh">Bệnh viện Đa khoa Tỉnh</option>
+                            {statusOptions.map(opt => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
                           </select>
                         </div>
                       </div>
                     )}
-                    
-                    <div className="row align-items-center">
-                      <div className="col-md-6">
-                        {formData.status === 'Đang theo dõi' && (
-                          <div className="mb-3">
-                            <label htmlFor="followUpDate" className="form-label">Ngày tái khám</label>
-                            <input 
-                              type="date" 
-                              className="form-control" 
-                              id="followUpDate" 
-                              value={formData.followUpDate ?? ""}
-                              onChange={handleInputChange}
-                              min={new Date().toISOString().split('T')[0]}
-                              required
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-md-6">
-                        {editingHealthCheckId && formData.checkupType === 'Khám sức khỏe định kỳ' && (
-                          <div className="form-check mb-3">
-                            <input 
-                              className="form-check-input" 
-                              type="checkbox" 
-                              id="NeedToContactParent"
-                              checked={formData.NeedToContactParent}
-                              onChange={handleInputChange}
-                            />
-                            <label className="form-check-label" htmlFor="NeedToContactParent">
-                              Cần liên hệ phụ huynh
-                            </label>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="mb-3">
-                      <label htmlFor="notes" className="form-label">{editingHealthCheckId ? 'Kết quả' : 'Ghi chú (không bắt buộc)'}</label>
-                      <textarea 
-                        className="form-control" 
-                        id="notes" 
-                        rows="3"
-                        value={formData.notes ?? ""}
-                        onChange={handleInputChange}
-                      ></textarea>
-                    </div>
-                    
+                    {isReschedule && (
+                      <div className="alert alert-warning mt-2">Bạn đang dời lịch, vui lòng chọn ngày khám mới.</div>
+                    )}
                     <div className="alert alert-info">
                       <i className="fas fa-info-circle me-2"></i>
                       Vui lòng kiểm tra thông tin trước khi xác nhận lịch khám sức khỏe. Học sinh cần được thông báo về lịch khám trước ít nhất 3 ngày.
@@ -889,20 +1178,40 @@ const HealthCheckManagement = () => {
                 </div>
                 <div className="modal-body">
                   {/* Hiển thị thông báo lỗi nếu không có học sinh */}
-                  {classStudents.length === 0 && batchFormData.className && (
+                  {classStudents.length === 0 && batchFormData.ClassID && (
                     <div className="alert alert-danger">
                       Không thể tải danh sách học sinh hoặc không có học sinh trong lớp này.
                     </div>
                   )}
+                  
+                  {/* Hiển thị thông tin người tạo */}
+                  <div className="alert alert-info mb-3">
+                    <i className="fas fa-user me-2"></i>
+                    <strong>Người tạo:</strong> {currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định'}
+                  </div>
+                  
                   <form onSubmit={handleSubmitBatchForm} className="batch-form">
-                    <div className="row mb-3">                      <div className="col-md-6">
-                        <label htmlFor="className" className="form-label">Chọn lớp</label>
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <label htmlFor="PlanName" className="form-label">Tên kế hoạch *</label>
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          id="PlanName" 
+                          value={batchFormData.PlanName}
+                          onChange={handleBatchInputChange}
+                          placeholder="Nhập tên kế hoạch khám sức khỏe"
+                          required 
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="ClassID" className="form-label">Chọn lớp *</label>
                         <div className="custom-select-wrapper">
                           <select
                             className="form-select"
-                            id="className"
-                            value={batchFormData.className}
-                            onChange={e => handleBatchInputChange({ target: { id: 'className', value: e.target.value } })}
+                            id="ClassID"
+                            value={batchFormData.ClassID}
+                            onChange={handleBatchInputChange}
                             required
                           >
                             <option key="empty" value="">Chọn lớp</option>
@@ -913,46 +1222,36 @@ const HealthCheckManagement = () => {
                             ))}
                           </select>
                         </div>
-                      </div>                      <div className="col-md-6">
-                        <label htmlFor="checkupDate" className="form-label">Ngày khám</label>
+                      </div>
+                    </div>
+                    
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <label htmlFor="CheckupDate" className="form-label">Ngày khám</label>
                         <input 
                           type="date" 
                           className="form-control" 
-                          id="checkupDate" 
-                          defaultValue={new Date().toISOString().split('T')[0]}
-                          onChange={(e) => {
-                            console.log('Date selected:', e.target.value);
-                            handleBatchInputChange({
-                              target: {
-                                id: 'checkupDate',
-                                value: e.target.value
-                              }
-                            });
-                          }}
+                          id="CheckupDate" 
+                          value={batchFormData.CheckupDate}
+                          onChange={handleBatchInputChange}
                           min={new Date().toISOString().split('T')[0]}
                           required 
                         />
                       </div>
                     </div>
-                      <div className="row mb-3">                      <div className="col-md-6">
-                        <label htmlFor="checkupType" className="form-label">Loại khám</label>
+                    
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <label htmlFor="CheckupContent" className="form-label">Nội dung khám</label>
                         <div className="custom-select-wrapper">
                           <select 
                             className="form-select" 
-                            id="checkupType" 
-                            defaultValue="Khám sức khỏe định kỳ"
-                            onChange={(e) => {
-                              console.log('Checkup type selected:', e.target.value);
-                              handleBatchInputChange({
-                                target: {
-                                  id: 'checkupType',
-                                  value: e.target.value
-                                }
-                              });
-                            }}
+                            id="CheckupContent" 
+                            value={batchFormData.CheckupContent}
+                            onChange={handleBatchInputChange}
                             required
                           >
-                            <option key="empty" value="">Chọn loại khám</option>
+                            <option key="empty" value="">Chọn nội dung khám</option>
                             <option key="Khám sức khỏe định kỳ" value="Khám sức khỏe định kỳ">Khám sức khỏe định kỳ</option>
                             <option key="Khám mắt" value="Khám mắt">Khám mắt</option>
                             <option key="Khám răng" value="Khám răng">Khám răng</option>
@@ -962,21 +1261,16 @@ const HealthCheckManagement = () => {
                             <option key="Xét nghiệm máu" value="Xét nghiệm máu">Xét nghiệm máu</option>
                           </select>
                         </div>
-                      </div>                      <div className="col-md-6">
-                        <label htmlFor="notes" className="form-label">Ghi chú (không bắt buộc)</label>
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="Notes" className="form-label">Ghi chú (không bắt buộc)</label>
                         <input 
                           type="text" 
                           className="form-control" 
-                          id="notes" 
-                          onChange={(e) => {
-                            console.log('Notes updated:', e.target.value);
-                            handleBatchInputChange({
-                              target: {
-                                id: 'notes',
-                                value: e.target.value
-                              }
-                            });
-                          }}
+                          id="Notes" 
+                          value={batchFormData.Notes}
+                          onChange={handleBatchInputChange}
+                          placeholder="Nhập ghi chú nếu cần"
                         />
                       </div>
                     </div>
@@ -994,7 +1288,7 @@ const HealthCheckManagement = () => {
                         )}
                       </div>
                       
-                      {batchFormData.className ? (
+                      {batchFormData.ClassID ? (
                         <div id="studentListContainer" className="student-list-container">
                           {classStudents.length > 0 ? (
                             <div className="table-responsive">
@@ -1015,9 +1309,10 @@ const HealthCheckManagement = () => {
                                             className="form-check-input" 
                                             type="checkbox" 
                                             id={`student-${student.UserID || idx}`}
-                                            checked={selectedStudents.includes(student.UserID)}
-                                            onChange={() => handleStudentSelection(student.UserID)}
-                                            style={{cursor: 'pointer'}}
+                                            checked={!!student.UserID && selectedStudents.includes(student.UserID)}
+                                            onChange={() => student.UserID && handleStudentSelection(student.UserID)}
+                                            style={{cursor: student.UserID ? 'pointer' : 'not-allowed'}}
+                                            disabled={!student.UserID}
                                           />
                                           <label 
                                             htmlFor={`student-${student.UserID || idx}`} 
@@ -1025,7 +1320,7 @@ const HealthCheckManagement = () => {
                                           ></label>
                                         </div>
                                       </td>
-                                      <td>{student.UserID}</td>
+                                      <td>{student.UserID || <span style={{color: 'red'}}>Không có mã</span>}</td>
                                       <td>{student.Name || student.name}</td>
                                     </tr>
                                   ))}
@@ -1071,7 +1366,7 @@ const HealthCheckManagement = () => {
           </div>
         )}
         
-        {healthChecks.length === 0 && !loading && (
+        {plans.length === 0 && !loading && (
           <div className="alert alert-info">
             <i className="fas fa-info-circle me-2"></i>
             Không tìm thấy kết quả nào phù hợp với điều kiện lọc. Vui lòng thử lại với điều kiện khác hoặc 
@@ -1083,6 +1378,143 @@ const HealthCheckManagement = () => {
               xóa bộ lọc
             </button>.
           </div>
+        )}
+        {showStudentListModal && (
+          <div className="modal show d-block" tabIndex="-1" style={{background: 'rgba(0,0,0,0.7)'}}>
+            <div className="modal-dialog modal-fullscreen">
+              <div className="modal-content">
+                <div className="modal-header" style={{justifyContent: 'center'}}>
+                  <h3 className="w-100 text-center"><i className="fas fa-users"></i> Danh sách học sinh</h3>
+                  <button type="button" className="btn-close position-absolute end-0 me-3" onClick={() => setShowStudentListModal(false)}></button>
+                </div>
+                <div className="modal-body" style={{padding: '2rem'}}>
+                  <div className="table-responsive">
+                    <table className="table table-bordered table-hover align-middle" style={{minWidth: 700}}>
+                      <thead className="table-light">
+                        <tr>
+                          <th style={{width: 60, textAlign: 'center'}}>STT</th>
+                          <th style={{minWidth: 120}}>Mã học sinh</th>
+                          <th style={{minWidth: 180}}>Tên học sinh</th>
+                          <th style={{minWidth: 140}}>Trạng thái đồng ý</th>
+                          <th style={{minWidth: 220}}>Hành động</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {consentForms.length === 0 && (
+                          <tr><td colSpan="5" className="text-center">Không có học sinh nào.</td></tr>
+                        )}
+                        {consentForms.map((form, idx) => {
+                          // Sửa lại điều kiện isApproved để nhận giá trị từ StatusID hoặc các key khác
+                          const isApproved = form.statusID === 1 || form.consentStatus === 'Đồng ý' || form.status === 'Đồng ý' || form.consent_status === 'Đồng ý';
+                          const isDenied = form.statusID === 2 || form.consentStatus === 'Từ chối' || form.status === 'Từ chối' || form.consent_status === 'Từ chối';
+                          const result = healthCheckResults[form.id];
+                          const isWaiting = isApproved && !result;
+                          const canEditResult = (currentUser?.roleType === 'MedicalStaff' || currentUser?.roleType === 'Admin');
+                          console.log('form:', form, 'isApproved:', isApproved, 'result:', result, 'isWaiting:', isWaiting, 'canEditResult:', canEditResult);
+                          return (
+                            <tr key={form.studentID}>
+                              <td style={{textAlign: 'center'}}>{idx + 1}</td>
+                              <td>{form.studentID}</td>
+                              <td>{studentNames[form.studentID] || form.studentID}</td>
+                              <td>{getConsentStatusText(form.consentStatus || form.status || form.consent_status, form.statusID)}</td>
+                              <td>
+                                {isApproved && result && (
+                                  <button className="btn btn-link btn-sm p-0" onClick={() => { setDetailModalContent({ type: 'result', data: result, student: studentNames[form.studentID] || form.studentID }); setShowDetailModal(true); }}>
+                                    {result.Conclusion || 'Đã nhập'}
+                                  </button>
+                                )}
+                                {isWaiting && (
+                                  <button
+                                    className="btn btn-link btn-sm text-warning p-0"
+                                    style={{zIndex: 9999, pointerEvents: 'auto'}}
+                                    onClick={() => handleOpenResultModal(form)}
+                                  >
+                                    Đang đợi kết quả (Nhập kết quả)
+                                  </button>
+                                )}
+                                {isWaiting && !canEditResult && (
+                                  <span className="text-warning">Đang đợi kết quả</span>
+                                )}
+                                {isDenied && (
+                                  <>
+                                    <button className="btn btn-link btn-sm p-0" onClick={() => { setDetailModalContent({ type: 'reason', data: form.reasonForDenial || 'Không có lý do', student: studentNames[form.studentID] || form.studentID }); setShowDetailModal(true); }}>
+                                      Xem lý do
+                                    </button>
+                                  </>
+                                )}
+                                {!isApproved && !isDenied && (
+                                  <span className="text-secondary">Chờ phản hồi</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowStudentListModal(false)}>Đóng</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Modal/card nhỏ hiển thị lý do hoặc kết quả khám */}
+        {showDetailModal && (
+          <div className="modal show d-block" tabIndex="-1" style={{background: 'rgba(0,0,0,0.5)'}}>
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    {detailModalContent?.type === 'reason' ? 'Lý do từ chối' : 'Chi tiết kết quả khám'}
+                  </h5>
+                  <button type="button" className="btn-close" onClick={() => setShowDetailModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  {detailModalContent?.type === 'reason' && (
+                    <>
+                      <div><b>Học sinh:</b> {detailModalContent.student}</div>
+                      <div className="mt-2"><b>Lý do:</b> {detailModalContent.data}</div>
+                    </>
+                  )}
+                  {detailModalContent?.type === 'result' && (
+                    <>
+                      <div><b>Học sinh:</b> {detailModalContent.student}</div>
+                      <div className="mt-2"><b>Kết luận:</b> {detailModalContent.data.conclusion}</div>
+                      <div><b>Chiều cao:</b> {detailModalContent.data.height}</div>
+                      <div><b>Cân nặng:</b> {detailModalContent.data.weight}</div>
+                      <div><b>Huyết áp:</b> {detailModalContent.data.bloodPressure}</div>
+                      <div><b>Nhịp tim:</b> {detailModalContent.data.heartRate}</div>
+                      <div><b>Thị lực:</b> {detailModalContent.data.eyesight}</div>
+                      <div><b>Thính lực:</b> {detailModalContent.data.hearing}</div>
+                      <div><b>Răng miệng:</b> {detailModalContent.data.oralHealth}</div>
+                      <div><b>Cột sống:</b> {detailModalContent.data.spine}</div>
+                      <div><b>Ngày khám:</b> {detailModalContent.data.checkUpDate}</div>
+                      <div><b>Người khám:</b> {detailModalContent.data.checker}</div>
+                      <div><b>Trạng thái:</b> {detailModalContent.data.status}</div>
+                    </>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowDetailModal(false)}>Đóng</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {showResultModal && (
+          <HealthCheckResultForm
+            consentFormId={resultForm.consentId}
+            checkUpType={resultForm.CheckupType}
+            checker={currentUser?.username || ''}
+            existingResult={healthCheckResults[resultForm.consentId] || null}
+            onSuccess={() => {
+              setShowResultModal(false);
+              fetchResultForConsent(resultForm.consentId);
+            }}
+            onCancel={() => setShowResultModal(false)}
+          />
         )}
       </div>
     </div>

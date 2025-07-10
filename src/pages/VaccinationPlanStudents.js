@@ -13,7 +13,7 @@ const VaccinationPlanStudents = () => {
       try {
         const res = await apiClient.get(`/VaccinationConsentForm/plan/${planId}`);
         // Lọc các học sinh đã xác nhận
-        const confirmed = res.data.filter(f => f.consentStatus === "Approved" && f.studentID);
+        const confirmed = res.data.filter(f => (f.statusID === 1 || f.consentStatus === "Approved") && f.studentID);
         // Lấy thông tin profile cho từng studentID (UserID)
         const studentProfiles = await Promise.all(
           confirmed.map(async (f) => {
@@ -55,7 +55,7 @@ const VaccinationPlanStudents = () => {
             Chỉ hiển thị học sinh đã được phụ huynh xác nhận đồng ý tiêm chủng.
           </div>
         </div>
-        <div className="main-panel" style={{ maxWidth: 700, margin: '0 auto' }}>
+        <div className="main-panel" style={{ width: '100%', margin: 0, padding: 0 }}>
           {loading ? (
             <div style={{ textAlign: 'center', padding: 32 }}>
               <div className="spinner-border text-primary" role="status" style={{ width: 48, height: 48, marginBottom: 12 }}>
@@ -69,8 +69,8 @@ const VaccinationPlanStudents = () => {
               <div>Không có học sinh nào đã xác nhận tiêm chủng.</div>
             </div>
           ) : (
-            <div style={{ overflowX: 'auto', padding: 24 }}>
-              <table className="table table-hover" style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: 8 }}>
+            <div style={{ overflowX: 'auto', padding: 0 }}>
+              <table className="table table-hover" style={{ width: '100vw', borderCollapse: 'collapse', background: '#fff', borderRadius: 8 }}>
                 <thead style={{ background: '#f1f5f9' }}>
                   <tr>
                     <th style={{ padding: '12px 8px', textAlign: 'left' }}>STT</th>

@@ -208,7 +208,6 @@ namespace Businessobjects.Migrations
                     PlanName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ScheduleDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CheckupContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatorID = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -254,7 +253,6 @@ namespace Businessobjects.Migrations
                     PlanName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatorID = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false)
                 },
                 constraints: table =>

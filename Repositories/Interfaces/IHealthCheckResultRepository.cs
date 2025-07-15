@@ -15,5 +15,6 @@ namespace Repositories.Interfaces
         Task DeleteHealthCheckResultAsync(string id);
         Task<bool> HealthCheckResultExistsAsync(string id);
         Task<bool> HasResultForConsentAsync(string consentId);
+        Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByConsentIdsAsync(IEnumerable<string> consentIds);
     }
 }

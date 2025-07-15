@@ -29,6 +29,10 @@ namespace Businessobjects.Data
         public DbSet<VaccinationHealthCheck> VaccinationHealthChecks { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SchoolClass> SchoolClasses { get; set; }
+        public DbSet<Status> Statuses { get; set; }
+        public DbSet<MedicalIncident> MedicalIncidents { get; set; }
+        public DbSet<IncidentInvolvement> IncidentInvolvements { get; set; }
+        public DbSet<SupplyMedUsage> SupplyMedUsages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,6 +55,7 @@ namespace Businessobjects.Data
             modelBuilder.Entity<VaccinationConsultation>().ToTable("Vaccination_Consultation");
             modelBuilder.Entity<VaccinationHealthCheck>().ToTable("Vaccination_Health_Check");
             modelBuilder.Entity<Notification>().ToTable("Notification");
+            modelBuilder.Entity<Status>().ToTable("Status");
 
             base.OnModelCreating(modelBuilder);
 
@@ -124,7 +129,7 @@ namespace Businessobjects.Data
                 .HasOne(h => h.Student)
                 .WithMany()
                 .HasForeignKey(h => h.StudentID)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MedicationSubmissionForm>()
                 .HasOne(m => m.Student)
@@ -149,6 +154,12 @@ namespace Businessobjects.Data
                 .WithMany()
                 .HasForeignKey(h => h.StudentID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<HealthCheckConsentForm>()
+                .HasOne(h => h.Status)
+                .WithMany(s => s.HealthCheckConsentForms)
+                .HasForeignKey(h => h.StatusID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private void ConfigureVaccinationRelationships(ModelBuilder modelBuilder)
@@ -195,6 +206,13 @@ namespace Businessobjects.Data
 
         private void SeedData(ModelBuilder modelBuilder)
         {
+            // Status seed data
+            modelBuilder.Entity<Status>().HasData(
+                new Status { StatusID = 1, StatusName = "Accept" },
+                new Status { StatusID = 2, StatusName = "Deny" },
+                new Status { StatusID = 3, StatusName = "Waiting" }
+            );
+
             // Role seed data
             modelBuilder.Entity<Role>().HasData(
                 new Role { RoleID = "1", RoleType = "Admin" },

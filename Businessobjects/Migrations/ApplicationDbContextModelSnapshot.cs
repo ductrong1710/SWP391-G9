@@ -116,9 +116,6 @@ namespace Businessobjects.Migrations
                     b.Property<string>("Spine")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal?>("Weight")
                         .HasColumnType("decimal(5,2)");
 
@@ -233,7 +230,7 @@ namespace Businessobjects.Migrations
 
                     b.HasIndex("StudentID");
 
-                    b.ToTable("IncidentInvolvement");
+                    b.ToTable("IncidentInvolvement", (string)null);
                 });
 
             modelBuilder.Entity("Businessobjects.Models.MedicalIncident", b =>
@@ -280,7 +277,7 @@ namespace Businessobjects.Migrations
 
                     b.HasIndex("MedicalStaffID");
 
-                    b.ToTable("MedicalIncident");
+                    b.ToTable("MedicalIncident", (string)null);
                 });
 
             modelBuilder.Entity("Businessobjects.Models.MedicalSupply", b =>
@@ -498,9 +495,6 @@ namespace Businessobjects.Migrations
 
                     b.Property<DateTime?>("ScheduleDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 

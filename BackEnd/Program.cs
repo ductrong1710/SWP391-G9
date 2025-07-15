@@ -5,8 +5,7 @@ using Repositories.Implements;
 using Repositories.Interfaces;
 using Services;
 using Services.Interfaces;
-using Services.interfaces;
-using Services.implements;
+using Services.Implements;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +30,9 @@ builder.Services.AddScoped<IVaccinationConsentFormRepository, VaccinationConsent
 builder.Services.AddScoped<IVaccinationResultRepository, VaccinationResultRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<ISchoolClassRepository, SchoolClassRepository>();
+builder.Services.AddScoped<IMedicalIncidentRepository, MedicalIncidentRepository>();
+builder.Services.AddScoped<IIncidentInvolvementRepository, IncidentInvolvementRepository>();
+builder.Services.AddScoped<ISupplyMedUsageRepository, SupplyMedUsageRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -40,7 +42,16 @@ builder.Services.AddScoped<IMedicalSupplyService, MedicalSupplyService>();
 builder.Services.AddScoped<IMedicationService, MedicationService>();
 builder.Services.AddScoped<IMedicationSubmissionFormService, MedicationSubmissionFormService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IPeriodicHealthCheckPlanService, PeriodicHealthCheckPlanService>();
+builder.Services.AddScoped<IPeriodicHealthCheckPlanService, PeriodicHealthCheckPlanService>(provider =>
+{
+    var planRepo = provider.GetRequiredService<IPeriodicHealthCheckPlanRepository>();
+    var classService = provider.GetRequiredService<ISchoolClassService>();
+    var consentFormService = provider.GetRequiredService<IHealthCheckConsentFormService>();
+    var healthRecordService = provider.GetRequiredService<IHealthRecordService>();
+    var notificationService = provider.GetRequiredService<INotificationService>();
+    var dbContext = provider.GetRequiredService<Businessobjects.Data.ApplicationDbContext>();
+    return new Services.Implements.PeriodicHealthCheckPlanService(planRepo, classService, consentFormService, healthRecordService, notificationService, dbContext);
+});
 builder.Services.AddScoped<IHealthCheckConsentFormService, HealthCheckConsentFormService>();
 builder.Services.AddScoped<IHealthCheckResultService, HealthCheckResultService>();
 builder.Services.AddScoped<IVaccineTypeService, VaccineTypeService>();
@@ -49,6 +60,7 @@ builder.Services.AddScoped<IVaccinationConsentFormService, VaccinationConsentFor
 builder.Services.AddScoped<IVaccinationResultService, VaccinationResultService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ISchoolClassService, SchoolClassService>();
+builder.Services.AddScoped<IMedicalIncidentService, MedicalIncidentService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

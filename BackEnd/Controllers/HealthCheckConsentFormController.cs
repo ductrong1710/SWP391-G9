@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -40,9 +39,15 @@ namespace BackEnd.Controllers
 
         // GET: api/HealthCheckConsentForm/plan/5
         [HttpGet("plan/{planId}")]
-        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByPlan(string planId)
+        public async Task<ActionResult<IEnumerable<HealthCheckConsentForm>>> GetConsentFormsByPlan(string planId, [FromQuery] int? statusId)
         {
             var consentForms = await _consentFormService.GetConsentFormsByPlanIdAsync(planId);
+            
+            if (statusId.HasValue)
+            {
+                consentForms = consentForms.Where(f => f.StatusID == statusId.Value);
+            }
+            
             return Ok(consentForms);
         }
 
@@ -72,6 +77,25 @@ namespace BackEnd.Controllers
             try
             {
                 var createdForm = await _consentFormService.CreateConsentFormAsync(form);
+                // Đã có logic gửi notification xác nhận cho phụ huynh ở PeriodicHealthCheckPlanController, không gửi thêm ở đây nữa
+                // var dbContext = HttpContext.RequestServices.GetService(typeof(Businessobjects.Data.ApplicationDbContext)) as Businessobjects.Data.ApplicationDbContext;
+                // var plan = dbContext?.PeriodicHealthCheckPlans.FirstOrDefault(p => p.ID == createdForm.HealthCheckPlanID);
+                // var studentProfile = dbContext?.Profiles.FirstOrDefault(p => p.UserID == createdForm.StudentID);
+                // var studentName = studentProfile?.Name ?? createdForm.StudentID;
+                // var scheduleDate = plan?.ScheduleDate != null ? plan.ScheduleDate.Value.ToString("yyyy-MM-dd") : "";
+                // var message = $"Học sinh có mã {createdForm.StudentID} đã được lên lịch khám sức khỏe vào ngày {scheduleDate}. Vui lòng kiểm tra lịch trên hệ thống.";
+                // var notification = new Businessobjects.Models.Notification
+                // {
+                //     NotificationID = Guid.NewGuid().ToString(),
+                //     UserID = createdForm.ParentID,
+                //     Title = "Thông báo lịch khám sức khỏe",
+                //     Message = message,
+                //     CreatedAt = DateTime.Now,
+                //     IsRead = false,
+                //     ConsentFormID = createdForm.ID
+                // };
+                // dbContext.Notifications.Add(notification);
+                // dbContext.SaveChanges();
                 return CreatedAtAction(nameof(GetConsentForm), new { id = createdForm.ID }, createdForm);
             }
             catch (InvalidOperationException ex)
@@ -106,9 +130,36 @@ namespace BackEnd.Controllers
             var consentForm = await _consentFormService.GetConsentFormByIdAsync(id);
             if (consentForm == null)
                 return NotFound();
-            consentForm.ConsentStatus = "Approved";
+            consentForm.StatusID = 1; // Accept
             consentForm.ResponseTime = DateTime.Now;
             await _consentFormService.UpdateConsentFormAsync(id, consentForm);
+
+            // Gửi notification cho admin/medical staff
+            var dbContext = HttpContext.RequestServices.GetService(typeof(Businessobjects.Data.ApplicationDbContext)) as Businessobjects.Data.ApplicationDbContext;
+            var plan = dbContext?.PeriodicHealthCheckPlans.FirstOrDefault(p => p.ID == consentForm.HealthCheckPlanID);
+            var studentProfile = dbContext?.Profiles.FirstOrDefault(p => p.UserID == consentForm.StudentID);
+            var studentName = studentProfile?.Name ?? consentForm.StudentID;
+            var message = $"Phụ huynh đã xác nhận đồng ý cho <b>{studentName}</b> tham gia kế hoạch '{plan?.PlanName ?? consentForm.HealthCheckPlanID}'.";
+            // Gửi cho tất cả admin/medical staff
+            var staffUsers = dbContext?.Users.Where(u => u.RoleID == "Admin" || u.RoleID == "MedicalStaff").ToList();
+            if (staffUsers != null)
+            {
+                foreach (var staff in staffUsers)
+                {
+                    var notification = new Businessobjects.Models.Notification
+                    {
+                        NotificationID = Guid.NewGuid().ToString(),
+                        UserID = staff.UserID,
+                        Title = "Phụ huynh xác nhận khám sức khỏe",
+                        Message = message,
+                        CreatedAt = DateTime.Now,
+                        IsRead = false,
+                        ConsentFormID = consentForm.ID
+                    };
+                    dbContext.Notifications.Add(notification);
+                }
+                dbContext.SaveChanges();
+            }
             return Ok(consentForm);
         }
 
@@ -124,10 +175,37 @@ namespace BackEnd.Controllers
             var consentForm = await _consentFormService.GetConsentFormByIdAsync(id);
             if (consentForm == null)
                 return NotFound();
-            consentForm.ConsentStatus = "Denied";
+            consentForm.StatusID = 2; // Deny
             consentForm.ResponseTime = DateTime.Now;
             consentForm.ReasonForDenial = request?.Reason;
             await _consentFormService.UpdateConsentFormAsync(id, consentForm);
+
+            // Gửi notification cho admin/medical staff
+            var dbContext = HttpContext.RequestServices.GetService(typeof(Businessobjects.Data.ApplicationDbContext)) as Businessobjects.Data.ApplicationDbContext;
+            var plan = dbContext?.PeriodicHealthCheckPlans.FirstOrDefault(p => p.ID == consentForm.HealthCheckPlanID);
+            var studentProfile = dbContext?.Profiles.FirstOrDefault(p => p.UserID == consentForm.StudentID);
+            var studentName = studentProfile?.Name ?? consentForm.StudentID;
+            var message = $"Phụ huynh đã từ chối cho <b>{studentName}</b> tham gia kế hoạch '{plan?.PlanName ?? consentForm.HealthCheckPlanID}'. Lý do: {request?.Reason}";
+            // Gửi cho tất cả admin/medical staff
+            var staffUsers = dbContext?.Users.Where(u => u.RoleID == "Admin" || u.RoleID == "MedicalStaff").ToList();
+            if (staffUsers != null)
+            {
+                foreach (var staff in staffUsers)
+                {
+                    var notification = new Businessobjects.Models.Notification
+                    {
+                        NotificationID = Guid.NewGuid().ToString(),
+                        UserID = staff.UserID,
+                        Title = "Phụ huynh từ chối khám sức khỏe",
+                        Message = message,
+                        CreatedAt = DateTime.Now,
+                        IsRead = false,
+                        ConsentFormID = consentForm.ID
+                    };
+                    dbContext.Notifications.Add(notification);
+                }
+                dbContext.SaveChanges();
+            }
             return Ok(consentForm);
         }
 

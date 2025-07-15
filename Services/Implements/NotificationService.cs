@@ -2,7 +2,7 @@ using Businessobjects.Models;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
-namespace Services.implements
+namespace Services.Implements
 {
     public class NotificationService : INotificationService
     {
@@ -22,9 +22,10 @@ namespace Services.implements
             return await _notificationRepository.GetNotificationByIdAsync(notificationId);
         }
 
-        public async Task CreateNotificationAsync(Notification notification)
+        public async Task<Notification> CreateNotificationAsync(Notification notification)
         {
             await _notificationRepository.CreateNotificationAsync(notification);
+            return notification;
         }
 
         public async Task MarkAsReadAsync(string notificationId)

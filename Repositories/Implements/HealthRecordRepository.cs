@@ -37,6 +37,16 @@ namespace Repositories.Implements
 
         public async Task CreateHealthRecordAsync(HealthRecord healthRecord)
         {
+            bool parentExists = await _context.Users.AnyAsync(u => u.UserID == healthRecord.ParentID);
+            if (!parentExists)
+            {
+                throw new ArgumentException($"ParentID '{healthRecord.ParentID}' không tồn tại trong hệ thống.");
+            }
+            bool studentExists = await _context.Users.AnyAsync(u => u.UserID == healthRecord.StudentID);
+            if (!studentExists)
+            {
+                throw new ArgumentException($"StudentID '{healthRecord.StudentID}' không tồn tại trong hệ thống.");
+            }
             await _context.HealthRecords.AddAsync(healthRecord);
             await _context.SaveChangesAsync();
         }

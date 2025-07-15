@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -113,6 +112,23 @@ namespace BackEnd.Controllers
             await _consentFormService.UpdateVaccinationConsentFormAsync(id, form);
 
             return Ok(new { message = "Consent form approved!" });
+        }
+
+        public class DenyModel { public string Reason { get; set; } }
+
+        [HttpPost("{id}/deny")]
+        public async Task<IActionResult> DenyConsentForm(string id, [FromBody] DenyModel model)
+        {
+            var form = await _consentFormService.GetVaccinationConsentFormByIdAsync(id);
+            if (form == null)
+                return NotFound();
+
+            form.ConsentStatus = "Denied";
+            form.ResponseTime = DateTime.Now;
+            form.ReasonForDenial = model?.Reason;
+            await _consentFormService.UpdateVaccinationConsentFormAsync(id, form);
+
+            return Ok(new { message = "Consent form denied!" });
         }
     }
 }

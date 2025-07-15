@@ -1,9 +1,8 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
 using Services.Interfaces; // Add this using directive
 
-namespace Services.implements
+namespace Services.Implements
 {
     public class VaccinationConsentFormService : IVaccinationConsentFormService
     {
@@ -49,9 +48,6 @@ namespace Services.implements
             if (plan == null)
                 throw new KeyNotFoundException("Vaccination plan not found");
 
-            if (plan.Status != "Planned" && plan.Status != "InProgress")
-                throw new InvalidOperationException("Cannot submit consent form for a completed or cancelled vaccination plan");
-
             if (plan.ScheduledDate < DateTime.Today)
                 throw new InvalidOperationException("Cannot submit consent form for a past vaccination plan");
 
@@ -91,9 +87,6 @@ namespace Services.implements
             var plan = await _planRepository.GetVaccinationPlanByIdAsync(form.VaccinationPlanID);
             if (plan == null)
                 throw new KeyNotFoundException("Vaccination plan not found");
-
-            if (plan.Status == "Completed" || plan.Status == "Cancelled")
-                throw new InvalidOperationException("Cannot update consent form for a completed or cancelled vaccination plan");
 
             if (plan.ScheduledDate < DateTime.Today)
                 throw new InvalidOperationException("Cannot update consent form for a past vaccination plan");

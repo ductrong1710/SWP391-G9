@@ -111,5 +111,16 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults.AnyAsync(r => r.HealthCheckConsentID == consentId);
         }
+
+        public async Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByConsentIdsAsync(IEnumerable<string> consentIds)
+        {
+            return await _context.HealthCheckResults
+                .Include(r => r.HealthCheckConsent)
+                    .ThenInclude(c => c.Student)
+                .Include(r => r.HealthCheckConsent)
+                    .ThenInclude(c => c.HealthCheckPlan)
+                .Where(r => consentIds.Contains(r.HealthCheckConsentID))
+                .ToListAsync();
+        }
     }
 }

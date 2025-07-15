@@ -5222,11 +5222,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\LEARNING\\Code\\BackEnd\\BackEnd\\BackEnd.csproj",
+      "projectUniqueName": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\BackEnd\\BackEnd.csproj",
       "projectName": "BackEnd",
-      "projectPath": "D:\\LEARNING\\Code\\BackEnd\\BackEnd\\BackEnd.csproj",
+      "projectPath": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\BackEnd\\BackEnd.csproj",
       "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-      "outputPath": "D:\\LEARNING\\Code\\BackEnd\\BackEnd\\obj\\",
+      "outputPath": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\BackEnd\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"
@@ -5247,11 +5247,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\LEARNING\\Code\\BackEnd\\Businessobjects\\Businessobjects.csproj": {
-              "projectPath": "D:\\LEARNING\\Code\\BackEnd\\Businessobjects\\Businessobjects.csproj"
+            "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj": {
+              "projectPath": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj"
             },
-            "D:\\LEARNING\\Code\\BackEnd\\Services\\Services.csproj": {
-              "projectPath": "D:\\LEARNING\\Code\\BackEnd\\Services\\Services.csproj"
+            "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\Services\\Services.csproj": {
+              "projectPath": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\Services\\Services.csproj"
             }
           }
         }

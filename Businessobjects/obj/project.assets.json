@@ -4697,11 +4697,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\LEARNING\\Code\\BackEnd\\Businessobjects\\Businessobjects.csproj",
+      "projectUniqueName": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj",
       "projectName": "Businessobjects",
-      "projectPath": "D:\\LEARNING\\Code\\BackEnd\\Businessobjects\\Businessobjects.csproj",
+      "projectPath": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\Businessobjects\\Businessobjects.csproj",
       "packagesPath": "C:\\Users\\ductr\\.nuget\\packages\\",
-      "outputPath": "D:\\LEARNING\\Code\\BackEnd\\Businessobjects\\obj\\",
+      "outputPath": "D:\\LEARNING\\code\\code\\SWP391-G9-BackEnd\\Businessobjects\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\IDECoder\\VisualStudio\\VSShare\\NuGetPackages"

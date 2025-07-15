@@ -26,10 +26,11 @@ namespace Repositories.Implements
             return await _context.Notifications.FirstOrDefaultAsync(n => n.NotificationID == notificationId);
         }
 
-        public async Task CreateNotificationAsync(Notification notification)
+        public async Task<Notification> CreateNotificationAsync(Notification notification)
         {
-            await _context.Notifications.AddAsync(notification);
+            _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
+            return notification;
         }
 
         public async Task MarkAsReadAsync(string notificationId)

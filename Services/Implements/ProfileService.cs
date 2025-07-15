@@ -1,11 +1,10 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
 using Services.Interfaces; // Add this using directive
 using Microsoft.EntityFrameworkCore;
 using Businessobjects.Data;
 
-namespace Services.implements
+namespace Services.Implements
 {
     public class ProfileService : IProfileService
     {

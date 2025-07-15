@@ -1,6 +1,6 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IHealthCheckConsentFormService
     {
@@ -12,5 +12,7 @@ namespace Services.interfaces
         Task<HealthCheckConsentForm> CreateConsentFormAsync(HealthCheckConsentForm form);
         Task UpdateConsentFormAsync(string id, HealthCheckConsentForm form);
         Task DeleteConsentFormAsync(string id);
+        Task<IEnumerable<User>> GetChildrenByParentIdAsync(string parentId);
+        Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdsAsync(IEnumerable<string> studentIds);
     }
 }

@@ -119,9 +119,6 @@ namespace Businessobjects.Migrations
                     b.Property<string>("Spine")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal?>("Weight")
                         .HasColumnType("decimal(5,2)");
 
@@ -501,9 +498,6 @@ namespace Businessobjects.Migrations
 
                     b.Property<DateTime?>("ScheduleDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 

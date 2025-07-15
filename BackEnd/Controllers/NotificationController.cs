@@ -22,10 +22,10 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateNotification([FromBody] Notification notification)
+        public async Task<ActionResult<Notification>> CreateNotification([FromBody] Notification notification)
         {
-            await _notificationService.CreateNotificationAsync(notification);
-            return Ok();
+            var created = await _notificationService.CreateNotificationAsync(notification);
+            return Ok(created);
         }
 
         [HttpPost("mark-as-read/{notificationId}")]

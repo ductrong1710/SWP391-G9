@@ -12,5 +12,9 @@ namespace Repositories.Interfaces
         Task UpdatePlanAsync(PeriodicHealthCheckPlan plan);
         Task DeletePlanAsync(string id);
         Task<bool> PlanExistsAsync(string id);
+        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByStatusAsync(string status);
+        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByClassIdAsync(string classId);
+        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatedDateRangeAsync(DateTime start, DateTime end);
+        Task<IEnumerable<object>> GetAllPlansWithClassNameAsync();
     }
 }

@@ -19,6 +19,7 @@ namespace Repositories.Implements
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
+                .Include(f => f.Status)
                 .ToListAsync();
         }
 
@@ -27,6 +28,7 @@ namespace Repositories.Implements
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
+                .Include(f => f.Status)
                 .FirstOrDefaultAsync(f => f.ID == id);
         }
 
@@ -35,6 +37,7 @@ namespace Repositories.Implements
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
+                .Include(f => f.Status)
                 .Where(f => f.HealthCheckPlanID == planId)
                 .ToListAsync();
         }
@@ -44,6 +47,7 @@ namespace Repositories.Implements
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
+                .Include(f => f.Status)
                 .Where(f => f.StudentID == studentId)
                 .ToListAsync();
         }
@@ -53,11 +57,18 @@ namespace Repositories.Implements
             return await _context.HealthCheckConsentForms
                 .Include(f => f.HealthCheckPlan)
                 .Include(f => f.Student)
+                .Include(f => f.Status)
                 .FirstOrDefaultAsync(f => f.HealthCheckPlanID == planId && f.StudentID == studentId);
         }
 
         public async Task CreateConsentFormAsync(HealthCheckConsentForm form)
         {
+            // Kiểm tra ParentID có tồn tại trong Users không
+            bool parentExists = await _context.Users.AnyAsync(u => u.UserID == form.ParentID);
+            if (!parentExists)
+            {
+                throw new ArgumentException($"ParentID '{form.ParentID}' không tồn tại trong hệ thống.");
+            }
             await _context.HealthCheckConsentForms.AddAsync(form);
             await _context.SaveChangesAsync();
         }
@@ -81,6 +92,30 @@ namespace Repositories.Implements
         public async Task<bool> ConsentFormExistsAsync(string id)
         {
             return await _context.HealthCheckConsentForms.AnyAsync(f => f.ID == id);
+        }
+
+        public async Task<IEnumerable<User>> GetChildrenByParentIdAsync(string parentId)
+        {
+            // Lấy danh sách StudentID từ HealthRecord theo ParentID
+            var studentIds = await _context.HealthRecords
+                .Where(hr => hr.ParentID == parentId)
+                .Select(hr => hr.StudentID)
+                .ToListAsync();
+
+            // Lấy thông tin User của các học sinh này
+            return await _context.Users
+                .Where(u => studentIds.Contains(u.UserID))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdsAsync(IEnumerable<string> studentIds)
+        {
+            return await _context.HealthCheckConsentForms
+                .Include(f => f.HealthCheckPlan)
+                .Include(f => f.Student)
+                .Include(f => f.Status)
+                .Where(f => studentIds.Contains(f.StudentID))
+                .ToListAsync();
         }
     }
 }

@@ -1,9 +1,8 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
 using Services.Interfaces; // Add this using directive
 
-namespace Services.implements
+namespace Services.Implements
 {
     public class HealthCheckResultService : IHealthCheckResultService
     {
@@ -51,28 +50,66 @@ namespace Services.implements
             return await _resultRepository.GetPendingConsultationsAsync();
         }
 
+        public async Task<IEnumerable<HealthCheckResult>> GetHealthCheckResultsByConsentIdsAsync(IEnumerable<string> consentIds)
+        {
+            return await _resultRepository.GetHealthCheckResultsByConsentIdsAsync(consentIds);
+        }
+
         public async Task<HealthCheckResult> CreateHealthCheckResultAsync(HealthCheckResult result)
         {
+            Console.WriteLine($"=== CreateHealthCheckResultAsync Start ===");
+            Console.WriteLine($"Result ID: {result.ID}");
+            Console.WriteLine($"ConsentFormID: {result.HealthCheckConsentID}");
+            Console.WriteLine($"CheckUpDate: {result.CheckUpDate}");
+            Console.WriteLine($"NeedToContactParent: {result.NeedToContactParent}");
+            Console.WriteLine($"FollowUpDate: {result.FollowUpDate}");
+            
             var consentForm = await _consentFormRepository.GetConsentFormByIdAsync(result.HealthCheckConsentID);
+            Console.WriteLine($"ConsentForm found: {consentForm != null}");
             if (consentForm == null)
+            {
+                Console.WriteLine("ERROR: Health check consent form not found");
                 throw new KeyNotFoundException("Health check consent form not found");
-
-            if (consentForm.ConsentStatus != "Approved")
+            }
+            
+            Console.WriteLine($"ConsentForm StatusID: {consentForm.StatusID}");
+            if (consentForm.StatusID != 1) // 1: Accept
+            {
+                Console.WriteLine("ERROR: Cannot create result for non-approved consent form");
                 throw new InvalidOperationException("Cannot create result for non-approved consent form");
+            }
 
-            if (await _resultRepository.HasResultForConsentAsync(result.HealthCheckConsentID))
+            var hasExistingResult = await _resultRepository.HasResultForConsentAsync(result.HealthCheckConsentID);
+            Console.WriteLine($"Has existing result: {hasExistingResult}");
+            if (hasExistingResult)
+            {
+                Console.WriteLine("ERROR: A result already exists for this consent form");
                 throw new InvalidOperationException("A result already exists for this consent form");
+            }
 
+            Console.WriteLine($"CheckUpDate > DateTime.Today: {result.CheckUpDate > DateTime.Today}");
             if (result.CheckUpDate > DateTime.Today)
+            {
+                Console.WriteLine("ERROR: Cannot set future date for check-up date");
                 throw new InvalidOperationException("Cannot set future date for check-up date");
+            }
 
+            Console.WriteLine($"NeedToContactParent: {result.NeedToContactParent}, FollowUpDate: {result.FollowUpDate}");
             if (result.NeedToContactParent == true && !result.FollowUpDate.HasValue)
+            {
+                Console.WriteLine("ERROR: Follow-up date is required when parent contact is needed");
                 throw new InvalidOperationException("Follow-up date is required when parent contact is needed");
+            }
 
             if (result.FollowUpDate.HasValue && result.FollowUpDate.Value <= DateTime.Today)
+            {
+                Console.WriteLine("ERROR: Follow-up date must be in the future");
                 throw new InvalidOperationException("Follow-up date must be in the future");
+            }
 
+            Console.WriteLine("All validations passed, creating result...");
             await _resultRepository.CreateHealthCheckResultAsync(result);
+            Console.WriteLine("Result created successfully");
             return result;
         }
 

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Businessobjects.Models;
 using Services;
 using Services.Interfaces;
-using Services.interfaces; // Added namespace for IHealthCheckConsentFormService
 
 namespace BackEnd.Controllers
 {
@@ -150,50 +149,42 @@ namespace BackEnd.Controllers
                 .Distinct()
                 .ToList();
 
-            var notifiedParents = new HashSet<string>();
-            foreach (var parentId in parentIds)
+            foreach (var student in students)
             {
-                // Lấy danh sách học sinh của phụ huynh này
-                var studentIds = dbContext.HealthRecords
-                    .Where(hr => hr.ParentID == parentId && studentUserIds.Contains(hr.StudentID))
-                    .Select(hr => hr.StudentID)
-                    .ToList();
-                foreach (var studentId in studentIds)
+                var healthRecord = dbContext.HealthRecords.FirstOrDefault(hr => hr.StudentID == student.UserID);
+                if (healthRecord == null || string.IsNullOrEmpty(healthRecord.ParentID)) continue;
+                var parentId = healthRecord.ParentID;
+                var studentName = student.Name ?? "học sinh";
+                var message = $"Kế hoạch tiêm chủng '{plan.PlanName}' đã được cập nhật. Vui lòng xác nhận cho học sinh: {studentName.ToUpper()}";
+                // Lấy consent form theo planId và studentId
+                var consentForm = dbContext.VaccinationConsentForms.FirstOrDefault(cf => cf.VaccinationPlanID == plan.ID && cf.StudentID == student.UserID);
+                if (consentForm == null)
                 {
-                    var studentProfile = dbContext.Profiles.FirstOrDefault(p => p.UserID == studentId);
-                    var studentName = studentProfile?.Name ?? "học sinh";
-                    var message = $"Kế hoạch tiêm chủng '{plan.PlanName}' đã được cập nhật. Vui lòng xác nhận cho <b>{studentName}</b>.";
-                    // Lấy consent form theo planId và studentId
-                    var consentForm = dbContext.VaccinationConsentForms.FirstOrDefault(cf => cf.VaccinationPlanID == plan.ID && cf.StudentID == studentId);
-                    if (consentForm == null)
+                    // Tạo mới consent form nếu chưa có
+                    consentForm = new Businessobjects.Models.VaccinationConsentForm
                     {
-                        // Tạo mới consent form nếu chưa có
-                        consentForm = new Businessobjects.Models.VaccinationConsentForm
-                        {
-                            ID = Guid.NewGuid().ToString().Substring(0, 6).ToUpper(),
-                            VaccinationPlanID = plan.ID,
-                            StudentID = studentId,
-                            ParentID = parentId,
-                            ConsentStatus = null,
-                            ResponseTime = null,
-                            ReasonForDenial = null
-                        };
-                        dbContext.VaccinationConsentForms.Add(consentForm);
-                        dbContext.SaveChanges();
-                    }
-                    var notification = new Notification
-                    {
-                        NotificationID = Guid.NewGuid().ToString(),
-                        UserID = parentId,
-                        Title = "Xác nhận kế hoạch tiêm chủng",
-                        Message = message,
-                        CreatedAt = DateTime.Now,
-                        IsRead = false,
-                        ConsentFormID = consentForm.ID
+                        ID = Guid.NewGuid().ToString().Substring(0, 6).ToUpper(),
+                        VaccinationPlanID = plan.ID,
+                        StudentID = student.UserID,
+                        ParentID = parentId,
+                        ConsentStatus = null,
+                        ResponseTime = null,
+                        ReasonForDenial = null
                     };
-                    await _notificationService.CreateNotificationAsync(notification);
+                    dbContext.VaccinationConsentForms.Add(consentForm);
+                    dbContext.SaveChanges();
                 }
-                notifiedParents.Add(parentId);
+                var notification = new Notification
+                {
+                    NotificationID = Guid.NewGuid().ToString(),
+                    UserID = parentId,
+                    Title = "Xác nhận kế hoạch tiêm chủng",
+                    Message = message,
+                    CreatedAt = DateTime.Now,
+                    IsRead = false,
+                    ConsentFormID = consentForm.ID
+                };
+                await _notificationService.CreateNotificationAsync(notification);
             }
             return Ok(new { message = "Notifications sent!" });
         }

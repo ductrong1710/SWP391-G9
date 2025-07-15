@@ -1,11 +1,10 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
 using Services.Interfaces; // Add this using directive
 using Businessobjects.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Services.implements
+namespace Services.Implements
 {
     public class VaccinationPlanService : IVaccinationPlanService
     {

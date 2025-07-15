@@ -6,7 +6,7 @@ namespace Services.Interfaces
     {
         Task<IEnumerable<Notification>> GetNotificationsByUserIdAsync(string userId);
         Task<Notification?> GetNotificationByIdAsync(string notificationId);
-        Task CreateNotificationAsync(Notification notification);
+        Task<Notification> CreateNotificationAsync(Notification notification);
         Task MarkAsReadAsync(string notificationId);
     }
 } 

@@ -8,16 +8,32 @@ namespace Businessobjects.Models
         [Key]
         [Column("ID")]
         public string ID { get; set; } = null!;
+        
         [Required]
+        [Column("PlanName")]
         public string PlanName { get; set; } = null!;
+        
+        [Column("ScheduleDate")]
         public DateTime? ScheduleDate { get; set; }
+        
+        [Column("CheckupContent")]
         public string? CheckupContent { get; set; }
+        
+        [Column("Status")]
         public string? Status { get; set; }
-        [Required]
+        
         [Column("CreatorID")]
         public string CreatorID { get; set; } = null!;
         [ForeignKey("CreatorID")]
         public User? Creator { get; set; }
+        
+        [Column("ClassID")]
+        public string? ClassID { get; set; }
+        [ForeignKey("ClassID")]
+        public SchoolClass? Class { get; set; }
+        
+        [Column("CreatedDate")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
         
         public virtual ICollection<HealthCheckConsentForm>? ConsentForms { get; set; }
     }

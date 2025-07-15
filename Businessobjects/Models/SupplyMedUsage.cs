@@ -6,18 +6,24 @@ namespace Businessobjects.Models
     public class SupplyMedUsage
     {
         [Key]
-        [Column("ID")]
-        public string ID { get; set; } = null!;
-        [Column("MedicalSupplyID")]
-        public string? MedicalSupplyID { get; set; }
+        [Column("UsageID")]
+        public string UsageID { get; set; } = null!;
+        [Column("IncidentID")]
+        public string? IncidentID { get; set; }
+        [Column("SupplyID")]
+        public string? SupplyID { get; set; }
         [Column("MedicationID")]
         public string? MedicationID { get; set; }
-        public DateTime? UsageDate { get; set; }
+        [Column("QuantityUsed")]
         public int? QuantityUsed { get; set; }
+        [Column("UsageTime")]
+        public DateTime? UsageTime { get; set; }
         public string? UsagePurpose { get; set; }
         public string? AdministeredBy { get; set; }
         public string? Notes { get; set; }
-        [ForeignKey("MedicalSupplyID")]
+        [ForeignKey("IncidentID")]
+        public MedicalIncident? MedicalIncident { get; set; }
+        [ForeignKey("SupplyID")]
         public MedicalSupply? MedicalSupply { get; set; }
         [ForeignKey("MedicationID")]
         public Medication? Medication { get; set; }

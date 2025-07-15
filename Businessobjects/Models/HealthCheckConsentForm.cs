@@ -8,23 +8,31 @@ namespace Businessobjects.Models
         [Key]
         [Column("ID")]
         public string ID { get; set; } = null!;
-        [Required]
+        
         [Column("HealthCheckPlanID")]
-        public string HealthCheckPlanID { get; set; } = null!;
+        public string? HealthCheckPlanID { get; set; }
         [ForeignKey("HealthCheckPlanID")]
         public PeriodicHealthCheckPlan? HealthCheckPlan { get; set; }
-        [Required]
+        
         [Column("StudentID")]
-        public string StudentID { get; set; } = null!;
+        public string? StudentID { get; set; }
         [ForeignKey("StudentID")]
         public User? Student { get; set; }
-        [Required]
+        
         [Column("ParentID")]
-        public string ParentID { get; set; } = null!;
+        public string? ParentID { get; set; }
         [ForeignKey("ParentID")]
         public User? Parent { get; set; }
-        public string? ConsentStatus { get; set; }
+        
+        [Column("StatusID")]
+        public int? StatusID { get; set; }
+        [ForeignKey("StatusID")]
+        public Status? Status { get; set; }
+        
+        [Column("ResponseTime")]
         public DateTime? ResponseTime { get; set; }
+        
+        [Column("ReasonForDenial")]
         public string? ReasonForDenial { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 using Businessobjects.Models;
 
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IPeriodicHealthCheckPlanService
     {
@@ -11,5 +11,9 @@ namespace Services.interfaces
         Task<PeriodicHealthCheckPlan> CreatePlanAsync(PeriodicHealthCheckPlan plan);
         Task UpdatePlanAsync(string id, PeriodicHealthCheckPlan plan);
         Task DeletePlanAsync(string id);
+        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByStatusAsync(string status);
+        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByClassIdAsync(string classId);
+        Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatedDateRangeAsync(DateTime start, DateTime end);
+        Task<IEnumerable<object>> GetAllPlansWithClassNameAsync();
     }
 }

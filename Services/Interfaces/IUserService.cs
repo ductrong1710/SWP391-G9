@@ -1,5 +1,5 @@
 using Businessobjects.Models;
-namespace Services.interfaces
+namespace Services.Interfaces
 {
     public interface IUserService
     {

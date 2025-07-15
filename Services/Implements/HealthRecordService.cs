@@ -3,7 +3,7 @@ using Repositories.Interfaces;
 using Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Services.implements
+namespace Services.Implements
 {
     public class HealthRecordService : IHealthRecordService
     {

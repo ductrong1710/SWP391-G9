@@ -13,5 +13,7 @@ namespace Repositories.Interfaces
         Task UpdateConsentFormAsync(HealthCheckConsentForm form);
         Task DeleteConsentFormAsync(string id);
         Task<bool> ConsentFormExistsAsync(string id);
+        Task<IEnumerable<User>> GetChildrenByParentIdAsync(string parentId);
+        Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdsAsync(IEnumerable<string> studentIds);
     }
 }

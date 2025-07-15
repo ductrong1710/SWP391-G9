@@ -75,5 +75,56 @@ namespace Repositories.Implements
         {
             return await _context.PeriodicHealthCheckPlans.AnyAsync(p => p.ID == id);
         }
+
+        public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByStatusAsync(string status)
+        {
+            return await _context.PeriodicHealthCheckPlans
+                .Include(p => p.Creator)
+                .Include(p => p.ConsentForms)
+                .Where(p => p.Status == status)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByClassIdAsync(string classId)
+        {
+            return await _context.PeriodicHealthCheckPlans
+                .Include(p => p.Creator)
+                .Include(p => p.ConsentForms)
+                .Where(p => p.ClassID == classId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<PeriodicHealthCheckPlan>> GetPlansByCreatedDateRangeAsync(DateTime start, DateTime end)
+        {
+            return await _context.PeriodicHealthCheckPlans
+                .Include(p => p.Creator)
+                .Include(p => p.ConsentForms)
+                .Where(p => p.CreatedDate >= start && p.CreatedDate <= end)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<object>> GetAllPlansWithClassNameAsync()
+        {
+            return await _context.PeriodicHealthCheckPlans
+                .Include(p => p.Creator)
+                .Include(p => p.ConsentForms)
+                .Join(_context.SchoolClasses,
+                      plan => plan.ClassID,
+                      schoolClass => schoolClass.ClassID,
+                      (plan, schoolClass) => new {
+                          plan.ID,
+                          plan.PlanName,
+                          plan.ScheduleDate,
+                          plan.CheckupContent,
+                          plan.Status,
+                          plan.ClassID,
+                          ClassName = schoolClass.ClassName,
+                          plan.CreatedDate,
+                          plan.CreatorID,
+                          plan.Creator,
+                          plan.ConsentForms
+                      })
+                .ToListAsync();
+        }
     }
 }

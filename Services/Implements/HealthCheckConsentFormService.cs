@@ -1,9 +1,8 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.interfaces;
 using Services.Interfaces; // Add this using directive
 
-namespace Services.implements
+namespace Services.Implements
 {
     public class HealthCheckConsentFormService : IHealthCheckConsentFormService
     {
@@ -45,6 +44,26 @@ namespace Services.implements
             if (existingForm != null)
                 throw new InvalidOperationException("A consent form already exists for this student and plan");
 
+            var allForms = await _consentFormRepository.GetAllConsentFormsAsync();
+            int maxNum = 0;
+            foreach (var f in allForms)
+            {
+                if (f.ID != null && f.ID.StartsWith("HC"))
+                {
+                    if (int.TryParse(f.ID.Substring(2), out int num))
+                    {
+                        if (num > maxNum) maxNum = num;
+                    }
+                }
+            }
+            form.ID = $"HC{(maxNum + 1).ToString("D4")}";
+            
+            // Set default status to Waiting (3)
+            if (!form.StatusID.HasValue)
+            {
+                form.StatusID = 3;
+            }
+
             await _consentFormRepository.CreateConsentFormAsync(form);
             return form;
         }
@@ -66,6 +85,18 @@ namespace Services.implements
                 throw new KeyNotFoundException("Consent form not found");
 
             await _consentFormRepository.DeleteConsentFormAsync(id);
+        }
+
+        public async Task<IEnumerable<User>> GetChildrenByParentIdAsync(string parentId)
+        {
+            // Giả sử repository có hàm GetChildrenByParentIdAsync
+            return await _consentFormRepository.GetChildrenByParentIdAsync(parentId);
+        }
+
+        public async Task<IEnumerable<HealthCheckConsentForm>> GetConsentFormsByStudentIdsAsync(IEnumerable<string> studentIds)
+        {
+            // Giả sử repository có hàm GetConsentFormsByStudentIdsAsync
+            return await _consentFormRepository.GetConsentFormsByStudentIdsAsync(studentIds);
         }
     }
 }

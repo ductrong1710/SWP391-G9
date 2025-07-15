@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import apiClient from '../services/apiClient';
 
 const AuthContext = createContext();
@@ -6,10 +6,24 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Lấy lại user và token từ localStorage khi khởi tạo
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return !!localStorage.getItem('token');
+  });
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
+
+  // Khi app khởi động, nếu có token thì set lại header cho apiClient
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+  }, []);
 
   const login = async (username, password) => {
     setAuthError(null);

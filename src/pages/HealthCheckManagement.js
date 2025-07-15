@@ -698,7 +698,6 @@ const HealthCheckManagement = () => {
       HealthFacility: 'Phòng Y tế Trường',
       CheckupType: form.checkupType || form.CheckupType || ''
     });
-    setShowStudentListModal(false); // Đóng modal danh sách học sinh
     setShowResultModal(true);       // Mở modal nhập kết quả
     console.log('DEBUG resultForm:', {
       consentId: consentId,

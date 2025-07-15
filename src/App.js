@@ -21,6 +21,8 @@ import Notifications from './pages/Notifications';
 import VaccinationPlanStudents from './pages/VaccinationPlanStudents';
 import VaccinationPlanRecord from './pages/VaccinationPlanRecord';
 import MedicalHistory from './pages/MedicalHistory';
+import MedicalIncidentManagement from './pages/MedicalIncidentManagement';
+import MedicalIncidentHistory from './pages/MedicalIncidentHistory';
 
 function App() {
   const location = useLocation();
@@ -37,14 +39,17 @@ function App() {
     '/record-process',
     '/documents-blog',
     '/notifications',
-    '/medical-history'
+    '/medical-history',
+    '/medical-incident-management',
+    '/medical-incident-history'
   ];
   
   // Define routes where Navbar and Footer should be hidden
   // All routes with sidebar plus login/register should hide navbar
-  const noNavbarRoutes = ['/login', '/register', ...sidebarRoutes];
+  const noNavbarRoutes = ['/login', '/register', ...sidebarRoutes, '/vaccination-plan/record', '/vaccination-plan/'];
   
-  const showNavbar = !noNavbarRoutes.includes(location.pathname);
+  // Ẩn navbar cho các route động như /vaccination-plan/:id/record
+  const showNavbar = !noNavbarRoutes.some(route => location.pathname === route || location.pathname.startsWith('/vaccination-plan/') && (location.pathname.endsWith('/record') || location.pathname.includes('/record')));
   const showSidebar = sidebarRoutes.includes(location.pathname);
   
   // Handle sidebar toggle from Sidebar component
@@ -116,6 +121,8 @@ function App() {
                   <MedicalHistory />
                 </div>
               } />
+              <Route path="/medical-incident-management" element={<div className="page-wrapper"><MedicalIncidentManagement /></div>} />
+              <Route path="/medical-incident-history" element={<div className="page-wrapper"><MedicalIncidentHistory /></div>} />
             </Routes>
           </main>
         </div>

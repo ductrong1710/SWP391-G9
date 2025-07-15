@@ -2,11 +2,11 @@ import axios from 'axios';
 
 // Cấu hình axios instance với base URL của backend API
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5284/api', // Thêm /api vào base URL để khớp với backend
+  baseURL: 'http://localhost:5284/api', // Đảm bảo đúng host và port backend ASP.NET Core
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000 // Thêm timeout 10 giây để tránh chờ quá lâu
+  timeout: 10000 
 });
 
 // Thêm interceptor để gắn token vào header của mỗi request

@@ -206,38 +206,29 @@ const MedicalHistory = () => {
   };
 
   const mapBackendToFrontend = (record) => {
-    const checkupDate = record.healthCheck?.date || record.healthCheckResult?.date || record.date;
-    const student = record.healthCheck?.student || record.student;
-
+    // Map đúng các trường từ backend Health_Check_Result
     return {
       id: record.id || record.ID,
-      childId: student?.id || student?.ID,
-      childName: student?.name || 'N/A',
-      className: student?.class || 'N/A',
-      checkupDate: checkupDate ? new Date(checkupDate).toISOString().split('T')[0] : 'N/A',
-      checkupType: record.healthCheck?.checkupType || 'N/A',
-      doctor: record.healthCheck?.doctorName || 'N/A',
-      status: record.resultStatus || 'N/A',
+      childId: record.healthCheckConsentID || record.HealthCheckConsentID,
+      childName: record.studentName || record.StudentName || '', // Nếu backend trả về tên học sinh, nếu không thì để trống
+      className: record.className || record.ClassName || '',
+      checkupDate: record.checkUpDate || record.CheckUpDate ? new Date(record.checkUpDate || record.CheckUpDate).toISOString().split('T')[0] : 'N/A',
+      checkupType: record.checkupType || record.CheckupType || 'Định kỳ',
+      doctor: record.checker || record.Checker || '',
+      status: record.status || record.Status || 'Completed',
       result: {
-        height: record.height || 'N/A',
-        weight: record.weight || 'N/A',
-        bloodPressure: record.bloodPressure || 'N/A',
-        heartRate: record.heartRate || 'N/A',
-        temperature: record.temperature || 'N/A',
-        vision: record.eyesight || 'N/A',
-        hearing: record.hearing || 'N/A',
-        dental: record.oralHealth || 'N/A',
-        skin: record.dermatology || 'N/A',
-        respiratory: 'N/A', // Map these if available
-        cardiovascular: 'N/A',
-        gastrointestinal: 'N/A',
-        musculoskeletal: record.musculoskeletal || 'N/A',
-        neurological: 'N/A',
-        notes: record.notes || 'Không có',
-        recommendations: record.recommendations || 'Không có',
-        followUpRequired: record.followUpRequired || false,
-        followUpDate: record.followUpDate ? new Date(record.followUpDate).toISOString().split('T')[0] : null,
-        followUpReason: 'N/A' // Map if available
+        height: record.height || record.Height || 'N/A',
+        weight: record.weight || record.Weight || 'N/A',
+        bloodPressure: record.bloodPressure || record.BloodPressure || 'N/A',
+        heartRate: record.heartRate || record.HeartRate || 'N/A',
+        vision: record.eyesight || record.Eyesight || 'N/A',
+        hearing: record.hearing || record.Hearing || 'N/A',
+        dental: record.oralHealth || record.OralHealth || 'N/A',
+        musculoskeletal: record.spine || record.Spine || 'N/A',
+        notes: record.conclusion || record.Conclusion || 'Không có',
+        followUpRequired: record.needToContactParent || record.NeedToContactParent || false,
+        followUpDate: record.followUpDate || record.FollowUpDate ? new Date(record.followUpDate || record.FollowUpDate).toISOString().split('T')[0] : null,
+        // Các trường khác nếu có thể bổ sung thêm ở đây
       }
     };
   };
@@ -480,10 +471,6 @@ const MedicalHistory = () => {
                           <span className="info-value">{record.className}</span>
                         </div>
                         <div className="info-item">
-                          <span className="info-label">Bác sĩ:</span>
-                          <span className="info-value">{record.doctor}</span>
-                        </div>
-                        <div className="info-item">
                           <span className="info-label">Ngày kiểm tra:</span>
                           <span className="info-value">{new Date(record.checkupDate).toLocaleDateString('vi-VN')}</span>
                         </div>
@@ -527,12 +514,6 @@ const MedicalHistory = () => {
                               <div className="vital-item">
                                 <span className="vital-label">Nhịp tim:</span>
                                 <span className="vital-value">{record.result.heartRate} bpm</span>
-                              </div>
-                            )}
-                            {record.result.temperature && (
-                              <div className="vital-item">
-                                <span className="vital-label">Nhiệt độ:</span>
-                                <span className="vital-value">{record.result.temperature}°C</span>
                               </div>
                             )}
                           </div>
@@ -673,10 +654,6 @@ const MedicalHistory = () => {
                         <span>{new Date(selectedRecord.checkupDate).toLocaleDateString('vi-VN')}</span>
                       </div>
                       <div className="detail-item">
-                        <label>Bác sĩ:</label>
-                        <span>{selectedRecord.doctor}</span>
-                      </div>
-                      <div className="detail-item">
                         <label>Trạng thái:</label>
                         <span>{getStatusText(selectedRecord.status)}</span>
                       </div>
@@ -710,12 +687,6 @@ const MedicalHistory = () => {
                             <div className="detail-item">
                               <label>Nhịp tim:</label>
                               <span>{selectedRecord.result.heartRate} bpm</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.temperature && (
-                            <div className="detail-item">
-                              <label>Nhiệt độ:</label>
-                              <span>{selectedRecord.result.temperature}°C</span>
                             </div>
                           )}
                         </div>

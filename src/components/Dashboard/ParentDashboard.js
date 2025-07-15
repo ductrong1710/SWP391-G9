@@ -19,11 +19,71 @@ const ParentDashboard = () => {
     navigate(path);
   };
 
+  const getConsentStatusText = (status, statusId) => {
+    if (statusId) {
+      switch (statusId) {
+        case 1:
+          return 'Đồng ý';
+        case 2:
+          return 'Từ chối';
+        case 3:
+          return 'Chờ phản hồi';
+        default:
+          return 'Chưa phản hồi';
+      }
+    }
+    
+    if (!status) return 'Chờ phản hồi';
+    switch (status) {
+      case 'Đồng ý':
+      case 'Approved':
+        return 'Đồng ý';
+      case 'Từ chối':
+      case 'Denied':
+        return 'Từ chối';
+      case 'Chờ phản hồi':
+      case 'Waiting':
+        return 'Chờ phản hồi';
+      default:
+        return status;
+    }
+  };
+
   useEffect(() => {
     if (studentId) {
       getHealthCheckHistoryWithResult(studentId).then(res => setHistory(res.data));
     }
   }, [studentId]);
+
+  // Thêm component bảng kết quả tạm thời cho phụ huynh
+  const fields = [
+    { label: 'Chiều cao', key: 'height' },
+    { label: 'Cân nặng', key: 'weight' },
+    { label: 'Huyết áp', key: 'bloodPressure' },
+    { label: 'Nhịp tim', key: 'heartRate' },
+    { label: 'Thị lực', key: 'eyesight' },
+    { label: 'Thính lực', key: 'hearing' },
+    { label: 'Răng miệng', key: 'oralHealth' },
+    { label: 'Cột sống', key: 'spine' },
+    { label: 'Kết luận', key: 'conclusion' },
+    { label: 'Ngày khám', key: 'checkUpDate' },
+    { label: 'Người khám', key: 'checker' },
+    { label: 'Trạng thái', key: 'status' },
+  ];
+  function ParentHealthResultTable({ result }) {
+    return (
+      <table className="table table-bordered" style={{ marginTop: 12, marginBottom: 12 }}>
+        <tbody>
+          {fields.map(f => (
+            <tr key={f.key}>
+              <td><b>{f.label}</b></td>
+              <td>{result && result[f.key] ? result[f.key] : 'Đang đợi kết quả'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
 
   return (
     <div className="dashboard-layout">
@@ -240,11 +300,30 @@ const ParentDashboard = () => {
                   <tr key={idx}>
                     <td>{item.ConsentForm?.HealthCheckPlan?.PlanName}</td>
                     <td>{item.ConsentForm?.ResponseTime ? new Date(item.ConsentForm.ResponseTime).toLocaleDateString() : ''}</td>
-                    <td>{item.ConsentForm?.ConsentStatus}</td>
+                    <td>{getConsentStatusText(item.ConsentForm?.ConsentStatus, item.ConsentForm?.StatusID)}</td>
                     <td>
-                      {item.HealthCheckResult
-                        ? (item.HealthCheckResult.ResultStatus === 'Completed' ? 'Hoàn thành' : 'Theo dõi sau khám')
-                        : 'Chưa có kết quả'}
+                      {/* Nếu đã đồng ý nhưng chưa có kết quả, hiển thị bảng tạm thời */}
+                      {getConsentStatusText(item.ConsentForm?.ConsentStatus, item.ConsentForm?.StatusID) === 'Đồng ý' && !item.HealthCheckResult && (
+                        <>
+                          <ParentHealthResultTable result={null} />
+                          {/* Chỉ hiển thị nút nhập kết quả nếu chưa có kết quả */}
+                          <button
+                            className="enter-result-btn"
+                            onClick={() => handleNavigate(`/nhap-ket-qua-kham/${item.ConsentForm?.ConsentFormID}`)}
+                            style={{ marginTop: 8 }}
+                          >
+                            Nhập kết quả khám
+                          </button>
+                        </>
+                      )}
+                      {/* Nếu đã có kết quả, chỉ hiển thị bảng kết quả thật, không hiển thị nút nhập */}
+                      {item.HealthCheckResult && (
+                        <ParentHealthResultTable result={item.HealthCheckResult} />
+                      )}
+                      {/* Nếu chưa đồng ý, chỉ hiện chữ */}
+                      {getConsentStatusText(item.ConsentForm?.ConsentStatus, item.ConsentForm?.StatusID) !== 'Đồng ý' && !item.HealthCheckResult && (
+                        <span>Chưa có kết quả</span>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -15,9 +15,9 @@
 .header .logo {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   text-decoration: none;
-  width: 220px; /* Fixed width instead of min-width */
+  width: 260px; /* Tăng width để đủ chỗ cho HEALTH CONNECT */
   flex-shrink: 0;
   z-index: 2;
 }
@@ -38,6 +38,8 @@
   color: #222;
   letter-spacing: 0.1px;
   white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .header .main-nav {

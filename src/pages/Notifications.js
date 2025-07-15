@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../services/apiClient';
+import { useAuth } from '../context/AuthContext';
 
 export default function Notifications() {
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showHealthCheckModal, setShowHealthCheckModal] = useState(false);
@@ -15,7 +17,8 @@ export default function Notifications() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await apiClient.get('/Notification/user/U10001'); // Sửa lại userID nếu cần
+      if (!user || !user.userID) return;
+      const res = await apiClient.get(`/Notification/user/${user.userID}`);
       setNotifications(res.data);
     } catch (err) {
       console.error('Lỗi khi lấy notifications:', err);

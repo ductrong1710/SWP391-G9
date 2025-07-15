@@ -2,7 +2,7 @@ import apiClient from './apiClient';
 
 // Lấy danh sách học sinh đã đồng ý khám của 1 kế hoạch
 export const getApprovedStudents = (planId) =>
-  apiClient.get(`/HealthCheckConsentForm/plan/${planId}/filter?consentStatus=Approved`);
+  apiClient.get(`/HealthCheckConsentForm/plan/${planId}/filter?statusId=1`);
 
 // Lấy tất cả học sinh của 1 kế hoạch
 export const getAllStudents = (planId) =>
@@ -30,4 +30,8 @@ export const getResultByConsent = (consentFormId) =>
 
 // Lấy lịch sử kiểm tra y tế định kỳ của học sinh (kèm kết quả khám)
 export const getHealthCheckHistoryWithResult = (studentId) =>
-  apiClient.get(`/HealthCheckConsentForm/student/${studentId}/history`); 
+  apiClient.get(`/HealthCheckConsentForm/student/${studentId}/history`);
+
+// Lấy tất cả kết quả khám sức khỏe
+export const getAllHealthCheckResults = () =>
+  apiClient.get('/HealthCheckResult'); 

@@ -116,6 +116,10 @@ const Sidebar = ({ onSidebarToggle }) => {
               <div className="menu-icon"><i className="fas fa-history"></i></div>
               {!collapsed && <span className="menu-text">Lịch sử kiểm tra y tế</span>}
             </Link>
+            <Link to="/medical-incident-management" className={`menu-item ${isActive('/medical-incident-management')}`}> 
+              <div className="menu-icon"><i className="fas fa-ambulance"></i></div>
+              {!collapsed && <span className="menu-text">Khai báo tai nạn y tế</span>}
+            </Link>
           </>}
           {/* Menu cho MedicalStaff */}
           {userRole === 'MedicalStaff' && <>
@@ -138,6 +142,10 @@ const Sidebar = ({ onSidebarToggle }) => {
             <Link to="/documents-blog" className={`menu-item ${isActive('/documents-blog')}`}>
               <div className="menu-icon"><i className="fas fa-book-medical"></i></div>
               {!collapsed && <span className="menu-text">Blog & Tài liệu</span>}
+            </Link>
+            <Link to="/medical-incident-management" className={`menu-item ${isActive('/medical-incident-management')}`}> 
+              <div className="menu-icon"><i className="fas fa-ambulance"></i></div>
+              {!collapsed && <span className="menu-text">Khai báo tai nạn y tế</span>}
             </Link>
           </>}
           {/* Menu cho Parent */}
@@ -162,6 +170,10 @@ const Sidebar = ({ onSidebarToggle }) => {
               <div className="menu-icon"><i className="fas fa-book-medical"></i></div>
               {!collapsed && <span className="menu-text">Blog & Tài liệu</span>}
             </Link>
+            <Link to="/medical-incident-history" className={`menu-item ${isActive('/medical-incident-history')}`}> 
+              <div className="menu-icon"><i className="fas fa-ambulance"></i></div>
+              {!collapsed && <span className="menu-text">Lịch sử tai nạn y tế</span>}
+            </Link>
           </>}
           {/* Menu cho Student */}
           {userRole === 'Student' && <>
@@ -172,6 +184,10 @@ const Sidebar = ({ onSidebarToggle }) => {
             <Link to="/documents-blog" className={`menu-item ${isActive('/documents-blog')}`}>
               <div className="menu-icon"><i className="fas fa-book-medical"></i></div>
               {!collapsed && <span className="menu-text">Blog & Tài liệu</span>}
+            </Link>
+            <Link to="/medical-incident-history" className={`menu-item ${isActive('/medical-incident-history')}`}> 
+              <div className="menu-icon"><i className="fas fa-ambulance"></i></div>
+              {!collapsed && <span className="menu-text">Lịch sử tai nạn y tế</span>}
             </Link>
           </>}
         </div>

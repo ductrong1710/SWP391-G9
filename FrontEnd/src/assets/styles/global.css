@@ -225,14 +225,3 @@ body {
   justify-content: center;
   padding: 0 3rem;
 }
-
-/* Mobile responsiveness */
-@media (max-width: 992px) {
-  .login-brand-panel {
-    display: none;
-  }
-  
-  .hero-title {
-    font-size: 2rem;
-  }
-}

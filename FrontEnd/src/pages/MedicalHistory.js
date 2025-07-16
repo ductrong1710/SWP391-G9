@@ -663,7 +663,7 @@ const MedicalHistory = () => {
                   {selectedRecord.result && (
                     <>
                       <div className="detail-section">
-                        <h4>Dấu hiệu sinh tồn</h4>
+                        <h4>Thông tin sức khỏe</h4>
                         <div className="detail-grid">
                           {selectedRecord.result.height && (
                             <div className="detail-item">

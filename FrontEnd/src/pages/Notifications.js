@@ -70,7 +70,13 @@ export default function Notifications() {
       alert('Đã xác nhận đồng ý tiêm chủng!');
       fetchNotifications();
     } catch (err) {
-      alert('Lỗi khi xác nhận đồng ý tiêm chủng!');
+      // Kiểm tra lỗi đã qua ngày tiêm chủng
+      const msg = err?.response?.data?.message || err?.response?.data || err?.message || '';
+      if (msg && msg.toLowerCase().includes('past vaccination plan')) {
+        alert('Kế hoạch đã qua ngày tiêm chủng, không thể xác nhận!');
+      } else {
+        alert('Lỗi khi xác nhận đồng ý tiêm chủng!');
+      }
     }
   };
 
@@ -100,9 +106,14 @@ export default function Notifications() {
       <h2>Thông báo của bạn</h2>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {notifications.map((n, idx) => {
+          // Log chi tiết các trường liên quan đến button xác nhận
           console.log('Notification item:', n);
+          console.log('DEBUG: title:', n.title, '| consentFormID:', n.ConsentFormID, '| consentFormID (camel):', n.consentFormID, '| hasResult:', hasResult(n));
+          const consentFormId = n.ConsentFormID || n.consentFormID || n.consentformid;
+          // Sửa key để đảm bảo duy nhất
+          const uniqueKey = n.notificationID ? n.notificationID : `notif-${idx}`;
           return (
-            <li key={n.notificationID || idx} style={{
+            <li key={uniqueKey} style={{
               background: n.isRead ? '#f0f0f0' : '#e6f7ff',
               marginBottom: 12,
               padding: 16,
@@ -113,12 +124,12 @@ export default function Notifications() {
               <div style={{ margin: '8px 0' }}>{n.message}</div>
               <div style={{ fontSize: 12, color: '#888' }}>{new Date(n.createdAt).toLocaleString()}</div>
               {/* Nút xác nhận khám sức khỏe cho mọi notification có consentFormID, chỉ hiện nếu chưa có kết quả */}
-              {n.title && n.title.toLowerCase().includes('khám sức khỏe') && (n.ConsentFormID || n.consentFormID) && !hasResult(n) && (
+              {n.title && n.title.toLowerCase().includes('sức khỏe') && consentFormId && !hasResult(n) && (
                 <div style={{ marginTop: 8 }}>
                   <button
                     style={{ padding: '4px 12px', borderRadius: 4, border: 'none', background: '#38a169', color: '#fff', cursor: 'pointer' }}
                     onClick={() => {
-                      setSelectedConsentFormId(n.ConsentFormID || n.consentFormID);
+                      setSelectedConsentFormId(consentFormId);
                       setShowHealthCheckModal(true);
                     }}
                   >

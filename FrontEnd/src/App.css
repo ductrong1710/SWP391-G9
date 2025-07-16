@@ -191,15 +191,6 @@
   padding: 0.5rem 0;
 }
 
-@media (max-width: 992px) {
-  .content-with-sidebar {
-    margin-left: 80px;
-    width: calc(100% - 80px);
-  }
-}
-
-/* Removed mobile media queries since we're focusing on web only */
-
 @media screen and (min-width: 1200px) {
   .content-with-sidebar section {
     padding: 2.5rem;

@@ -1,3 +1,5 @@
 .vs/
 bin/
 obj/ 
+credentials/
+token.json/

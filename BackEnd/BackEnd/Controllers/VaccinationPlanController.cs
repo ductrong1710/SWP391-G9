@@ -185,6 +185,53 @@ namespace BackEnd.Controllers
                     ConsentFormID = consentForm.ID
                 };
                 await _notificationService.CreateNotificationAsync(notification);
+
+                // Gửi email cho phụ huynh
+                var profile = dbContext.Profiles.FirstOrDefault(p => p.UserID == parentId);
+                var parentEmail = profile?.Email;
+                string className = "(không rõ)";
+                if (!string.IsNullOrEmpty(student.ClassID))
+                {
+                    var schoolClass = dbContext.SchoolClasses.FirstOrDefault(c => c.ClassID == student.ClassID);
+                    if (schoolClass != null)
+                        className = schoolClass.ClassName;
+                }
+                string scheduledDate = plan.ScheduledDate.HasValue ? plan.ScheduledDate.Value.ToString("dd/MM/yyyy HH:mm") : "(vui lòng xem chi tiết trên hệ thống)";
+                if (!string.IsNullOrEmpty(parentEmail))
+                {
+                    var gmailService = new GmailEmailService("credentials/credentials.json", "token.json");
+                    string subject = "Thông báo và xác nhận lịch tiêm chủng cho học sinh";
+                    string body = $@"
+Kính gửi Quý phụ huynh,
+
+Nhà trường xin trân trọng thông báo về lịch tiêm chủng sắp tới dành cho học sinh:
+
+- Họ và tên học sinh: {studentName}
+- Lớp: {className}
+- Thời gian tiêm chủng: {scheduledDate}
+- Địa điểm: Phòng Y tế trường
+
+Để đảm bảo quyền lợi và sức khỏe cho các em học sinh, kính mong Quý phụ huynh vui lòng đăng nhập vào hệ thống quản lý sức khỏe học đường và xác nhận sự đồng ý cho con em mình tham gia tiêm chủng.
+
+**Hướng dẫn xác nhận:**
+1. Truy cập trang web của nhà trường: http://localhost:3000/
+2. Đăng nhập bằng tài khoản phụ huynh.
+3. Vào mục ""Lịch tiêm chủng"" và thực hiện xác nhận cho học sinh.
+
+Nếu Quý phụ huynh có bất kỳ thắc mắc nào về lịch tiêm chủng, loại vắc xin, hoặc cần hỗ trợ thêm thông tin, xin vui lòng liên hệ với nhà trường qua số điện thoại hoặc email trên hệ thống.
+
+Xin chân thành cảm ơn sự hợp tác của Quý phụ huynh!
+
+Trân trọng,
+Ban Y tế Trường
+";
+                    await gmailService.SendEmailAsync(
+                        parentEmail,
+                        subject,
+                        body,
+                        isHtml: false
+                    );
+                }
             }
             return Ok(new { message = "Notifications sent!" });
         }

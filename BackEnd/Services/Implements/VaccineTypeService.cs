@@ -28,6 +28,24 @@ namespace Services.Implements
             if (await _vaccineTypeRepository.VaccineTypeExistsByNameAsync(vaccineType.VaccineName))
                 throw new InvalidOperationException("A vaccine type with this name already exists");
 
+            // Sinh mã tự động nếu chưa có
+            if (string.IsNullOrWhiteSpace(vaccineType.VaccinationID))
+            {
+                // Lấy mã lớn nhất hiện có
+                var all = await _vaccineTypeRepository.GetAllVaccineTypesAsync();
+                int max = 0;
+                foreach (var v in all)
+                {
+                    if (v.VaccinationID != null && v.VaccinationID.StartsWith("VC"))
+                    {
+                        var numPart = v.VaccinationID.Substring(2);
+                        if (int.TryParse(numPart, out int n) && n > max)
+                            max = n;
+                    }
+                }
+                vaccineType.VaccinationID = $"VC{(max + 1).ToString("D4")}";
+            }
+
             await _vaccineTypeRepository.CreateVaccineTypeAsync(vaccineType);
             return vaccineType;
         }

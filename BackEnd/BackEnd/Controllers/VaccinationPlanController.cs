@@ -196,7 +196,7 @@ namespace BackEnd.Controllers
                     if (schoolClass != null)
                         className = schoolClass.ClassName;
                 }
-                string scheduledDate = plan.ScheduledDate.HasValue ? plan.ScheduledDate.Value.ToString("dd/MM/yyyy HH:mm") : "(vui lòng xem chi tiết trên hệ thống)";
+                string scheduledDate = plan.ScheduledDate.HasValue ? plan.ScheduledDate.Value.ToString("dd/MM/yyyy") : "(vui lòng xem chi tiết trên hệ thống)";
                 if (!string.IsNullOrEmpty(parentEmail))
                 {
                     var gmailService = new GmailEmailService("credentials/credentials.json", "token.json");

@@ -9,7 +9,7 @@ namespace Businessobjects.Models
     {
         [Key]
         [Column("VaccinationID")]
-        public string VaccinationID { get; set; } = null!;
+        public string? VaccinationID { get; set; }
         [Required]
         public string VaccineName { get; set; } = null!;
         public string? Description { get; set; }

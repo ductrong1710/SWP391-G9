@@ -36,6 +36,14 @@ const VaccinationManagement = () => {
   const [planToNotify, setPlanToNotify] = useState(null);
   const [notifyLoading, setNotifyLoading] = useState(false);
   const [notifyMessage, setNotifyMessage] = useState('');
+  const [showAddVaccineModal, setShowAddVaccineModal] = useState(false);
+  const [addVaccineData, setAddVaccineData] = useState({ VaccineName: '', Description: '' });
+  const [addVaccineLoading, setAddVaccineLoading] = useState(false);
+  const [showVaccineManager, setShowVaccineManager] = useState(false);
+  const [editVaccineId, setEditVaccineId] = useState(null);
+  const [editVaccineData, setEditVaccineData] = useState({ VaccineName: '', Description: '' });
+  const [deleteVaccineId, setDeleteVaccineId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const gradeOptions = ['Toàn trường', '6', '7', '8', '9'];
 
   // Thống kê
@@ -43,6 +51,11 @@ const VaccinationManagement = () => {
   const completed = vaccinationPlans.reduce((sum, plan) => sum + (plan.completedStudents || 0), 0);
   const pending = vaccinationPlans.reduce((sum, plan) => sum + (plan.pendingStudents || 0), 0);
   const totalRounds = vaccinationPlans.length;
+
+  // Toast notification
+  const [showToast, setShowToast] = useState(false);
+  const [showDateErrorModal, setShowDateErrorModal] = useState(false);
+  const [dateErrorMessage, setDateErrorMessage] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -63,6 +76,14 @@ const VaccinationManagement = () => {
       });
     }
   }, [showEditModal]);
+
+  useEffect(() => {
+    if (notifyMessage && notifyMessage.includes('Thêm vaccine thành công')) {
+      setShowToast(true);
+      const timer = setTimeout(() => setShowToast(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [notifyMessage]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -134,6 +155,18 @@ const VaccinationManagement = () => {
         setNotifyMessage('Vui lòng nhập đầy đủ tên kế hoạch và đảm bảo bạn đã đăng nhập!');
         setLoading(false);
         return;
+      }
+      // Kiểm tra ngày dự kiến
+      if (formData.ScheduledDate) {
+        const selectedDate = new Date(formData.ScheduledDate);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        if (selectedDate < today) {
+          setDateErrorMessage('Ngày dự kiến phải lớn hơn hoặc bằng hôm nay!');
+          setShowDateErrorModal(true);
+          setLoading(false);
+          return;
+        }
       }
       const newPlan = {
         PlanName: formData.PlanName.trim(),
@@ -263,6 +296,98 @@ const VaccinationManagement = () => {
     }
   };
 
+  // Thêm vaccine
+  const handleAddVaccineInputChange = (e) => {
+    const { name, value } = e.target;
+    setAddVaccineData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddVaccine = async (e) => {
+    e.preventDefault();
+    setAddVaccineLoading(true);
+    setNotifyMessage('');
+    try {
+      if (!addVaccineData.VaccineName || !addVaccineData.Description) {
+        setNotifyMessage('Vui lòng nhập đầy đủ tên vaccine và mô tả!');
+        setAddVaccineLoading(false);
+        return;
+      }
+      await apiClient.post('/VaccineType', {
+        VaccineName: addVaccineData.VaccineName,
+        Description: addVaccineData.Description
+      });
+      setShowAddVaccineModal && setShowAddVaccineModal(false);
+      setAddVaccineData({ VaccineName: '', Description: '' });
+      // Cập nhật lại danh sách vaccine
+      const res = await apiClient.get('/VaccineType');
+      setVaccineList(res.data);
+      setNotifyMessage('Thêm vaccine thành công!');
+    } catch (err) {
+      let msg = 'Có lỗi khi thêm vaccine!';
+      if (err.response && err.response.data) {
+        if (typeof err.response.data === 'string') msg += ' ' + err.response.data;
+        else if (err.response.data.title) msg += ' ' + err.response.data.title;
+        else if (err.response.data.error) msg += ' ' + err.response.data.error;
+        else msg += ' ' + JSON.stringify(err.response.data);
+      }
+      setNotifyMessage(msg);
+    } finally {
+      setAddVaccineLoading(false);
+    }
+  };
+
+  // Quản lý vaccine
+  const openVaccineManager = async () => {
+    setShowVaccineManager(true);
+    try {
+      const res = await apiClient.get('/VaccineType');
+      setVaccineList(res.data);
+    } catch {}
+  };
+  const closeVaccineManager = () => {
+    setShowVaccineManager(false);
+    setEditVaccineId(null);
+    setEditVaccineData({ VaccineName: '', Description: '' });
+    setDeleteVaccineId(null);
+  };
+  const handleEditVaccineClick = (v) => {
+    setEditVaccineId(v.vaccinationID || v.VaccinationID);
+    setEditVaccineData({ VaccineName: v.vaccineName || v.VaccineName, Description: v.description || v.Description });
+  };
+  const handleEditVaccineInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditVaccineData(prev => ({ ...prev, [name]: value }));
+  };
+  const handleEditVaccineSave = async (id) => {
+    try {
+      await apiClient.put(`/VaccineType/${id}`, {
+        VaccinationID: id,
+        VaccineName: editVaccineData.VaccineName,
+        Description: editVaccineData.Description
+      });
+      const res = await apiClient.get('/VaccineType');
+      setVaccineList(res.data);
+      setEditVaccineId(null);
+      setNotifyMessage('Cập nhật vaccine thành công!');
+    } catch (err) {
+      setNotifyMessage('Có lỗi khi cập nhật vaccine!');
+    }
+  };
+  const handleDeleteVaccine = async (id) => {
+    setDeleteLoading(true);
+    try {
+      await apiClient.delete(`/VaccineType/${id}`);
+      const res = await apiClient.get('/VaccineType');
+      setVaccineList(res.data);
+      setNotifyMessage('Xóa vaccine thành công!');
+      setDeleteVaccineId(null);
+    } catch (err) {
+      setNotifyMessage('Có lỗi khi xóa vaccine!');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   if (loading && vaccinationPlans.length === 0) {
     return (
       <div className="vaccination-management-container">
@@ -344,13 +469,18 @@ const VaccinationManagement = () => {
           </select>
         </div>
 
-        <button 
-          className="create-plan-btn"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <i className="fas fa-plus"></i>
-          Tạo kế hoạch mới
-        </button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button className="add-vaccine-btn" onClick={openVaccineManager} style={{padding: '6px 16px', background: '#3182ce', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer'}}>
+            <i className="fas fa-syringe"></i> Quản lý vaccine
+          </button>
+          <button 
+            className="create-plan-btn"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <i className="fas fa-plus"></i>
+            Tạo kế hoạch mới
+          </button>
+        </div>
       </div>
 
       {/* Vaccination Plans List */}
@@ -797,6 +927,212 @@ const VaccinationManagement = () => {
               <button className="submit-btn" onClick={handleSendNotificationsConfirmed} disabled={notifyLoading}>
                 {notifyLoading ? 'Đang gửi...' : 'Xác nhận'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal thêm vaccine */}
+      {showAddVaccineModal && (
+        <div className="modal-overlay">
+          <div className="create-plan-modal" style={{ background: '#f4f8fb', minWidth: 400 }}>
+            <div className="modal-header">
+              <h3>Thêm vaccine mới</h3>
+              <button className="close-btn" onClick={() => setShowAddVaccineModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <form onSubmit={handleAddVaccine}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Tên vaccine:</label>
+                  <input
+                    type="text"
+                    name="VaccineName"
+                    value={addVaccineData.VaccineName}
+                    onChange={handleAddVaccineInputChange}
+                    required
+                    style={{ width: '100%', padding: 8, marginBottom: 12 }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Mô tả:</label>
+                  <textarea
+                    name="Description"
+                    value={addVaccineData.Description}
+                    onChange={handleAddVaccineInputChange}
+                    rows={3}
+                    style={{ width: '100%', padding: 8 }}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="modal-footer" style={{ textAlign: 'right' }}>
+                <button type="button" className="close-btn" onClick={() => setShowAddVaccineModal(false)} style={{ marginRight: 8 }}>
+                  Hủy
+                </button>
+                <button type="submit" className="create-plan-btn" disabled={addVaccineLoading}>
+                  {addVaccineLoading ? 'Đang lưu...' : 'Xác nhận'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal quản lý vaccine */}
+      {showVaccineManager && (
+        <div className="modal-overlay">
+          <div className="create-plan-modal" style={{ background: '#f4f8fb', minWidth: 600, maxWidth: 800 }}>
+            <div className="modal-header">
+              <h3>Quản lý vaccine</h3>
+              <button className="close-btn" onClick={closeVaccineManager}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="modal-body">
+              {/* Form thêm vaccine mới */}
+              <form onSubmit={handleAddVaccine} style={{ marginBottom: 16, display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontWeight: 500 }}>Tên vaccine:</label>
+                  <input
+                    type="text"
+                    name="VaccineName"
+                    value={addVaccineData.VaccineName}
+                    onChange={handleAddVaccineInputChange}
+                    required
+                    style={{ width: '100%', padding: 8, marginBottom: 0 }}
+                  />
+                </div>
+                <div style={{ flex: 2 }}>
+                  <label style={{ fontWeight: 500 }}>Mô tả:</label>
+                  <input
+                    type="text"
+                    name="Description"
+                    value={addVaccineData.Description}
+                    onChange={handleAddVaccineInputChange}
+                    style={{ width: '100%', padding: 8, marginBottom: 0 }}
+                    required
+                  />
+                </div>
+                <button type="submit" className="create-plan-btn" disabled={addVaccineLoading} style={{ minWidth: 120 }}>
+                  {addVaccineLoading ? 'Đang lưu...' : 'Thêm mới'}
+                </button>
+              </form>
+              {/* Danh sách vaccine */}
+              <table style={{ width: '100%', background: '#fff', borderRadius: 8, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                <thead style={{ background: '#e2e8f0' }}>
+                  <tr>
+                    <th style={{ padding: 8 }}>Mã</th>
+                    <th style={{ padding: 8 }}>Tên vaccine</th>
+                    <th style={{ padding: 8 }}>Mô tả</th>
+                    <th style={{ padding: 8, minWidth: 120 }}>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vaccineList.map(v => (
+                    <tr key={v.vaccinationID || v.VaccinationID}>
+                      <td style={{ padding: 8 }}>{v.vaccinationID || v.VaccinationID}</td>
+                      <td style={{ padding: 8 }}>
+                        {editVaccineId === (v.vaccinationID || v.VaccinationID) ? (
+                          <input
+                            type="text"
+                            name="VaccineName"
+                            value={editVaccineData.VaccineName}
+                            onChange={handleEditVaccineInputChange}
+                            style={{ width: '100%', padding: 4 }}
+                          />
+                        ) : (v.vaccineName || v.VaccineName)}
+                      </td>
+                      <td style={{ padding: 8 }}>
+                        {editVaccineId === (v.vaccinationID || v.VaccinationID) ? (
+                          <input
+                            type="text"
+                            name="Description"
+                            value={editVaccineData.Description}
+                            onChange={handleEditVaccineInputChange}
+                            style={{ width: '100%', padding: 4 }}
+                          />
+                        ) : (v.description || v.Description)}
+                      </td>
+                      <td style={{ padding: 8, display: 'flex', gap: 8 }}>
+                        {editVaccineId === (v.vaccinationID || v.VaccinationID) ? (
+                          <>
+                            <button className="create-plan-btn" style={{ padding: '4px 12px' }} onClick={() => handleEditVaccineSave(v.vaccinationID || v.VaccinationID)}>Lưu</button>
+                            <button className="close-btn" style={{ padding: '4px 12px' }} onClick={() => setEditVaccineId(null)}>Hủy</button>
+                          </>
+                        ) : (
+                          <>
+                            <button className="edit-btn" style={{ padding: '4px 12px' }} onClick={() => handleEditVaccineClick(v)}>Sửa</button>
+                            <button className="delete-btn" style={{ padding: '4px 12px', background: '#e53e3e', color: '#fff' }} onClick={() => setDeleteVaccineId(v.vaccinationID || v.VaccinationID)}>Xóa</button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal xác nhận xóa vaccine */}
+      {deleteVaccineId && (
+        <div className="modal-overlay" style={{ zIndex: 10001, background: 'rgba(0,0,0,0.25)' }}>
+          <div style={{
+            background: '#fff',
+            minWidth: 340,
+            maxWidth: 400,
+            margin: '120px auto',
+            borderRadius: 12,
+            boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+            padding: 32,
+            textAlign: 'center',
+            position: 'relative'
+          }}>
+            <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: '#e53e3e' }}>Xác nhận xóa vaccine</div>
+            <div style={{ marginBottom: 24 }}>Bạn có chắc chắn muốn xóa vaccine này không?</div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+              <button className="delete-btn" style={{ background: '#e53e3e', color: '#fff', padding: '8px 24px', borderRadius: 6 }} onClick={() => handleDeleteVaccine(deleteVaccineId)} disabled={deleteLoading}>Xóa</button>
+              <button className="close-btn" style={{ padding: '8px 24px', borderRadius: 6 }} onClick={() => setDeleteVaccineId(null)}>Hủy</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          top: 24,
+          right: 24,
+          background: '#38a169',
+          color: '#fff',
+          padding: '16px 32px',
+          borderRadius: 8,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          zIndex: 9999,
+          fontSize: 18,
+          fontWeight: 500
+        }}>
+          {notifyMessage}
+        </div>
+      )}
+      {showDateErrorModal && (
+        <div className="modal-overlay" style={{ zIndex: 10001, background: 'rgba(0,0,0,0.25)' }}>
+          <div style={{
+            background: '#fff',
+            minWidth: 340,
+            maxWidth: 400,
+            margin: '120px auto',
+            borderRadius: 12,
+            boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+            padding: 32,
+            textAlign: 'center',
+            position: 'relative'
+          }}>
+            <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: '#e53e3e' }}>Lỗi ngày dự kiến</div>
+            <div style={{ marginBottom: 24 }}>{dateErrorMessage}</div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+              <button className="close-btn" style={{ padding: '8px 24px', borderRadius: 6 }} onClick={() => setShowDateErrorModal(false)}>Đóng</button>
             </div>
           </div>
         </div>

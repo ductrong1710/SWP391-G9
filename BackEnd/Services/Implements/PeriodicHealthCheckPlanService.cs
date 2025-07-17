@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Businessobjects.Data;
 using Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq; // Added for .DefaultIfEmpty() and .Max()
 
 namespace Services.Implements
 {
@@ -51,6 +52,20 @@ namespace Services.Implements
 
         public async Task<PeriodicHealthCheckPlan> CreatePlanAsync(PeriodicHealthCheckPlan plan)
         {
+            // Nếu chưa có ID (tạo mới), backend sẽ tự sinh ID PHxxxx
+            if (string.IsNullOrEmpty(plan.ID))
+            {
+                // Lấy tất cả kế hoạch đã có để tìm số lớn nhất
+                var allPlans = await _planRepository.GetAllPlansAsync();
+                int maxNumber = allPlans
+                    .Select(p => p.ID)
+                    .Where(id => id != null && id.StartsWith("PH") && id.Length == 6 && int.TryParse(id.Substring(2), out _))
+                    .Select(id => int.Parse(id.Substring(2)))
+                    .DefaultIfEmpty(0)
+                    .Max();
+                var newNumber = maxNumber + 1;
+                plan.ID = $"PH{newNumber:D4}";
+            }
             await _planRepository.CreatePlanAsync(plan);
             // Sau khi tạo kế hoạch, tạo consent form và gửi notification cho từng phụ huynh
             var students = _dbContext.Profiles.Where(p => p.ClassID == plan.ClassID).ToList();

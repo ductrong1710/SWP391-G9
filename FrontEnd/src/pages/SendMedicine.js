@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './SendMedicine.css';
 import apiClient from '../services/apiClient';
+import ErrorDialog from '../components/ErrorDialog';
 
 const SendMedicine = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -34,6 +35,9 @@ const SendMedicine = () => {
     className: '',
     status: ''
   });
+
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
 
   // Kiểm tra xác thực
   useEffect(() => {
@@ -105,7 +109,8 @@ const SendMedicine = () => {
       setFilters(prev => ({...prev}));
     } catch (error) {
       console.error('Lỗi khi gửi yêu cầu thuốc:', error);
-      alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+      setError('Đã xảy ra lỗi. Vui lòng thử lại.');
+      setShowError(true);
     } finally {
       setLoading(false);
     }
@@ -579,6 +584,7 @@ const SendMedicine = () => {
             <div className="modal-backdrop fade show"></div>
           </div>
         )}
+        <ErrorDialog open={showError} message={error} onClose={() => setShowError(false)} />
       </div>
     </div>
   );

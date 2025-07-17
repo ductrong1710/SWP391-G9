@@ -5,6 +5,7 @@ import './HealthCheckManagement.css';
 import apiClient from '../services/apiClient';
 import { getApprovedStudents, getResultByConsent } from '../services/healthCheckService';
 import HealthCheckResultForm from '../components/HealthCheckResultForm';
+import ErrorDialog from '../components/ErrorDialog';
 
 const HealthCheckManagement = () => {
   const { isAuthenticated, loading: authLoading, user: currentUser } = useAuth();
@@ -108,6 +109,14 @@ const HealthCheckManagement = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailModalContent, setDetailModalContent] = useState(null);
   
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
+  const [errorType, setErrorType] = useState('error');
+  
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [onConfirm, setOnConfirm] = useState(() => () => {});
+  
   useEffect(() => {
     // Kiểm tra xác thực
     if (!authLoading && !isAuthenticated) {
@@ -163,7 +172,8 @@ const HealthCheckManagement = () => {
       notes: '',
       status: 'Đã lên lịch',
       NeedToContactParent: false,
-      followUpDate: ''
+      followUpDate: '',
+      creatorID: currentUser?.userID || currentUser?.UserID || ""
     });
     setShowForm(true);
   };
@@ -179,7 +189,8 @@ const HealthCheckManagement = () => {
       notes: healthCheck.results,
       status: healthCheck.status,
       NeedToContactParent: healthCheck.NeedToContactParent || false,
-      followUpDate: healthCheck.followUpDate || ''
+      followUpDate: healthCheck.followUpDate || '',
+      creatorID: currentUser?.userID || currentUser?.UserID || ""
     });
     setShowForm(true);
   };
@@ -214,58 +225,64 @@ const HealthCheckManagement = () => {
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-    
     // Kiểm tra các trường bắt buộc
     if (!formData.studentId || !formData.checkupType || !formData.creatorID) {
-      alert('Vui lòng điền đầy đủ thông tin: Mã học sinh, Loại khám, và Người tạo!');
+      setError('Vui lòng điền đầy đủ thông tin: Mã học sinh, Loại khám, và Người tạo!');
+      setShowError(true);
+      return;
+    }
+    // 1. Lấy ClassID từ Profile (chuẩn hóa giống tạo lịch theo lớp)
+    let classId = '';
+    let studentProfile = null;
+    try {
+      const profileRes = await apiClient.get(`/Profile/user/${formData.studentId}`);
+      studentProfile = profileRes.data;
+      // Ưu tiên lấy đúng trường ClassID, không lấy tên lớp
+      classId = studentProfile?.ClassID || studentProfile?.classID || '';
+    } catch (err) {
+      console.warn('Không lấy được ClassID từ Profile:', err);
+      // Nếu không lấy được profile, báo lỗi và return
+      setError('Mã học sinh không tồn tại trong hệ thống!');
+      setErrorType('error');
+      setShowError(true);
       return;
     }
     
-    // Tạo dữ liệu cho kế hoạch khám sức khỏe định kỳ
+    // 2. Tạo dữ liệu cho kế hoạch khám sức khỏe định kỳ
     let checkupDateToUse = formData.checkupDate;
     if (formData.status === 'Dời lịch' && formData.newCheckupDate) {
       checkupDateToUse = formData.newCheckupDate;
     }
     const planData = {
-      PlanName: `Khám ${formData.checkupType} - ${formData.studentId}`,
-      ScheduleDate: checkupDateToUse,
-      CheckupContent: 'Khám sức khỏe định kỳ',
-      Status: "Đã lên lịch",
-      ClassID: null, // Không có lớp vì đây là khám cá nhân
-      CreatedDate: new Date().toISOString().split('T')[0],
-      CreatorID: formData.creatorID, // Lấy từ form
-      Notes: formData.notes || ''
+      planName: `Khám ${formData.checkupType} - ${formData.studentId}`,
+      scheduleDate: checkupDateToUse ? new Date(checkupDateToUse).toISOString() : null,
+      checkupContent: 'Khám sức khỏe định kỳ',
+      status: "Đã lên lịch",
+      classID: classId,
+      createdDate: new Date().toISOString(),
+      creatorID: formData.creatorID,
+      notes: formData.notes || ''
     };
     
     try {
       // Tạo kế hoạch khám sức khỏe định kỳ
       const planResponse = await apiClient.post('/PeriodicHealthCheckPlan', planData);
       console.log('Plan created:', planResponse.data);
-      
-      // Tạo kết quả khám sức khỏe
-      const resultData = {
-        ID: 0, // Thêm trường ID mặc định cho backend
-        studentId: formData.studentId,
-        checkupDate: checkupDateToUse,
-        doctorName: formData.doctorName,
-        healthFacility: formData.healthFacility,
-        checkupType: formData.checkupType,
-        status: "Đã lên lịch",
-        notes: formData.notes
-      };
-      
-      await apiClient.post('/HealthCheckResult', resultData);
-      
-      alert('Đã lên lịch khám sức khỏe thành công!');
+      // Hiển thị thông báo thành công
+      setError('Tạo lịch khám sức khỏe thành công!');
+      setErrorType('success');
+      setShowError(true);
+      // Reset form và đóng modal
       setShowForm(false);
       setEditingHealthCheckId(null);
-      
       // Refresh danh sách kế hoạch
       const plansRes = await apiClient.get('/PeriodicHealthCheckPlan');
       setPlans(plansRes.data);
     } catch (error) {
       console.error("Lỗi khi gửi dữ liệu:", error);
-      alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+      setError('Đã xảy ra lỗi. Vui lòng thử lại.');
+      setErrorType('error');
+      setShowError(true);
     }
   };
   
@@ -628,15 +645,22 @@ const HealthCheckManagement = () => {
   
   // Thêm hàm gửi thông báo cho toàn bộ phụ huynh của kế hoạch
   const handleSendNotificationsForPlan = async (plan) => {
-    const confirmed = window.confirm('Bạn có chắc chắn muốn gửi thông báo xác nhận đến tất cả phụ huynh của kế hoạch này?');
-    if (!confirmed) return;
-    try {
-      await apiClient.post(`/PeriodicHealthCheckPlan/${plan.id}/send-notifications`);
-      alert('Đã gửi thông báo đến tất cả phụ huynh của lớp!');
-    } catch (error) {
-      alert('Có lỗi khi gửi thông báo!');
-      console.error('Lỗi gửi thông báo:', error);
-    }
+    setConfirmMessage('Bạn có chắc chắn muốn gửi thông báo xác nhận đến tất cả phụ huynh của kế hoạch này?');
+    setShowConfirm(true);
+    setOnConfirm(() => async () => {
+      setShowConfirm(false);
+      try {
+        await apiClient.post(`/PeriodicHealthCheckPlan/${plan.id}/send-notifications`);
+        setError('Đã gửi thông báo đến tất cả phụ huynh của lớp!');
+        setErrorType('success');
+        setShowError(true);
+      } catch (error) {
+        setError('Có lỗi khi gửi thông báo!');
+        setErrorType('error');
+        setShowError(true);
+        console.error('Lỗi gửi thông báo:', error);
+      }
+    });
   };
   
   useEffect(() => {
@@ -1091,6 +1115,15 @@ const HealthCheckManagement = () => {
                         <label htmlFor="checkupDate" className="form-label">
                           {isReschedule ? 'Ngày dự khám mới' : (['Đang thực hiện', 'Đã hoàn thành'].includes(formData.status) ? 'Ngày khám' : 'Ngày dự khám')}
                         </label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          id="checkupDate"
+                          value={formData.checkupDate ?? ""}
+                          onChange={handleInputChange}
+                          required
+                          disabled={['Đang thực hiện', 'Đã hoàn thành', 'Bị hủy'].includes(formData.status)}
+                        />
                       </div>
                     </div>
                     
@@ -1515,6 +1548,12 @@ const HealthCheckManagement = () => {
             onCancel={() => setShowResultModal(false)}
           />
         )}
+        <ErrorDialog open={showError} message={error} onClose={() => setShowError(false)} type={errorType} />
+        {/* Dialog xác nhận gửi thông báo */}
+        <ErrorDialog open={showConfirm} message={confirmMessage} onClose={() => setShowConfirm(false)} type="info"
+          // Nút xác nhận
+          onConfirm={onConfirm}
+        />
       </div>
     </div>
   );

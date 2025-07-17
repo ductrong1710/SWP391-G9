@@ -7,7 +7,7 @@ namespace Businessobjects.Models
     {
         [Key]
         [Column("ID")]
-        public string ID { get; set; } = null!;
+        public string? ID { get; set; }
         
         [Required]
         [Column("PlanName")]

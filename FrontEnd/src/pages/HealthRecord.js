@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/apiClient';
 import healthRecordService from '../services/healthRecordService';
 import './HealthRecord.css';
+import ErrorDialog from '../components/ErrorDialog';
 
 const HealthRecord = () => {
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ const HealthRecord = () => {
     fullName: '',
     className: ''
   });
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -180,7 +183,8 @@ const HealthRecord = () => {
 
     } catch (error) {
       console.error('Error creating health record:', error);
-      alert('Có lỗi xảy ra khi tạo hồ sơ.');
+      setError('Có lỗi xảy ra khi tạo hồ sơ.');
+      setShowError(true);
     } finally {
       setLoading(false);
     }
@@ -253,7 +257,8 @@ const HealthRecord = () => {
 
     } catch (error) {
       console.error('Error submitting health record:', error);
-      alert('Có lỗi xảy ra khi gửi thông tin.');
+      setError('Có lỗi xảy ra khi gửi thông tin.');
+      setShowError(true);
     } finally {
       setLoading(false);
     }
@@ -442,6 +447,7 @@ const HealthRecord = () => {
           </div>
         </div>
       )}
+      <ErrorDialog open={showError} message={error} onClose={() => setShowError(false)} />
     </div>
   );
 };

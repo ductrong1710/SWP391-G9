@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import ErrorDialog from '../components/ErrorDialog';
 
 const MedicalIncidentManagement = () => {
   const { getUserRole } = useAuth();
@@ -30,6 +31,8 @@ const MedicalIncidentManagement = () => {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
   const [formError, setFormError] = useState('');
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
 
   const fetchIncidents = async () => {
     setLoading(true);
@@ -38,6 +41,8 @@ const MedicalIncidentManagement = () => {
       setIncidents(res.data);
     } catch (e) {
       setToast({ show: true, message: 'Lỗi tải danh sách sự cố', type: 'error' });
+      setError('Lỗi tải danh sách sự cố');
+      setShowError(true);
     }
     setLoading(false);
   };
@@ -229,6 +234,7 @@ const MedicalIncidentManagement = () => {
           <p><b>Ghi chú:</b> {selectedIncident.notes}</p>
         </div>
       )}
+      <ErrorDialog open={showError} message={error} onClose={() => setShowError(false)} />
     </div>
   );
 };

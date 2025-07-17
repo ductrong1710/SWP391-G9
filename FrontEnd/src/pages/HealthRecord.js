@@ -5,6 +5,7 @@ import apiClient from '../services/apiClient';
 import healthRecordService from '../services/healthRecordService';
 import medicalStaffService from '../services/medicalStaffService';
 import './HealthRecord.css';
+import './HealthRecordSimple.css';
 
 const HealthRecord = () => {
   const navigate = useNavigate();
@@ -33,11 +34,11 @@ const HealthRecord = () => {
     studentID: '',
     parentID: '',
     allergies: '',
-    chronicDiseases: '',
-    treatmentHistory: '',
+    chronic_diseases: '',
+    treatment_history: '',
     eyesight: '',
     hearing: '',
-    vaccinationHistory: '',
+    vaccination_history: '',
     note: '',
     parentContact: '',
     fullName: '',
@@ -178,36 +179,7 @@ const HealthRecord = () => {
     // fetchData will be called automatically due to useEffect dependencies
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Submitted':
-        return '#3182ce';
-      case 'Under Review':
-        return '#d69e2e';
-      case 'Approved':
-        return '#38a169';
-      case 'Rejected':
-        return '#e53e3e';
-      default:
-        return '#718096';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'Submitted':
-        return 'Đã gửi';
-      case 'Under Review':
-        return 'Đang xem xét';
-      case 'Approved':
-        return 'Đã phê duyệt';
-      case 'Rejected':
-        return 'Từ chối';
-      default:
-        return 'Không xác định';
-    }
-  };
-
+  // Helper functions for status display
   const getStatusClass = (status) => {
     switch (status) {
       case 'Submitted':
@@ -219,7 +191,22 @@ const HealthRecord = () => {
       case 'Rejected':
         return 'status-rejected';
       default:
-        return 'status-unknown';
+        return 'status-default';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'Submitted':
+        return 'Đã gửi';
+      case 'Under Review':
+        return 'Đang xem xét';
+      case 'Approved':
+        return 'Đã duyệt';
+      case 'Rejected':
+        return 'Từ chối';
+      default:
+        return status;
     }
   };
 
@@ -234,7 +221,7 @@ const HealthRecord = () => {
       case 'Rejected':
         return 'fa-times-circle';
       default:
-        return 'fa-question-circle';
+        return 'fa-paper-plane';
     }
   };
 
@@ -283,11 +270,11 @@ const HealthRecord = () => {
       studentID: '',
       parentID: '',
       allergies: '',
-      chronicDiseases: '',
-      treatmentHistory: '',
+      chronic_diseases: '',
+      treatment_history: '',
       eyesight: '',
       hearing: '',
-      vaccinationHistory: '',
+      vaccination_history: '',
       note: '',
       parentContact: '',
       fullName: '',
@@ -369,11 +356,11 @@ const HealthRecord = () => {
         studentID: studentProfile.userID,
         parentID: user.userID,
         allergies: formData.allergies,
-        chronicDiseases: formData.chronicDiseases,
-        treatmentHistory: formData.treatmentHistory,
+        chronic_diseases: formData.chronic_diseases,
+        treatment_history: formData.treatment_history,
         eyesight: formData.eyesight,
         hearing: formData.hearing,
-        vaccinationHistory: formData.vaccinationHistory,
+        vaccination_history: formData.vaccination_history,
         note: formData.note,
         parentContact: formData.parentContact,
         status: 'Submitted'
@@ -388,11 +375,11 @@ const HealthRecord = () => {
         studentID: '',
         parentID: '',
         allergies: '',
-        chronicDiseases: '',
-        treatmentHistory: '',
+        chronic_diseases: '',
+        treatment_history: '',
         eyesight: '',
         hearing: '',
-        vaccinationHistory: '',
+        vaccination_history: '',
         note: '',
         parentContact: '',
         fullName: '',
@@ -413,102 +400,243 @@ const HealthRecord = () => {
     return <div className="loading-container">Đang tải dữ liệu...</div>;
   }
 
-  // Giao diện cho phụ huynh
+  // Giao diện cho phụ huynh - Modern & Minimalist
   if (getUserRole() === 'Parent') {
     return (
       <div className="health-record-container parent-view">
-        <h1 className="main-title">Khai báo sức khỏe hàng ngày</h1>
-        <p className="sub-title">Vui lòng chọn tên con và cập nhật thông tin sức khỏe</p>
+        {/* Modern header with gradient */}
+        <div className="modern-header">
+          <div className="header-content">
+            <h1>Khai báo hồ sơ sức khỏe</h1>
+            <p>Vui lòng cung cấp thông tin sức khỏe đầy đủ của con em để nhà trường có thể chăm sóc tốt nhất</p>
+          </div>
+          <div className="header-icon">
+            <i className="fas fa-notes-medical"></i>
+          </div>
+        </div>
 
-        {/* Form khai báo */}
-        <div className="daily-declaration-form">
+        {/* Modern Health Record Declaration Form */}
+        <div className="declaration-form">
           <form onSubmit={handleHealthRecordFormSubmit}>
-            <div className="form-grid">
-              {/* Child Info */}
-              <div className="form-group">
-                <label htmlFor="fullName">Họ và tên học sinh</label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName ?? ""}
+            {/* Student info card */}
+            <div className="info-card">
+              <h3><i className="fas fa-user-graduate"></i> Thông tin học sinh</h3>
+              <div className="form-row">
+                <div className="form-field">
+                  <label>Họ và tên</label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName ?? ""}
+                    onChange={handleInputChange}
+                    placeholder="Nhập đầy đủ họ tên"
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <label>Lớp</label>
+                  <input
+                    type="text"
+                    name="className"
+                    value={formData.className ?? ""}
+                    onChange={handleInputChange}
+                    placeholder="VD: 5A, 6B..."
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Medical History Card */}
+            <div className="health-card">
+              <h3><i className="fas fa-notes-medical"></i> Tiền sử bệnh tật</h3>
+              
+              <div className="form-field">
+                <label>Dị ứng</label>
+                <textarea
+                  name="allergies"
+                  value={formData.allergies ?? ""}
                   onChange={handleInputChange}
+                  placeholder="Ghi rõ các loại dị ứng (thực phẩm, thuốc, môi trường...). Để trống nếu không có."
+                  rows="2"
+                />
+              </div>
+
+              <div className="form-field">
+                <label>Bệnh mãn tính</label>
+                <textarea
+                  name="chronic_diseases"
+                  value={formData.chronic_diseases ?? ""}
+                  onChange={handleInputChange}
+                  placeholder="Các bệnh mãn tính hiện tại (hen suyễn, tiểu đường, tim mạch...). Để trống nếu không có."
+                  rows="2"
+                />
+              </div>
+
+              <div className="form-field">
+                <label>Lịch sử điều trị</label>
+                <textarea
+                  name="treatment_history"
+                  value={formData.treatment_history ?? ""}
+                  onChange={handleInputChange}
+                  placeholder="Các ca phẫu thuật, nằm viện, điều trị đặc biệt... Để trống nếu không có."
+                  rows="2"
+                />
+              </div>
+            </div>
+
+            {/* Vision & Hearing Card */}
+            <div className="vision-hearing-card">
+              <h3><i className="fas fa-eye"></i> Thị lực & Thính lực</h3>
+              <div className="form-row">
+                <div className="form-field">
+                  <label>Thị lực (độ cận/viễn)</label>
+                  <input
+                    type="number"
+                    name="eyesight"
+                    value={formData.eyesight ?? ""}
+                    onChange={handleInputChange}
+                    placeholder="VD: -2.5, 1.5... (để trống nếu bình thường)"
+                    step="0.1"
+                  />
+                </div>
+                <div className="form-field">
+                  <label>Thính lực (%)</label>
+                  <input
+                    type="number"
+                    name="hearing"
+                    value={formData.hearing ?? ""}
+                    onChange={handleInputChange}
+                    placeholder="VD: 100, 80... (để trống nếu bình thường)"
+                    min="0"
+                    max="100"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Vaccination Card */}
+            <div className="vaccination-card">
+              <h3><i className="fas fa-syringe"></i> Lịch sử tiêm chủng</h3>
+              <div className="form-field">
+                <textarea
+                  name="vaccination_history"
+                  value={formData.vaccination_history ?? ""}
+                  onChange={handleInputChange}
+                  placeholder="Các loại vắc-xin đã tiêm, thời gian tiêm gần nhất... (BCG, DPT, sởi, viêm gan B, COVID-19...)"
+                  rows="3"
+                />
+              </div>
+            </div>
+
+            {/* Contact & Notes Card */}
+            <div className="contact-notes-card">
+              <h3><i className="fas fa-phone"></i> Thông tin liên hệ & Ghi chú</h3>
+              
+              <div className="form-field">
+                <label>Số điện thoại phụ huynh</label>
+                <input
+                  type="tel"
+                  name="parentContact"
+                  value={formData.parentContact ?? ""}
+                  onChange={handleInputChange}
+                  placeholder="Số điện thoại để liên hệ khẩn cấp"
                   required
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="className">Lớp</label>
-                <input
-                  type="text"
-                  id="className"
-                  name="className"
-                  value={formData.className ?? ""}
+
+              <div className="form-field">
+                <label>Ghi chú thêm</label>
+                <textarea
+                  name="note"
+                  value={formData.note ?? ""}
                   onChange={handleInputChange}
-                  required
+                  placeholder="Thông tin bổ sung khác về sức khỏe của con (không bắt buộc)..."
+                  rows="2"
                 />
               </div>
-
-              {/* Health Details */}
-              <div className="form-group full-width">
-                <label>Triệu chứng (nếu có)</label>
-                {/* Checkbox symptoms can be added here if needed */}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="allergies">Dị ứng</label>
-                <input type="text" id="allergies" name="allergies" value={formData.allergies ?? ""} onChange={handleInputChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="chronicDiseases">Bệnh mãn tính</label>
-                <input type="text" id="chronicDiseases" name="chronicDiseases" value={formData.chronicDiseases ?? ""} onChange={handleInputChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="treatmentHistory">Lịch sử điều trị</label>
-                <input type="text" id="treatmentHistory" name="treatmentHistory" value={formData.treatmentHistory ?? ""} onChange={handleInputChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="eyesight">Thị lực</label>
-                <input type="text" id="eyesight" name="eyesight" value={formData.eyesight ?? ""} onChange={handleInputChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="hearing">Thính lực</label>
-                <input type="text" id="hearing" name="hearing" value={formData.hearing ?? ""} onChange={handleInputChange} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="vaccinationHistory">Lịch sử tiêm chủng</label>
-                <input type="text" id="vaccinationHistory" name="vaccinationHistory" value={formData.vaccinationHistory ?? ""} onChange={handleInputChange} />
-              </div>
-
-              <div className="form-group full-width">
-                <label htmlFor="note">Ghi chú thêm</label>
-                <textarea id="note" name="note" value={formData.note ?? ""} onChange={handleInputChange}></textarea>
-              </div>
             </div>
-            <div className="form-actions">
-              <button type="submit" className="submit-btn">Gửi thông tin</button>
-            </div>
+
+            {/* Submit button */}
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? (
+                <>
+                  <i className="fas fa-spinner fa-spin"></i>
+                  Đang gửi...
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-paper-plane"></i>
+                  Gửi hồ sơ sức khỏe
+                </>
+              )}
+            </button>
           </form>
         </div>
 
-        {/* Danh sách đã khai báo */}
-        <div className="records-list">
-          <h2>Lịch sử khai báo</h2>
+        {/* Recent declarations */}
+        <div className="recent-declarations">
+          <div className="section-header">
+            <h2>Khai báo gần đây</h2>
+            <span className="record-count">{healthRecords.length} bản ghi</span>
+          </div>
+          
           {healthRecords.length > 0 ? (
-            healthRecords.map(record => (
-              <div key={record.healthRecordID} className="record-card">
-                <div className="record-header">
-                  <span>{record.childName} - {record.childClass}</span>
-                  <span>Ngày: {new Date(record.recordDate).toLocaleDateString()}</span>
-                  <span className="status" style={{ backgroundColor: getStatusColor(record.status) }}>
-                    {getStatusText(record.status)}
-                  </span>
+            <div className="declarations-list">
+              {healthRecords.slice(0, 5).map((record) => (
+                <div key={record.healthRecordID} className="declaration-item">
+                  <div className="declaration-date">
+                    <span className="day">
+                      {new Date(record.recordDate).getDate()}
+                    </span>
+                    <span className="month-year">
+                      Tháng {new Date(record.recordDate).getMonth() + 1}/{new Date(record.recordDate).getFullYear()}
+                    </span>
+                  </div>
+                  <div className="declaration-info">
+                    <h4>{record.childName || 'Học sinh'}</h4>
+                    <span className={`status-badge ${getStatusClass(record.status)}`}>
+                      {getStatusText(record.status)}
+                    </span>
+                  </div>
+                  <button 
+                    className="view-detail-btn"
+                    onClick={() => {
+                      setSelectedRecord(record);
+                      setShowDetailsModal(true);
+                    }}
+                  >
+                    <i className="fas fa-eye"></i>
+                  </button>
                 </div>
-                <div className="record-body">
-                  <p><strong>Ghi chú:</strong> {record.note}</p>
-                </div>
-              </div>
-            ))
-          ) : <p>Chưa có lịch sử khai báo.</p>}
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <i className="fas fa-file-medical"></i>
+              <h3>Chưa có khai báo nào</h3>
+              <p>Hãy thực hiện khai báo sức khỏe đầu tiên cho con em mình</p>
+            </div>
+          )}
+        </div>
+
+        {/* Quick health tips */}
+        <div className="health-tips">
+          <h3>💡 Lời khuyên sức khỏe</h3>
+          <div className="tips-list">
+            <div className="tip-item">
+              <span className="tip-icon">🧼</span>
+              <span>Rửa tay thường xuyên bằng xà phòng</span>
+            </div>
+            <div className="tip-item">
+              <span className="tip-icon">💧</span>
+              <span>Uống đủ nước mỗi ngày</span>
+            </div>
+            <div className="tip-item">
+              <span className="tip-icon">😷</span>
+              <span>Đeo khẩu trang khi cần thiết</span>
+            </div>
+          </div>
         </div>
       </div>
     );

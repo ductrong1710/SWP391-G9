@@ -556,184 +556,609 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .health-record-management-container {
-    padding: 10px 0;
+  .health-record-container.parent-view {
+    padding: 1rem 0.5rem;
   }
   
-  .health-record-management-container h1 {
-    font-size: 1.75rem;
+  .declaration-header {
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
   }
   
-  .stats-cards-container .health-stat-card .d-flex {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.75rem;
+  .header-content {
+    padding: 2rem 1.5rem;
   }
   
-  .stats-cards-container .stat-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 1.25rem;
-  }
-  
-  .stats-cards-container .card-number {
-    font-size: 1.75rem;
-  }
-  
-  .filter-card .row.g-3 > * {
+  .header-icon {
+    width: 60px;
+    height: 60px;
     margin-bottom: 1rem;
   }
   
-  .record-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+  .header-icon i {
+    font-size: 2rem;
   }
   
-  .record-status-wrapper {
-    align-items: flex-start;
+  .main-title {
+    font-size: 2rem;
   }
   
-  .health-info-grid {
+  .sub-title {
+    font-size: 1rem;
+  }
+  
+  .health-status-cards {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
   
-  .record-actions {
+  .status-card {
+    padding: 1rem;
+  }
+  
+  .status-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+  
+  .daily-declaration-form {
+    border-radius: 15px;
+  }
+  
+  .form-header {
+    padding: 1.5rem;
+  }
+  
+  .form-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .form-section {
+    padding: 1.5rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .checkbox-group {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .emergency-contact-info {
+    padding: 1rem;
+  }
+  
+  .contact-items {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .form-actions {
+    padding: 1.5rem;
+  }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  
+  .history-section {
+    padding: 1.5rem;
+  }
+  
+  .history-header {
     flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
   }
   
-  .record-actions .btn {
-    width: 100%;
-    text-align: center;
-    flex: none;
+  .history-stats {
+    gap: 1rem;
   }
   
-  .records-grid .row.g-3 > * {
-    margin-bottom: 1rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .filter-card .btn {
-    width: 100%;
-    margin-bottom: 0.5rem;
+  .timeline-item {
+    margin-bottom: 1.5rem;
   }
   
-  .btn-export-import {
-    text-align: center;
+  .timeline-marker {
+    margin-right: 1rem;
   }
   
-  .btn-export-import .btn {
-    width: 100%;
+  .timeline-dot {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
   }
   
-  .record-meta-inline {
+  .record-header-modern {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .record-meta {
+    flex-direction: column;
     gap: 0.5rem;
   }
   
-  .no-results {
+  .health-item {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .no-records {
     padding: 2rem 1rem;
   }
   
-  .no-results i {
-    font-size: 3rem;
+  .no-records-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .no-records-icon i {
+    font-size: 1.5rem;
   }
 }
 
-/* Parent view styles (existing) */
-.health-record-container.parent-view {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+@media (max-width: 480px) {
+  .main-title {
+    font-size: 1.75rem;
+  }
+  
+  .header-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .status-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .form-header h2 {
+    font-size: 1.125rem;
+  }
+  
+  .section-header h3 {
+    font-size: 1.125rem;
+  }
+  
+  .timeline-marker {
+    margin-right: 0.75rem;
+  }
+  
+  .timeline-dot {
+    width: 25px;
+    height: 25px;
+    font-size: 0.7rem;
+  }
+  
+  .record-card-modern {
+    border-radius: 10px;
+  }
+  
+  .record-header-modern {
+    padding: 1rem;
+  }
+  
+  .record-body-modern {
+    padding: 1rem;
+  }
 }
 
-.main-title {
-  color: #1e3a8a;
-  font-size: 2rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.sub-title {
-  color: #6b7280;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.daily-declaration-form {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.form-group {
+/* Loading state improvements */
+.loading-container {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  font-size: 1.125rem;
+  color: #6b7280;
+  background: white;
+  border-radius: 15px;
+  margin: 2rem 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.form-group.full-width {
-  grid-column: 1 / -1;
+.loading-container::before {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
-.form-group label {
-  color: #374151;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 0.75rem;
-  font-size: 1rem;
-}
-
+/* Accessibility improvements */
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.checkbox-item:focus-within .checkmark {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.submit-btn:focus {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.btn-view-detail:focus {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+/* Animation improvements */
+.status-card,
+.record-card-modern,
+.timeline-item {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.timeline-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.timeline-item:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.timeline-item:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Print styles */
+@media print {
+  .health-record-container.parent-view {
+    background: white;
+    padding: 0;
+  }
+  
+  .declaration-header {
+    background: #f8fafc !important;
+    color: #1e293b !important;
+    box-shadow: none;
+  }
+  
+  .health-status-cards,
+  .form-actions,
+  .record-actions {
+    display: none;
+  }
+  
+  .daily-declaration-form,
+  .history-section {
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+  }
+}
+
+/* Modern Health Record Declaration Form Styles */
+.declaration-form {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.declaration-form:hover {
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.declaration-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+/* Card styles for form sections */
+.info-card,
+.health-card,
+.vision-hearing-card,
+.vaccination-card,
+.contact-notes-card {
+  background: rgba(248, 250, 252, 0.8);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.info-card::before,
+.health-card::before,
+.vision-hearing-card::before,
+.vaccination-card::before,
+.contact-notes-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 16px 16px 0 0;
+}
+
+.health-card::before {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.vision-hearing-card::before {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.vaccination-card::before {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.contact-notes-card::before {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.info-card:hover,
+.health-card:hover,
+.vision-hearing-card:hover,
+.vaccination-card:hover,
+.contact-notes-card:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Section headers */
+.info-card h3,
+.health-card h3,
+.vision-hearing-card h3,
+.vaccination-card h3,
+.contact-notes-card h3 {
+  margin: 0 0 1.5rem 0;
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.info-card h3 i,
+.health-card h3 i,
+.vision-hearing-card h3 i,
+.vaccination-card h3 i,
+.contact-notes-card h3 i {
+  color: #3b82f6;
+  font-size: 1.1rem;
+}
+
+/* Form layout */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Input styles */
+.form-field input,
+.form-field textarea {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
   outline: none;
-  border-color: #1e3a8a;
-  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.95);
 }
 
-.form-actions {
-  text-align: center;
-  margin-top: 2rem;
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #9ca3af;
+  font-style: italic;
 }
 
+.form-field textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Submit button */
 .submit-btn {
-  background-color: #1e3a8a;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
   border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transition: left 0.3s ease;
+  z-index: 0;
+}
+
+.submit-btn:hover::before {
+  left: 0;
 }
 
 .submit-btn:hover {
-  background-color: #1e40af;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: 1.125rem;
-  color: #6b7280;
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }
+
+.submit-btn i,
+.submit-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .declaration-form {
+    margin: 1rem;
+    border-radius: 16px;
+  }
+  
+  .declaration-form form {
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .info-card,
+  .health-card,
+  .vision-hearing-card,
+  .vaccination-card,
+  .contact-notes-card {
+    padding: 1.25rem;
+  }
+  
+  .info-card h3,
+  .health-card h3,
+  .vision-hearing-card h3,
+  .vaccination-card h3,
+  .contact-notes-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-field input,
+  .form-field textarea {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .submit-btn {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .declaration-form {
+    margin: 0.5rem;
+  }
+  
+  .declaration-form form {
+    padding: 1rem;
+  }
+  
+  .info-card,
+  .health-card,
+  .vision-hearing-card,
+  .vaccination-card,
+  .contact-notes-card {
+    padding: 1rem;
+  }
+}
+
+/* Animation for form cards */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.info-card,
+.health-card,
+.vision-hearing-card,
+.vaccination-card,
+.contact-notes-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.health-card { animation-delay: 0.1s; }
+.vision-hearing-card { animation-delay: 0.2s; }
+.vaccination-card { animation-delay: 0.3s; }
+.contact-notes-card { animation-delay: 0.4s; }
+.submit-btn { animation: slideInUp 0.6s ease-out 0.5s both; }

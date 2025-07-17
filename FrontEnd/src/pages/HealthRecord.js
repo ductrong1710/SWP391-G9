@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/apiClient';
 import healthRecordService from '../services/healthRecordService';
+import medicalStaffService from '../services/medicalStaffService';
 import './HealthRecord.css';
-import ErrorDialog from '../components/ErrorDialog';
 
 const HealthRecord = () => {
   const navigate = useNavigate();
@@ -17,19 +17,17 @@ const HealthRecord = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  
-  // Thêm state cho bộ lọc nâng cao (giống HealthCheckManagement)
-  const [filters, setFilters] = useState({
-    recordDate: '',
-    className: '',
-    studentName: '',
-    healthStatus: ''
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [stats, setStats] = useState({
+    totalRecords: 0,
+    approvedRecords: 0,
+    pendingReview: 0,
+    criticalRecords: 0
   });
-  
-  // State cho danh sách lớp và options
-  const [availableClasses, setAvailableClasses] = useState([]);
-  const [availableStudents, setAvailableStudents] = useState([]);
-  
   const [formData, setFormData] = useState({
     healthRecordID: '',
     studentID: '',
@@ -45,125 +43,140 @@ const HealthRecord = () => {
     fullName: '',
     className: ''
   });
-  const [error, setError] = useState('');
-  const [showError, setShowError] = useState(false);
 
-  // Load danh sách lớp (giống HealthCheckManagement)
-  useEffect(() => {
-    apiClient.get('/SchoolClass')
-      .then(res => {
-        const classes = res.data.map(cls => ({
-          ClassID: cls.ClassID || cls.classID || cls.id,
-          ClassName: cls.ClassName || cls.className || cls.name
-        }));
-        setAvailableClasses(classes);
-      })
-      .catch(() => setAvailableClasses([]));
-  }, []);
-
-  // Load danh sách học sinh
-  useEffect(() => {
-    apiClient.get('/User/students')
-      .then(res => {
-        setAvailableStudents(res.data || []);
-      })
-      .catch(() => setAvailableStudents([]));
-  }, []);
-
-  // Filtered records với useMemo để tối ưu performance
-  const filteredRecords = useMemo(() => {
-    return healthRecords.filter(record => {
-      const matchDate = !filters.recordDate || 
-        new Date(record.recordDate).toISOString().split('T')[0] === filters.recordDate;
-      const matchClass = !filters.className || 
-        record.className === filters.className || record.childClass === filters.className;
-      const matchStudent = !filters.studentName || 
-        (record.childName && record.childName.toLowerCase().includes(filters.studentName.toLowerCase()));
-      const matchHealthStatus = !filters.healthStatus || 
-        record.healthStatus === filters.healthStatus;
-      const matchStatus = filterStatus === 'all' || record.status === filterStatus;
+  // Fetch data with enhanced features
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const userRole = getUserRole();
       
-      return matchDate && matchClass && matchStudent && matchHealthStatus && matchStatus;
-    });
-  }, [healthRecords, filters, filterStatus]);
+      if (userRole === 'Parent') {
+        // Parent logic remains the same
+        const childrenRes = await healthRecordService.getChildrenByParent(user.userID);
+        const childrenData = childrenRes.data;
+        setChildren(childrenData);
 
-  // Helper functions
-  const getClassName = (record) => {
-    return record.className || record.childClass || '---';
-  };
+        if (childrenData.length > 0) {
+          const recordPromises = childrenData.map(child =>
+            healthRecordService.getHealthRecordsByStudent(child.studentID)
+          );
+          const recordsRes = await Promise.all(recordPromises);
+          const records = recordsRes.flatMap(res => res.data);
+          setHealthRecords(records);
+        }
+      } else if (userRole === 'MedicalStaff') {
+        // Enhanced medical staff data fetching
+        const params = {
+          page: currentPage,
+          pageSize: pageSize,
+          studentId: selectedChild || undefined,
+          status: filterStatus !== 'all' ? filterStatus : undefined,
+          search: searchTerm || undefined
+        };
 
-  const handleApplyFilters = () => {
-    // Trigger re-render with current filters
-    setHealthRecords([...healthRecords]);
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      recordDate: '',
-      className: '',
-      studentName: '',
-      healthStatus: ''
-    });
-    setFilterStatus('all');
-    setSelectedChild('');
-  };
-
-  const handleExportToExcel = () => {
-    // TODO: Implement export functionality
-    alert('Chức năng xuất Excel đang được phát triển');
-  };
+        // Fetch records with pagination
+        const recordsRes = await medicalStaffService.getHealthRecords(params);
+        setHealthRecords(Array.isArray(recordsRes.data) ? recordsRes.data : recordsRes.data || []);
+        setTotalCount(recordsRes.totalCount || 0);
+        setTotalPages(recordsRes.totalPages || 1);
+        
+        // Fetch students for filter
+        const studentsData = await medicalStaffService.getStudentsForFilter();
+        setChildren(studentsData);
+        
+        // Fetch statistics
+        const statsData = await medicalStaffService.getHealthRecordStatistics();
+        setStats(statsData);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setHealthRecords([]);
+      setChildren([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, getUserRole, selectedChild, filterStatus, searchTerm, currentPage, pageSize]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const userRole = getUserRole();
-        let records = [];
-        let childrenData = [];
-
-        if (userRole === 'Parent') {
-          // Phụ huynh: Lấy danh sách con và hồ sơ sức khỏe của các con
-          const childrenRes = await healthRecordService.getChildrenByParent(user.userID);
-          childrenData = childrenRes.data;
-          setChildren(childrenData);
-
-          if (childrenData.length > 0) {
-            // Lấy hồ sơ của tất cả các con
-            const recordPromises = childrenData.map(child =>
-              healthRecordService.getHealthRecordsByStudent(child.studentID)
-            );
-            const recordsRes = await Promise.all(recordPromises);
-            records = recordsRes.flatMap(res => res.data);
-          }
-        } else if (userRole === 'MedicalStaff') {
-          // Nhân viên y tế: Lấy tất cả hồ sơ
-          const params = new URLSearchParams();
-          if (selectedChild) params.append('studentId', selectedChild);
-          if (filterStatus !== 'all') params.append('status', filterStatus);
-
-          const recordsRes = await healthRecordService.getAllHealthRecords(params);
-          records = recordsRes.data;
-          
-          // Lấy danh sách tất cả học sinh để lọc
-          const childrenRes = await apiClient.get('/User/students'); 
-          childrenData = childrenRes.data;
-          setChildren(childrenData);
-        }
-        
-        setHealthRecords(records);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setHealthRecords([]);
-        setChildren([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (user) {
       fetchData();
     }
-  }, [user, getUserRole, selectedChild, filterStatus]);
+  }, [fetchData, user]);
+
+  // Handle search
+  const handleSearch = useCallback((term) => {
+    setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when searching
+  }, []);
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (field, value) => {
+    switch (field) {
+      case 'student':
+        setSelectedChild(value);
+        break;
+      case 'status':
+        setFilterStatus(value);
+        break;
+      default:
+        break;
+    }
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  // Handle approve record
+  const handleApproveRecord = async (recordId) => {
+    try {
+      await medicalStaffService.approveHealthRecord(recordId);
+      alert('Đã phê duyệt hồ sơ thành công!');
+      fetchData(); // Refresh data
+    } catch (error) {
+      console.error('Error approving record:', error);
+      alert('Có lỗi xảy ra khi phê duyệt hồ sơ.');
+    }
+  };
+
+  // Handle reject record
+  const handleRejectRecord = async (recordId) => {
+    const note = prompt('Vui lòng nhập lý do từ chối:');
+    if (note !== null) {
+      try {
+        await medicalStaffService.rejectHealthRecord(recordId, note);
+        alert('Đã từ chối hồ sơ thành công!');
+        fetchData(); // Refresh data
+      } catch (error) {
+        console.error('Error rejecting record:', error);
+        alert('Có lỗi xảy ra khi từ chối hồ sơ.');
+      }
+    }
+  };
+
+  // Handle export
+  const handleExport = async () => {
+    try {
+      const result = await medicalStaffService.exportHealthRecords('excel');
+      alert(result.message || 'Xuất báo cáo thành công!');
+    } catch (error) {
+      console.error('Error exporting records:', error);
+      alert('Có lỗi xảy ra khi xuất báo cáo.');
+    }
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    setSearchTerm('');
+    setSelectedChild('');
+    setFilterStatus('all');
+    setCurrentPage(1);
+    // fetchData will be called automatically due to useEffect dependencies
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -191,34 +204,77 @@ const HealthRecord = () => {
       case 'Rejected':
         return 'Từ chối';
       default:
-        return status;
+        return 'Không xác định';
     }
   };
 
-  const getHealthStatusColor = (status) => {
+  const getStatusClass = (status) => {
     switch (status) {
-      case 'Good':
+      case 'Submitted':
+        return 'status-submitted';
+      case 'Under Review':
+        return 'status-review';
+      case 'Approved':
+        return 'status-approved';
+      case 'Rejected':
+        return 'status-rejected';
+      default:
+        return 'status-unknown';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Submitted':
+        return 'fa-paper-plane';
+      case 'Under Review':
+        return 'fa-clock';
+      case 'Approved':
+        return 'fa-check-circle';
+      case 'Rejected':
+        return 'fa-times-circle';
+      default:
+        return 'fa-question-circle';
+    }
+  };
+
+  const getHealthStatusColor = (healthStatus) => {
+    switch (healthStatus) {
+      case 'Khỏe mạnh':
         return '#38a169';
-      case 'Fair':
+      case 'Cần theo dõi':
         return '#d69e2e';
-      case 'Poor':
+      case 'Cần chú ý':
         return '#e53e3e';
       default:
         return '#718096';
     }
   };
 
-  const getSymptomCount = (record) => {
-    // Count symptoms based on record properties
-    const symptoms = [
-      record.hasFever, record.hasCough, record.hasShortnessOfBreath,
-      record.hasFatigue, record.hasLossOfTaste, record.hasLossOfSmell,
-      record.hasSoreThroat, record.hasHeadache, record.hasMusclePain,
-      record.hasDiarrhea, record.hasNausea, record.hasVomiting,
-      record.hasRunnyNose, record.hasCongestion, record.hasChills,
-      record.hasBodyAches
-    ];
-    return symptoms.filter(Boolean).length;
+  const getHealthStatusClass = (healthStatus) => {
+    switch (healthStatus) {
+      case 'Khỏe mạnh':
+        return 'health-good';
+      case 'Cần theo dõi':
+        return 'health-warning';
+      case 'Cần chú ý':
+        return 'health-critical';
+      default:
+        return 'health-unknown';
+    }
+  };
+
+  const getHealthStatusIcon = (healthStatus) => {
+    switch (healthStatus) {
+      case 'Khỏe mạnh':
+        return 'fa-heart';
+      case 'Cần theo dõi':
+        return 'fa-exclamation-triangle';
+      case 'Cần chú ý':
+        return 'fa-exclamation-circle';
+      default:
+        return 'fa-question-circle';
+    }
   };
 
   const handleCreateRecord = () => {
@@ -245,37 +301,14 @@ const HealthRecord = () => {
     setShowDetailsModal(true);
   };
 
-  const handleEditRecord = (record) => {
-    setFormData({
-      healthRecordID: record.healthRecordID || record.id,
-      studentID: record.studentID,
-      allergies: record.allergies || '',
-      chronicDiseases: record.chronicDiseases || '',
-      treatmentHistory: record.treatmentHistory || '',
-      eyesight: record.eyesight || '',
-      hearing: record.hearing || '',
-      vaccinationHistory: record.vaccinationHistory || '',
-      note: record.note || '',
-      parentContact: record.parentContact || '',
-      fullName: record.childName || '',
-      className: getClassName(record)
-    });
-    setShowCreateModal(true);
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
-<<<<<<< HEAD
-  const handleApproveRecord = async (record) => {
-    if (window.confirm('Bạn có chắc chắn muốn phê duyệt hồ sơ này?')) {
-      try {
-        await healthRecordService.updateHealthRecordStatus(record.healthRecordID || record.id, 'Approved');
-        alert('Đã phê duyệt hồ sơ thành công!');
-        // Refresh data
-        window.location.reload();
-      } catch (error) {
-        console.error('Error approving record:', error);
-        alert('Có lỗi xảy ra khi phê duyệt hồ sơ.');
-      }
-=======
   const handleSubmitRecord = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -297,53 +330,25 @@ const HealthRecord = () => {
 
     } catch (error) {
       console.error('Error creating health record:', error);
-      setError('Có lỗi xảy ra khi tạo hồ sơ.');
-      setShowError(true);
+      alert('Có lỗi xảy ra khi tạo hồ sơ.');
     } finally {
       setLoading(false);
->>>>>>> 7b476e1842ecfd97b1ab583c6b03e866161d9d1a
     }
   };
 
-  const handleRejectRecord = async (record) => {
-    const reason = prompt('Vui lòng nhập lý do từ chối:');
-    if (reason) {
-      try {
-        await healthRecordService.updateHealthRecordStatus(record.healthRecordID || record.id, 'Rejected', reason);
-        alert('Đã từ chối hồ sơ thành công!');
-        // Refresh data
-        window.location.reload();
-      } catch (error) {
-        console.error('Error rejecting record:', error);
-        alert('Có lỗi xảy ra khi từ chối hồ sơ.');
-      }
-    }
+  const getSymptomCount = (record) => {
+    const symptoms = [
+      record.hasFever, record.hasCough, record.hasShortnessOfBreath,
+      record.hasFatigue, record.hasLossOfTaste, record.hasLossOfSmell,
+      record.hasSoreThroat, record.hasHeadache, record.hasMusclePain,
+      record.hasDiarrhea, record.hasNausea, record.hasVomiting,
+      record.hasRunnyNose, record.hasCongestion, record.hasChills,
+      record.hasBodyAches
+    ];
+    return symptoms.filter(symptom => symptom).length;
   };
 
-  const handleSubmitRecord = async () => {
-    try {
-      if (formData.healthRecordID) {
-        // Update existing record
-        await healthRecordService.updateHealthRecord(formData.healthRecordID, formData);
-        alert('Cập nhật hồ sơ thành công!');
-      } else {
-        // Create new record
-        await healthRecordService.createHealthRecord({
-          ...formData,
-          parentID: user.userID,
-          status: 'Submitted'
-        });
-        alert('Tạo hồ sơ thành công!');
-      }
-      setShowCreateModal(false);
-      // Refresh data
-      window.location.reload();
-    } catch (error) {
-      console.error('Error saving record:', error);
-      alert('Có lỗi xảy ra khi lưu hồ sơ.');
-    }
-  };
-
+  // FORM HEALTH RECORD LUÔN HIỂN THỊ KHI PARENT LOGIN
   const handleHealthRecordFormSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -393,23 +398,15 @@ const HealthRecord = () => {
         fullName: '',
         className: ''
       });
-      window.location.reload();
+      // Force re-fetch
+      setFilterStatus(prev => prev + ' ');
 
     } catch (error) {
       console.error('Error submitting health record:', error);
-      setError('Có lỗi xảy ra khi gửi thông tin.');
-      setShowError(true);
+      alert('Có lỗi xảy ra khi gửi thông tin.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
   };
 
   if (loading) {
@@ -452,6 +449,11 @@ const HealthRecord = () => {
               </div>
 
               {/* Health Details */}
+              <div className="form-group full-width">
+                <label>Triệu chứng (nếu có)</label>
+                {/* Checkbox symptoms can be added here if needed */}
+              </div>
+
               <div className="form-group">
                 <label htmlFor="allergies">Dị ứng</label>
                 <input type="text" id="allergies" name="allergies" value={formData.allergies ?? ""} onChange={handleInputChange} />
@@ -512,13 +514,16 @@ const HealthRecord = () => {
     );
   }
 
-  // Giao diện cho nhân viên y tế (thiết kế giống HealthCheckManagement)
+  // Giao diện cho nhân viên y tế (đơn giản và hiện đại)
   return (
     <div className="health-record-management-container">
       <div className="container py-4">
         {/* Header với tiêu đề và nút tạo mới */}
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h1>Tra cứu hồ sơ sức khỏe</h1>
+          <div>
+            <h1>Tra cứu hồ sơ sức khỏe</h1>
+            <p className="text-muted">Quản lý và theo dõi hồ sơ sức khỏe học sinh</p>
+          </div>
           <div>
             <button className="btn btn-primary" onClick={handleCreateRecord}>
               <i className="fas fa-plus-circle me-2"></i>Tạo hồ sơ mới
@@ -538,7 +543,7 @@ const HealthRecord = () => {
                     </div>
                     <div className="stat-content">
                       <h5 className="card-title">Tổng hồ sơ</h5>
-                      <p className="card-number">{filteredRecords.length}</p>
+                      <p className="card-number">{stats.totalRecords || totalCount}</p>
                       <p className="card-text">Hồ sơ sức khỏe</p>
                     </div>
                   </div>
@@ -554,7 +559,7 @@ const HealthRecord = () => {
                     </div>
                     <div className="stat-content">
                       <h5 className="card-title">Đã phê duyệt</h5>
-                      <p className="card-number">{filteredRecords.filter(record => record.status === 'Approved').length}</p>
+                      <p className="card-number">{stats.approvedRecords || healthRecords.filter(r => r.status === 'Approved').length}</p>
                       <p className="card-text">Hồ sơ được duyệt</p>
                     </div>
                   </div>
@@ -570,7 +575,7 @@ const HealthRecord = () => {
                     </div>
                     <div className="stat-content">
                       <h5 className="card-title">Đang xem xét</h5>
-                      <p className="card-number">{filteredRecords.filter(record => record.status === 'Under Review' || record.status === 'Submitted').length}</p>
+                      <p className="card-number">{stats.pendingReview || healthRecords.filter(r => r.status === 'Under Review' || r.status === 'Submitted').length}</p>
                       <p className="card-text">Cần xử lý</p>
                     </div>
                   </div>
@@ -586,7 +591,7 @@ const HealthRecord = () => {
                     </div>
                     <div className="stat-content">
                       <h5 className="card-title">Cần chú ý</h5>
-                      <p className="card-number">{filteredRecords.filter(record => getSymptomCount(record) > 3).length}</p>
+                      <p className="card-number">{stats.criticalRecords || healthRecords.filter(r => getSymptomCount(r) > 3).length}</p>
                       <p className="card-text">Triệu chứng nhiều</p>
                     </div>
                   </div>
@@ -596,56 +601,47 @@ const HealthRecord = () => {
           </div>
         </div>
 
-
-
-        {/* Bộ lọc nâng cao */}
+        {/* Bộ lọc và tìm kiếm */}
         <div className="card filter-card mb-4">
           <div className="card-body">
             <h5 className="card-title mb-3">
-              <i className="fas fa-filter me-2"></i>Lọc danh sách hồ sơ
+              <i className="fas fa-filter me-2"></i>Lọc và tìm kiếm
             </h5>
             <div className="row g-3">
-              <div className="col-lg-3 col-md-6">
-                <label className="form-label">Ngày ghi nhận</label>
-                <input
-                  type="date"
-                  className="form-control"
-                  value={filters.recordDate}
-                  onChange={e => setFilters(prev => ({ ...prev, recordDate: e.target.value }))}
-                  placeholder="Chọn ngày ghi nhận"
-                />
+              <div className="col-lg-4 col-md-6">
+                <label className="form-label">Tìm kiếm học sinh</label>
+                <div className="input-group">
+                  <span className="input-group-text"><i className="fas fa-search"></i></span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Nhập tên học sinh..."
+                    value={searchTerm}
+                    onChange={e => handleSearch(e.target.value)}
+                  />
+                </div>
               </div>
               <div className="col-lg-3 col-md-6">
-                <label className="form-label">Lớp học</label>
+                <label className="form-label">Học sinh</label>
                 <select
                   className="form-select"
-                  value={filters.className}
-                  onChange={e => setFilters(prev => ({ ...prev, className: e.target.value }))}
+                  value={selectedChild}
+                  onChange={e => handleFilterChange('student', e.target.value)}
                 >
-                  <option value="">Tất cả các lớp</option>
-                  {availableClasses.map(cls => (
-                    <option key={cls.ClassID} value={cls.ClassName}>
-                      {cls.ClassName}
+                  <option value="">Tất cả học sinh</option>
+                  {children.map(child => (
+                    <option key={child.id} value={child.id}>
+                      {child.name} - {child.className}
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="col-lg-3 col-md-6">
-                <label className="form-label">Tên học sinh</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={filters.studentName}
-                  onChange={e => setFilters(prev => ({ ...prev, studentName: e.target.value }))}
-                  placeholder="Nhập tên học sinh..."
-                />
               </div>
               <div className="col-lg-3 col-md-6">
                 <label className="form-label">Trạng thái</label>
                 <select
                   className="form-select"
                   value={filterStatus}
-                  onChange={e => setFilterStatus(e.target.value)}
+                  onChange={e => handleFilterChange('status', e.target.value)}
                 >
                   <option value="all">Tất cả trạng thái</option>
                   <option value="Submitted">Đã gửi</option>
@@ -654,25 +650,19 @@ const HealthRecord = () => {
                   <option value="Rejected">Từ chối</option>
                 </select>
               </div>
-            </div>
-            <div className="row mt-3">
-              <div className="col-12 d-flex gap-2">
-                <button className="btn btn-primary" onClick={handleApplyFilters}>
-                  <i className="fas fa-search me-2"></i>Lọc
-                </button>
-                <button className="btn btn-outline-secondary" onClick={handleResetFilters}>
-                  <i className="fas fa-undo me-2"></i>Đặt lại
-                </button>
+              <div className="col-lg-2 col-md-6">
+                <label className="form-label">&nbsp;</label>
+                <div className="d-flex gap-2">
+                  <button className="btn btn-outline-secondary" onClick={handleRefresh}>
+                    <i className="fas fa-sync-alt"></i>
+                  </button>
+                  <button className="btn btn-outline-success" onClick={handleExport}>
+                    <i className="fas fa-download"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Nút xuất báo cáo */}
-        <div className="d-flex justify-content-end mb-3 btn-export-import">
-          <button className="btn btn-outline-success me-2" onClick={handleExportToExcel}>
-            <i className="fas fa-file-excel me-2"></i>Xuất Excel
-          </button>
         </div>
 
         {/* Danh sách hồ sơ */}
@@ -685,10 +675,10 @@ const HealthRecord = () => {
           </div>
         ) : (
           <div className="records-grid">
-            {filteredRecords.length > 0 ? (
+            {healthRecords.length > 0 ? (
               <div className="row g-3">
-                {filteredRecords.map((record) => (
-                  <div key={record.healthRecordID || record.id} className="col-xl-6 col-lg-12">
+                {healthRecords.map((record) => (
+                  <div key={record.id} className="col-xl-6 col-lg-12">
                     <div className="record-card">
                       <div className="record-header">
                         <div className="record-title">
@@ -696,16 +686,17 @@ const HealthRecord = () => {
                           <div className="record-meta-inline">
                             <span className="record-date">
                               <i className="fas fa-calendar me-2"></i>
-                              {record.recordDate ? new Date(record.recordDate).toLocaleDateString('vi-VN') : ''}
+                              {record.recordDate ? new Date(record.recordDate).toLocaleDateString('vi-VN') : 'N/A'}
                             </span>
                             <span className="record-class">
                               <i className="fas fa-users me-2"></i>
-                              {getClassName(record)}
+                              {record.childClass || 'N/A'}
                             </span>
                           </div>
                         </div>
                         <div className="record-status-wrapper">
-                          <span className="status-badge" style={{ backgroundColor: getStatusColor(record.status) }}>
+                          <span className={`status-badge ${getStatusClass(record.status)}`}>
+                            <i className={`fas ${getStatusIcon(record.status)} me-1`}></i>
                             {getStatusText(record.status)}
                           </span>
                         </div>
@@ -715,7 +706,8 @@ const HealthRecord = () => {
                         <div className="health-info-grid">
                           <div className="health-info-item">
                             <strong>Tình trạng:</strong>
-                            <span className="health-status-badge" style={{ backgroundColor: getHealthStatusColor(record.healthStatus) }}>
+                            <span className={`health-status-badge ${getHealthStatusClass(record.healthStatus)}`}>
+                              <i className={`fas ${getHealthStatusIcon(record.healthStatus)} me-1`}></i>
                               {record.healthStatus || 'Chưa đánh giá'}
                             </span>
                           </div>
@@ -730,7 +722,8 @@ const HealthRecord = () => {
                         
                         {record.note && (
                           <div className="record-note">
-                            <strong>Ghi chú:</strong> {record.note.length > 100 ? record.note.substring(0, 100) + '...' : record.note}
+                            <strong>Ghi chú:</strong> 
+                            <span>{record.note.length > 100 ? record.note.substring(0, 100) + '...' : record.note}</span>
                           </div>
                         )}
                         
@@ -738,15 +731,12 @@ const HealthRecord = () => {
                           <button className="btn btn-outline-info btn-sm" onClick={() => handleViewDetails(record)}>
                             <i className="fas fa-eye me-1"></i> Chi tiết
                           </button>
-                          <button className="btn btn-outline-secondary btn-sm" onClick={() => handleEditRecord(record)}>
-                            <i className="fas fa-edit me-1"></i> Sửa
-                          </button>
                           {record.status === 'Submitted' && (
                             <>
-                              <button className="btn btn-outline-success btn-sm" onClick={() => handleApproveRecord(record)}>
+                              <button className="btn btn-outline-success btn-sm" onClick={() => handleApproveRecord(record.id)}>
                                 <i className="fas fa-check me-1"></i> Duyệt
                               </button>
-                              <button className="btn btn-outline-danger btn-sm" onClick={() => handleRejectRecord(record)}>
+                              <button className="btn btn-outline-danger btn-sm" onClick={() => handleRejectRecord(record.id)}>
                                 <i className="fas fa-times me-1"></i> Từ chối
                               </button>
                             </>
@@ -766,6 +756,46 @@ const HealthRecord = () => {
             )}
           </div>
         )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-center mt-4">
+            <nav>
+              <ul className="pagination">
+                <li className={`page-item ${currentPage <= 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                </li>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, index) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = index + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = index + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + index;
+                  } else {
+                    pageNum = currentPage - 2 + index;
+                  }
+                  
+                  return (
+                    <li key={pageNum} className={`page-item ${currentPage === pageNum ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => handlePageChange(pageNum)}>
+                        {pageNum}
+                      </button>
+                    </li>
+                  );
+                })}
+                <li className={`page-item ${currentPage >= totalPages ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Modal chi tiết hồ sơ */}
@@ -783,24 +813,47 @@ const HealthRecord = () => {
                 <div className="row">
                   <div className="col-md-6">
                     <h5>Thông tin học sinh</h5>
-                    <p><strong>Họ tên:</strong> {selectedRecord.childName}</p>
-                    <p><strong>Lớp:</strong> {getClassName(selectedRecord)}</p>
-                    <p><strong>Ngày ghi nhận:</strong> {selectedRecord.recordDate ? new Date(selectedRecord.recordDate).toLocaleDateString('vi-VN') : ''}</p>
+                    <p><strong>Họ tên:</strong> {selectedRecord.childName || 'N/A'}</p>
+                    <p><strong>Lớp:</strong> {selectedRecord.childClass || 'N/A'}</p>
+                    <p><strong>Ngày ghi nhận:</strong> {selectedRecord.recordDate ? new Date(selectedRecord.recordDate).toLocaleDateString('vi-VN') : 'N/A'}</p>
+                    <p><strong>Trạng thái:</strong> 
+                      <span className={`status-badge ${getStatusClass(selectedRecord.status)} ms-2`}>
+                        <i className={`fas ${getStatusIcon(selectedRecord.status)} me-1`}></i>
+                        {getStatusText(selectedRecord.status)}
+                      </span>
+                    </p>
                   </div>
                   <div className="col-md-6">
                     <h5>Tình trạng sức khỏe</h5>
+                    <p><strong>Tổng quan:</strong> 
+                      <span className={`health-status-badge ${getHealthStatusClass(selectedRecord.healthStatus)} ms-2`}>
+                        <i className={`fas ${getHealthStatusIcon(selectedRecord.healthStatus)} me-1`}></i>
+                        {selectedRecord.healthStatus || 'Chưa đánh giá'}
+                      </span>
+                    </p>
+                    <p><strong>Số triệu chứng:</strong> {getSymptomCount(selectedRecord)} triệu chứng</p>
                     <p><strong>Dị ứng:</strong> {selectedRecord.allergies || 'Không có'}</p>
                     <p><strong>Bệnh mãn tính:</strong> {selectedRecord.chronicDiseases || 'Không có'}</p>
-                    <p><strong>Thị lực:</strong> {selectedRecord.eyesight || 'Bình thường'}</p>
-                    <p><strong>Thính lực:</strong> {selectedRecord.hearing || 'Bình thường'}</p>
                   </div>
                 </div>
                 <div className="row mt-3">
-                  <div className="col-md-12">
-                    <h5>Ghi chú</h5>
-                    <p>{selectedRecord.note || 'Không có ghi chú'}</p>
+                  <div className="col-md-6">
+                    <p><strong>Thị lực:</strong> {selectedRecord.eyesight || 'Bình thường'}</p>
+                    <p><strong>Thính lực:</strong> {selectedRecord.hearing || 'Bình thường'}</p>
+                  </div>
+                  <div className="col-md-6">
+                    <p><strong>Lịch sử điều trị:</strong> {selectedRecord.treatmentHistory || 'Không có'}</p>
+                    <p><strong>Tiêm chủng:</strong> {selectedRecord.vaccinationHistory || 'Không có'}</p>
                   </div>
                 </div>
+                {selectedRecord.note && (
+                  <div className="row mt-3">
+                    <div className="col-md-12">
+                      <h5>Ghi chú</h5>
+                      <p>{selectedRecord.note}</p>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowDetailsModal(false)}>
@@ -808,11 +861,11 @@ const HealthRecord = () => {
                 </button>
                 {selectedRecord.status === 'Submitted' && (
                   <>
-                    <button type="button" className="btn btn-success" onClick={() => handleApproveRecord(selectedRecord)}>
-                      Phê duyệt
+                    <button type="button" className="btn btn-success" onClick={() => handleApproveRecord(selectedRecord.id)}>
+                      <i className="fas fa-check me-1"></i> Phê duyệt
                     </button>
-                    <button type="button" className="btn btn-danger" onClick={() => handleRejectRecord(selectedRecord)}>
-                      Từ chối
+                    <button type="button" className="btn btn-danger" onClick={() => handleRejectRecord(selectedRecord.id)}>
+                      <i className="fas fa-times me-1"></i> Từ chối
                     </button>
                   </>
                 )}
@@ -837,14 +890,15 @@ const HealthRecord = () => {
                     <label className="form-label">Học sinh</label>
                     <select 
                       className="form-select" 
+                      name="studentID"
                       value={formData.studentID}
-                      onChange={e => setFormData(prev => ({ ...prev, studentID: e.target.value }))}
+                      onChange={handleInputChange}
                       required
                     >
                       <option value="">Chọn học sinh</option>
-                      {availableStudents.map(student => (
-                        <option key={student.userID} value={student.userID}>
-                          {student.fullName} - {student.className}
+                      {children.map(child => (
+                        <option key={child.id} value={child.id}>
+                          {child.name} - {child.className}
                         </option>
                       ))}
                     </select>
@@ -854,17 +908,32 @@ const HealthRecord = () => {
                     <input 
                       type="text" 
                       className="form-control"
+                      name="allergies"
                       value={formData.allergies}
-                      onChange={e => setFormData(prev => ({ ...prev, allergies: e.target.value }))}
+                      onChange={handleInputChange}
+                      placeholder="Nhập thông tin dị ứng..."
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Bệnh mãn tính</label>
+                    <input 
+                      type="text" 
+                      className="form-control"
+                      name="chronicDiseases"
+                      value={formData.chronicDiseases}
+                      onChange={handleInputChange}
+                      placeholder="Nhập thông tin bệnh mãn tính..."
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Ghi chú</label>
                     <textarea 
                       className="form-control"
+                      name="note"
                       rows="3"
                       value={formData.note}
-                      onChange={e => setFormData(prev => ({ ...prev, note: e.target.value }))}
+                      onChange={handleInputChange}
+                      placeholder="Nhập ghi chú thêm..."
                     />
                   </div>
                 </form>
@@ -873,15 +942,14 @@ const HealthRecord = () => {
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
                   Hủy
                 </button>
-                <button type="button" className="btn btn-primary" onClick={handleSubmitRecord}>
-                  Tạo hồ sơ
+                <button type="button" className="btn btn-primary" onClick={handleSubmitRecord} disabled={loading}>
+                  {loading ? 'Đang xử lý...' : 'Tạo hồ sơ'}
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
-      <ErrorDialog open={showError} message={error} onClose={() => setShowError(false)} />
     </div>
   );
 };

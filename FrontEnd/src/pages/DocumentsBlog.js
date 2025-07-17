@@ -118,6 +118,286 @@ const DocumentsBlog = () => {
       tags: ['khám sức khỏe', 'định kỳ', 'học sinh', 'phát hiện sớm'],
       priority: 'medium',
       downloads: 823
+    },
+    {
+      id: 7,
+      title: 'Chương trình tiêm chủng mở rộng trong trường học',
+      category: 'tiêm chủng',
+      author: 'BS. Nguyễn Thị Thu Hà',
+      date: '2025-01-12',
+      summary: 'Hướng dẫn triển khai chương trình tiêm chủng mở rộng cho học sinh theo khuyến cáo của Bộ Y tế.',
+      content: `<h2>Chương trình tiêm chủng mở rộng trong trường học</h2>
+                <p>Tiêm chủng là biện pháp phòng bệnh hiệu quả nhất, giúp bảo vệ sức khỏe cộng đồng học đường.</p>
+                <h3>Lịch tiêm chủng theo độ tuổi</h3>
+                <p>• Lớp 1: Vaccine DPT, Sởi-Rubella<br>• Lớp 6: Vaccine uốn ván, bạch hầu<br>• Lớp 11: Vaccine viêm gan B bổ sung</p>
+                <h3>Quy trình tiêm chủng</h3>
+                <p>Thông báo trước, khám sàng lọc, tiêm vaccine và theo dõi sau tiêm theo đúng quy định.</p>
+                <h3>Theo dõi tác dụng phụ</h3>
+                <p>Ghi nhận và xử lý kịp thời các phản ứng sau tiêm, đảm bảo an toàn tuyệt đối.</p>`,
+      imageUrl: '/assets/images/vaccination.jpg',
+      tags: ['tiêm chủng', 'vaccine', 'phòng bệnh', 'an toàn'],
+      priority: 'high',
+      downloads: 1340
+    },
+    {
+      id: 8,
+      title: 'Vệ sinh môi trường trường học và phòng chống dịch bệnh',
+      category: 'vệ sinh môi trường',
+      author: 'KS. Lê Văn Minh',
+      date: '2025-01-08',
+      summary: 'Các tiêu chuẩn và biện pháp đảm bảo vệ sinh môi trường trường học theo quy định mới.',
+      content: `<h2>Vệ sinh môi trường trường học và phòng chống dịch bệnh</h2>
+                <p>Môi trường sạch sẽ là yếu tố quan trọng trong việc bảo vệ sức khỏe học sinh.</p>
+                <h3>Tiêu chuẩn vệ sinh lớp học</h3>
+                <p>• Thông gió tự nhiên đảm bảo<br>• Ánh sáng đủ, không chói mắt<br>• Nhiệt độ phòng học 22-28°C<br>• Diện tích tối thiểu 1.2m²/học sinh</p>
+                <h3>Vệ sinh nhà vệ sinh</h3>
+                <p>Đảm bảo tỷ lệ nhà vệ sinh/học sinh, có nước sạch, xà phòng và được khử trùng định kỳ.</p>
+                <h3>Quản lý chất thải</h3>
+                <p>Phân loại rác thải, xử lý chất thải y tế đúng quy định và bảo vệ môi trường.</p>`,
+      imageUrl: '/assets/images/school-hygiene.jpg',
+      tags: ['vệ sinh', 'môi trường', 'lớp học', 'nhà vệ sinh'],
+      priority: 'medium',
+      downloads: 890
+    },
+    {
+      id: 9,
+      title: 'Phòng chống bệnh truyền nhiễm thường gặp ở học sinh',
+      category: 'y tế học đường',
+      author: 'TS.BS. Phạm Văn Nam',
+      date: '2025-01-06',
+      summary: 'Hướng dẫn nhận biết và phòng chống các bệnh truyền nhiễm phổ biến trong môi trường học đường.',
+      content: `<h2>Phòng chống bệnh truyền nhiễm thường gặp ở học sinh</h2>
+                <p>Học sinh là nhóm đối tượng dễ mắc các bệnh truyền nhiễm do tiếp xúc nhiều với nhau.</p>
+                <h3>Các bệnh thường gặp</h3>
+                <p>• Cúm, cảm lạnh<br>• Tay chân miệng<br>• Thủy đậu<br>• Viêm kết mạc mắt<br>• Viêm đường hô hấp</p>
+                <h3>Biện pháp phòng ngừa</h3>
+                <p>Tăng cường vệ sinh cá nhân, rửa tay thường xuyên, đeo khẩu trang khi cần thiết.</p>
+                <h3>Xử lý khi có ca bệnh</h3>
+                <p>Cách ly tạm thời, thông báo gia đình, khử trùng khu vực và theo dõi các trường hợp tiếp xúc.</p>`,
+      imageUrl: '/assets/images/infectious-diseases.jpg',
+      tags: ['bệnh truyền nhiễm', 'phòng ngừa', 'cách ly', 'học sinh'],
+      priority: 'high',
+      downloads: 1150
+    },
+    {
+      id: 10,
+      title: 'Chăm sóc sức khỏe răng miệng cho học sinh',
+      category: 'răng miệng',
+      author: 'BS. Nguyễn Thị Lan',
+      date: '2025-01-04',
+      summary: 'Chương trình chăm sóc sức khỏe răng miệng toàn diện cho học sinh các cấp học.',
+      content: `<h2>Chăm sóc sức khỏe răng miệng cho học sinh</h2>
+                <p>Sức khỏe răng miệng ảnh hưởng trực tiếp đến dinh dưỡng và học tập của học sinh.</p>
+                <h3>Thói quen vệ sinh răng miệng</h3>
+                <p>• Đánh răng 2 lần/ngày<br>• Sử dụng kem đánh răng có fluoride<br>• Súc miệng sau khi ăn<br>• Thay bàn chải 3 tháng/lần</p>
+                <h3>Chế độ ăn bảo vệ răng</h3>
+                <p>Hạn chế đồ ngọt, nước có gas, tăng cường calcium và vitamin D.</p>
+                <h3>Khám răng định kỳ</h3>
+                <p>6 tháng/lần để phát hiện sớm sâu răng và các bệnh lý răng miệng khác.</p>`,
+      imageUrl: '/assets/images/dental-health.jpg',
+      tags: ['răng miệng', 'vệ sinh', 'đánh răng', 'khám định kỳ'],
+      priority: 'medium',
+      downloads: 670
+    },
+    {
+      id: 11,
+      title: 'Hướng dẫn sử dụng máy đo thân nhiệt tự động',
+      category: 'thiết bị y tế',
+      author: 'Kỹ thuật viên Y tế',
+      date: '2025-01-03',
+      summary: 'Quy trình vận hành và bảo trì máy đo thân nhiệt tự động tại cổng trường.',
+      content: `<h2>Hướng dẫn sử dụng máy đo thân nhiệt tự động</h2>
+                <p>Máy đo thân nhiệt tự động là thiết bị quan trọng trong việc sàng lọc sức khỏe hàng ngày.</p>
+                <h3>Cách sử dụng</h3>
+                <p>• Đặt máy ở vị trí thuận lợi<br>• Hiệu chỉnh độ cao phù hợp<br>• Đảm bảo khoảng cách đo 5-10cm<br>• Kiểm tra pin và độ chính xác</p>
+                <h3>Bảo trì định kỳ</h3>
+                <p>Vệ sinh bề mặt máy, kiểm tra cảm biến và hiệu chỉnh theo hướng dẫn nhà sản xuất.</p>
+                <h3>Xử lý khi có bất thường</h3>
+                <p>Thông báo ngay cho bộ phận kỹ thuật và có phương án dự phòng.</p>`,
+      imageUrl: '/assets/images/temperature-scanner.jpg',
+      tags: ['thiết bị y tế', 'đo thân nhiệt', 'bảo trì', 'hướng dẫn'],
+      priority: 'medium',
+      downloads: 445
+    },
+    {
+      id: 12,
+      title: 'Chương trình giáo dục sức khỏe sinh sản cho học sinh THPT',
+      category: 'giáo dục sức khỏe',
+      author: 'TS. Trần Thị Mai',
+      date: '2024-12-28',
+      summary: 'Nội dung và phương pháp giáo dục sức khỏe sinh sản phù hợp với lứa tuổi học sinh THPT.',
+      content: `<h2>Chương trình giáo dục sức khỏe sinh sản cho học sinh THPT</h2>
+                <p>Giáo dục sức khỏe sinh sản giúp học sinh có kiến thức đúng đắn về sức khỏe và an toàn.</p>
+                <h3>Nội dung chính</h3>
+                <p>• Sinh lý tuổi dậy thì<br>• Bảo vệ bản thân<br>• Tác hại của tệ nạn xã hội<br>• Kỹ năng sống</p>
+                <h3>Phương pháp giảng dạy</h3>
+                <p>Sử dụng phương pháp tương tác, thảo luận nhóm và học qua trải nghiệm.</p>
+                <h3>Phối hợp với gia đình</h3>
+                <p>Tổ chức các buổi tập huấn cho phụ huynh để đồng hành cùng con em.</p>`,
+      imageUrl: '/assets/images/reproductive-health.jpg',
+      tags: ['giáo dục sức khỏe', 'sinh sản', 'THPT', 'tuổi dậy thì'],
+      priority: 'high',
+      downloads: 920
+    },
+    {
+      id: 13,
+      title: 'Phòng chống tai nạn thương tích học đường',
+      category: 'an toàn học đường',
+      author: 'ThS. Vũ Thị Hồng',
+      date: '2024-12-25',
+      summary: 'Các biện pháp phòng ngừa và xử lý tai nạn thương tích trong hoạt động giáo dục.',
+      content: `<h2>Phòng chống tai nạn thương tích học đường</h2>
+                <p>Tai nạn thương tích học đường có thể được phòng ngừa thông qua các biện pháp phù hợp.</p>
+                <h3>Các nguyên nhân chính</h3>
+                <p>• Cơ sở vật chất không an toàn<br>• Thiếu ý thức an toàn<br>• Hoạt động thể thao không đúng cách<br>• Thiếu giám sát</p>
+                <h3>Biện pháp phòng ngừa</h3>
+                <p>Kiểm tra định kỳ cơ sở vật chất, giáo dục ý thức an toàn và tăng cường giám sát.</p>
+                <h3>Xử lý tai nạn</h3>
+                <p>Sơ cứu kịp thời, thông báo cấp cứu và gia đình, ghi nhận báo cáo chi tiết.</p>`,
+      imageUrl: '/assets/images/school-safety.jpg',
+      tags: ['tai nạn', 'an toàn', 'phòng ngừa', 'sơ cứu'],
+      priority: 'high',
+      downloads: 1080
+    },
+    {
+      id: 14,
+      title: 'Quản lý và bảo quản thuốc trong nhà trường',
+      category: 'quản lý thuốc',
+      author: 'Dược sĩ Hoàng Văn Tùng',
+      date: '2024-12-22',
+      summary: 'Hướng dẫn quản lý, bảo quản và sử dụng thuốc an toàn trong trường học.',
+      content: `<h2>Quản lý và bảo quản thuốc trong nhà trường</h2>
+                <p>Việc quản lý thuốc đúng cách đảm bảo hiệu quả điều trị và an toàn cho học sinh.</p>
+                <h3>Danh mục thuốc cơ bản</h3>
+                <p>• Thuốc hạ sốt<br>• Thuốc sát trùng<br>• Băng gạc y tế<br>• Thuốc dị ứng<br>• Dung dịch nước muối sinh lý</p>
+                <h3>Nguyên tắc bảo quản</h3>
+                <p>Bảo quản ở nơi khô ráo, thoáng mát, tránh ánh sáng trực tiếp và kiểm tra hạn sử dụng.</p>
+                <h3>Sử dụng thuốc an toàn</h3>
+                <p>Chỉ sử dụng theo chỉ định của bác sĩ và ghi nhận đầy đủ việc sử dụng thuốc.</p>`,
+      imageUrl: '/assets/images/medicine-management.jpg',
+      tags: ['quản lý thuốc', 'bảo quản', 'an toàn', 'sử dụng'],
+      priority: 'medium',
+      downloads: 560
+    },
+    {
+      id: 15,
+      title: 'Hướng dẫn xử lý tình huống khẩn cấp y tế',
+      category: 'cấp cứu',
+      author: 'BS. Cấp cứu Nguyễn Văn Hùng',
+      date: '2024-12-20',
+      summary: 'Quy trình xử lý các tình huống khẩn cấp y tế phổ biến trong trường học.',
+      content: `<h2>Hướng dẫn xử lý tình huống khẩn cấp y tế</h2>
+                <p>Xử lý đúng tình huống khẩn cấp có thể cứu sống và giảm thiểu hậu quả nghiêm trọng.</p>
+                <h3>Các tình huống thường gặp</h3>
+                <p>• Ngừng tim đột ngột<br>• Sốc phản vệ<br>• Co giật<br>• Ngạt thở<br>• Chấn thương đầu</p>
+                <h3>Nguyên tắc xử lý</h3>
+                <p>Đảm bảo an toàn, gọi cấp cứu 115, thực hiện sơ cứu cơ bản và chờ hỗ trợ chuyên nghiệp.</p>
+                <h3>Trang thiết bị cấp cứu</h3>
+                <p>Túi cấp cứu, máy sốc tim tự động AED và đào tạo nhân viên sử dụng.</p>`,
+      imageUrl: '/assets/images/emergency-care.jpg',
+      tags: ['cấp cứu', 'khẩn cấp', 'sơ cứu', 'AED'],
+      priority: 'high',
+      downloads: 1450
+    },
+    {
+      id: 16,
+      title: 'Chương trình khuyến khích hoạt động thể chất',
+      category: 'thể chất',
+      author: 'ThS. Lê Thành Đạt',
+      date: '2024-12-18',
+      summary: 'Các hoạt động thể chất phù hợp và an toàn cho học sinh các lứa tuổi.',
+      content: `<h2>Chương trình khuyến khích hoạt động thể chất</h2>
+                <p>Hoạt động thể chất đều đặn giúp học sinh phát triển toàn diện về thể chất và tinh thần.</p>
+                <h3>Lợi ích của hoạt động thể chất</h3>
+                <p>• Tăng cường thể lực<br>• Cải thiện sức khỏe tim mạch<br>• Phát triển kỹ năng vận động<br>• Giảm stress và lo âu</p>
+                <h3>Hoạt động theo độ tuổi</h3>
+                <p>Tiểu học: chạy nhảy, trò chơi vận động. THCS-THPT: thể thao đồng đội, gym nhẹ.</p>
+                <h3>An toàn khi tập luyện</h3>
+                <p>Khởi động đầy đủ, uống nước đủ và dừng ngay khi có dấu hiệu bất thường.</p>`,
+      imageUrl: '/assets/images/physical-activity.jpg',
+      tags: ['thể chất', 'vận động', 'thể thao', 'sức khỏe'],
+      priority: 'medium',
+      downloads: 730
+    },
+    {
+      id: 17,
+      title: 'Phòng chống cận thị học đường',
+      category: 'thị lực',
+      author: 'BS. Mắt Đinh Thị Nga',
+      date: '2024-12-15',
+      summary: 'Các biện pháp phòng ngừa và điều trị cận thị ở học sinh trong thời đại số.',
+      content: `<h2>Phòng chống cận thị học đường</h2>
+                <p>Tỷ lệ cận thị ở học sinh ngày càng tăng cao do nhiều yếu tố môi trường và sinh hoạt.</p>
+                <h3>Nguyên nhân gây cận thị</h3>
+                <p>• Sử dụng thiết bị điện tử quá nhiều<br>• Tư thế đọc sách không đúng<br>• Thiếu ánh sáng tự nhiên<br>• Yếu tố di truyền</p>
+                <h3>Biện pháp phòng ngừa</h3>
+                <p>Nguyên tắc 20-20-20: cứ 20 phút nhìn gần, nhìn xa 20 giây ở khoảng cách 20 feet.</p>
+                <h3>Khám mắt định kỳ</h3>
+                <p>6 tháng/lần để phát hiện sớm và can thiệp kịp thời các vấn đề về thị lực.</p>`,
+      imageUrl: '/assets/images/eye-care.jpg',
+      tags: ['thị lực', 'cận thị', 'mắt', 'phòng ngừa'],
+      priority: 'high',
+      downloads: 1320
+    },
+    {
+      id: 18,
+      title: 'Dinh dưỡng thông minh cho học sinh',
+      category: 'dinh dưỡng',
+      author: 'CN. Nguyễn Thị Hạnh',
+      date: '2024-12-12',
+      summary: 'Hướng dẫn xây dựng chế độ dinh dưỡng khoa học cho sự phát triển tối ưu của học sinh.',
+      content: `<h2>Dinh dưỡng thông minh cho học sinh</h2>
+                <p>Dinh dưỡng đúng cách là nền tảng cho sự phát triển trí tuệ và thể chất của học sinh.</p>
+                <h3>Nguyên tắc dinh dưỡng</h3>
+                <p>• Đa dạng thực phẩm<br>• Cân bằng các nhóm chất<br>• Đủ năng lượng theo độ tuổi<br>• Bổ sung vitamin và khoáng chất</p>
+                <h3>Thực phẩm nên ăn</h3>
+                <p>Ngũ cốc, rau xanh, trái cây, protein từ thịt cá, sữa và các chế phẩm từ sữa.</p>
+                <h3>Thực phẩm hạn chế</h3>
+                <p>Đồ ăn nhanh, nước ngọt có gas, thực phẩm chế biến sẵn và đồ chiên rán.</p>`,
+      imageUrl: '/assets/images/smart-nutrition.jpg',
+      tags: ['dinh dưỡng', 'thông minh', 'thực phẩm', 'phát triển'],
+      priority: 'medium',
+      downloads: 885
+    },
+    {
+      id: 19,
+      title: 'Chăm sóc sức khỏe học sinh khuyết tật',
+      category: 'giáo dục đặc biệt',
+      author: 'ThS. Phạm Thị Lan Anh',
+      date: '2024-12-10',
+      summary: 'Hướng dẫn chăm sóc và hỗ trợ y tế cho học sinh có nhu cầu đặc biệt.',
+      content: `<h2>Chăm sóc sức khỏe học sinh khuyết tật</h2>
+                <p>Học sinh khuyết tật cần được chăm sóc y tế đặc biệt và sự hỗ trợ toàn diện.</p>
+                <h3>Các loại khuyết tật thường gặp</h3>
+                <p>• Khuyết tật vận động<br>• Khuyết tật thị giác<br>• Khuyết tật thính giác<br>• Rối loạn phổ tự kỷ<br>• Khó khăn học tập</p>
+                <h3>Hỗ trợ y tế cần thiết</h3>
+                <p>Theo dõi sức khỏe đặc biệt, hỗ trợ vật lý trị liệu và can thiệp sớm.</p>
+                <h3>Phối hợp đa ngành</h3>
+                <p>Làm việc với bác sĩ chuyên khoa, nhà trị liệu và gia đình để đạt kết quả tốt nhất.</p>`,
+      imageUrl: '/assets/images/special-education.jpg',
+      tags: ['khuyết tật', 'giáo dục đặc biệt', 'hỗ trợ', 'chăm sóc'],
+      priority: 'medium',
+      downloads: 420
+    },
+    {
+      id: 20,
+      title: 'Y tế học đường trong thời đại số',
+      category: 'công nghệ y tế',
+      author: 'TS. Nguyễn Minh Khoa',
+      date: '2024-12-08',
+      summary: 'Ứng dụng công nghệ số trong quản lý và chăm sóc sức khỏe học sinh hiện đại.',
+      content: `<h2>Y tế học đường trong thời đại số</h2>
+                <p>Công nghệ số đang thay đổi cách chúng ta quản lý và chăm sóc sức khỏe học sinh.</p>
+                <h3>Ứng dụng công nghệ</h3>
+                <p>• Hồ sơ sức khỏe điện tử<br>• Ứng dụng theo dõi sức khỏe<br>• Telemedicine cho tư vấn từ xa<br>• AI trong chẩn đoán sớm</p>
+                <h3>Lợi ích của số hóa</h3>
+                <p>Quản lý thông tin hiệu quả, phân tích dữ liệu y tế và cải thiện chất lượng chăm sóc.</p>
+                <h3>Thách thức và giải pháp</h3>
+                <p>Bảo mật thông tin, đào tạo nhân viên và đầu tư hạ tầng công nghệ phù hợp.</p>`,
+      imageUrl: '/assets/images/digital-health.jpg',
+      tags: ['công nghệ', 'số hóa', 'telemedicine', 'AI'],
+      priority: 'medium',
+      downloads: 620
     }
   ];
 
@@ -156,11 +436,24 @@ const DocumentsBlog = () => {
 
   const handleDocumentSelect = (document) => {
     setSelectedDocument(document);
-    window.scrollTo(0, 0);
+    // Smooth scroll to top with a slight delay to ensure DOM update
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 100);
   };
 
   const handleBackToList = () => {
     setSelectedDocument(null);
+    // Smooth scroll to top when returning to list
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 100);
   };
 
   const handleCategorySelect = (category) => {
@@ -187,7 +480,18 @@ const DocumentsBlog = () => {
     { key: 'sức khỏe tâm lý', label: 'Sức khỏe tâm lý', icon: 'fas fa-brain' },
     { key: 'dinh dưỡng', label: 'Dinh dưỡng', icon: 'fas fa-utensils' },
     { key: 'cấp cứu', label: 'Cấp cứu', icon: 'fas fa-first-aid' },
-    { key: 'khám sức khỏe', label: 'Khám sức khỏe', icon: 'fas fa-stethoscope' }
+    { key: 'khám sức khỏe', label: 'Khám sức khỏe', icon: 'fas fa-stethoscope' },
+    { key: 'tiêm chủng', label: 'Tiêm chủng', icon: 'fas fa-syringe' },
+    { key: 'vệ sinh môi trường', label: 'Vệ sinh môi trường', icon: 'fas fa-leaf' },
+    { key: 'răng miệng', label: 'Răng miệng', icon: 'fas fa-tooth' },
+    { key: 'thiết bị y tế', label: 'Thiết bị y tế', icon: 'fas fa-heartbeat' },
+    { key: 'giáo dục sức khỏe', label: 'Giáo dục sức khỏe', icon: 'fas fa-graduation-cap' },
+    { key: 'an toàn học đường', label: 'An toàn học đường', icon: 'fas fa-shield-alt' },
+    { key: 'quản lý thuốc', label: 'Quản lý thuốc', icon: 'fas fa-pills' },
+    { key: 'thể chất', label: 'Hoạt động thể chất', icon: 'fas fa-running' },
+    { key: 'thị lực', label: 'Chăm sóc thị lực', icon: 'fas fa-eye' },
+    { key: 'giáo dục đặc biệt', label: 'Giáo dục đặc biệt', icon: 'fas fa-hands-helping' },
+    { key: 'công nghệ y tế', label: 'Công nghệ y tế', icon: 'fas fa-laptop-medical' }
   ];
 
   const renderDocumentsList = () => (
@@ -319,7 +623,13 @@ const DocumentsBlog = () => {
                           </div>
                         </div>
                         <div className="document-content">
-                          <h5 className="document-title">{document.title}</h5>
+                          <h5 
+                            className="document-title"
+                            onClick={() => handleDocumentSelect(document)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {document.title}
+                          </h5>
                           <p className="document-summary">{document.summary}</p>
                           <div className="document-meta">
                             <span className="author">
@@ -341,8 +651,9 @@ const DocumentsBlog = () => {
                           <button 
                             className="btn btn-primary btn-sm w-100"
                             onClick={() => handleDocumentSelect(document)}
+                            title="Click để đọc toàn bộ nội dung"
                           >
-                            <i className="fas fa-eye me-2"></i>Xem chi tiết
+                            <i className="fas fa-book-open me-2"></i>Đọc đầy đủ
                           </button>
                         </div>
                       </div>
@@ -355,7 +666,13 @@ const DocumentsBlog = () => {
                     <div className="document-list-item" key={document.id}>
                       <div className="document-info">
                         <div className="document-main">
-                          <h5 className="document-title">{document.title}</h5>
+                          <h5 
+                            className="document-title"
+                            onClick={() => handleDocumentSelect(document)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {document.title}
+                          </h5>
                           <p className="document-summary">{document.summary}</p>
                           <div className="document-meta-list">
                             <span className="author">
@@ -380,8 +697,9 @@ const DocumentsBlog = () => {
                           <button 
                             className="btn btn-outline-primary btn-sm"
                             onClick={() => handleDocumentSelect(document)}
+                            title="Click để đọc toàn bộ nội dung"
                           >
-                            <i className="fas fa-eye"></i> Xem
+                            <i className="fas fa-book-open"></i> Đọc đầy đủ
                           </button>
                         </div>
                       </div>
@@ -458,6 +776,12 @@ const DocumentsBlog = () => {
 
                 {/* Document body */}
                 <div className="document-body">
+                  <div className="reading-time mb-3">
+                    <small className="text-muted">
+                      <i className="fas fa-clock me-1"></i>
+                      Thời gian đọc: ~{Math.ceil(selectedDocument.content.replace(/<[^>]*>/g, '').split(' ').length / 200)} phút
+                    </small>
+                  </div>
                   <div className="document-content" dangerouslySetInnerHTML={{ __html: selectedDocument.content }}></div>
                 </div>
 
@@ -577,81 +901,6 @@ const DocumentsBlog = () => {
               <p className="page-subtitle lead">
                 Trung tâm thông tin y tế học đường - Tài liệu chính thức và hướng dẫn chuyên nghiệp
               </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats cards */}
-        <div className="stats-row">
-          <div className="row g-3 mb-4">
-            <div className="col-xl-3 col-md-6">
-              <div className="card stat-card documents">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-file-alt"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5>Tài liệu</h5>
-                      <p className="stat-number">{documents.length}</p>
-                      <p className="stat-text">Tổng số tài liệu</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-xl-3 col-md-6">
-              <div className="card stat-card categories">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-tags"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5>Danh mục</h5>
-                      <p className="stat-number">{categories.length - 1}</p>
-                      <p className="stat-text">Chủ đề khác nhau</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-xl-3 col-md-6">
-              <div className="card stat-card downloads">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-download"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5>Lượt tải</h5>
-                      <p className="stat-number">{documents.reduce((sum, doc) => sum + (doc.downloads || 0), 0).toLocaleString()}</p>
-                      <p className="stat-text">Tổng lượt tải</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-xl-3 col-md-6">
-              <div className="card stat-card recent">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-clock"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5>Cập nhật</h5>
-                      <p className="stat-number">{documents.filter(doc => {
-                        const docDate = new Date(doc.date);
-                        const thirtyDaysAgo = new Date();
-                        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                        return docDate >= thirtyDaysAgo;
-                      }).length}</p>
-                      <p className="stat-text">Trong 30 ngày</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

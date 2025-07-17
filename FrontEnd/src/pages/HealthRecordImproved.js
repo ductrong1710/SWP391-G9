@@ -495,86 +495,51 @@ const HealthRecord = () => {
         </div>
 
         {/* Thẻ thống kê */}
-        <div className="stats-cards-container mb-4">
-          <div className="row g-3">
-            <div className="col-xl-3 col-md-6">
-              <div className="card health-stat-card total-records">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-file-medical"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5 className="card-title">Tổng hồ sơ</h5>
-                      <p className="card-number">{filteredRecords.length}</p>
-                      <p className="card-text">Hồ sơ sức khỏe</p>
-                    </div>
-                  </div>
-                </div>
+        <div className="row mb-4">
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">Tổng hồ sơ</h5>
+                <p className="card-number">{filteredRecords.length}</p>
+                <p className="card-text">Hồ sơ sức khỏe</p>
               </div>
             </div>
-            <div className="col-xl-3 col-md-6">
-              <div className="card health-stat-card approved-records">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-check-circle"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5 className="card-title">Đã phê duyệt</h5>
-                      <p className="card-number">{filteredRecords.filter(record => record.status === 'Approved').length}</p>
-                      <p className="card-text">Hồ sơ được duyệt</p>
-                    </div>
-                  </div>
-                </div>
+          </div>
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">Đã phê duyệt</h5>
+                <p className="card-number">{filteredRecords.filter(record => record.status === 'Approved').length}</p>
+                <p className="card-text">Hồ sơ</p>
               </div>
             </div>
-            <div className="col-xl-3 col-md-6">
-              <div className="card health-stat-card pending-records">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-clock"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5 className="card-title">Đang xem xét</h5>
-                      <p className="card-number">{filteredRecords.filter(record => record.status === 'Under Review' || record.status === 'Submitted').length}</p>
-                      <p className="card-text">Cần xử lý</p>
-                    </div>
-                  </div>
-                </div>
+          </div>
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">Đang xem xét</h5>
+                <p className="card-number">{filteredRecords.filter(record => record.status === 'Under Review').length}</p>
+                <p className="card-text">Hồ sơ</p>
               </div>
             </div>
-            <div className="col-xl-3 col-md-6">
-              <div className="card health-stat-card attention-records">
-                <div className="card-body">
-                  <div className="d-flex align-items-center">
-                    <div className="stat-icon">
-                      <i className="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div className="stat-content">
-                      <h5 className="card-title">Cần chú ý</h5>
-                      <p className="card-number">{filteredRecords.filter(record => getSymptomCount(record) > 3).length}</p>
-                      <p className="card-text">Triệu chứng nhiều</p>
-                    </div>
-                  </div>
-                </div>
+          </div>
+          <div className="col-md-3">
+            <div className="card health-stat-card">
+              <div className="card-body">
+                <h5 className="card-title">Cần chú ý</h5>
+                <p className="card-number">{filteredRecords.filter(record => getSymptomCount(record) > 3).length}</p>
+                <p className="card-text">Triệu chứng nhiều</p>
               </div>
             </div>
           </div>
         </div>
 
-
-
         {/* Bộ lọc nâng cao */}
-        <div className="card filter-card mb-4">
+        <div className="card mb-4">
           <div className="card-body">
-            <h5 className="card-title mb-3">
-              <i className="fas fa-filter me-2"></i>Lọc danh sách hồ sơ
-            </h5>
-            <div className="row g-3">
-              <div className="col-lg-3 col-md-6">
-                <label className="form-label">Ngày ghi nhận</label>
+            <h5 className="card-title mb-3">Lọc danh sách hồ sơ</h5>
+            <div className="row">
+              <div className="col-md-3 mb-2">
                 <input
                   type="date"
                   className="form-control"
@@ -583,14 +548,13 @@ const HealthRecord = () => {
                   placeholder="Chọn ngày ghi nhận"
                 />
               </div>
-              <div className="col-lg-3 col-md-6">
-                <label className="form-label">Lớp học</label>
+              <div className="col-md-3 mb-2">
                 <select
                   className="form-select"
                   value={filters.className}
                   onChange={e => setFilters(prev => ({ ...prev, className: e.target.value }))}
                 >
-                  <option value="">Tất cả các lớp</option>
+                  <option value="">Chọn lớp</option>
                   {availableClasses.map(cls => (
                     <option key={cls.ClassID} value={cls.ClassName}>
                       {cls.ClassName}
@@ -598,18 +562,16 @@ const HealthRecord = () => {
                   ))}
                 </select>
               </div>
-              <div className="col-lg-3 col-md-6">
-                <label className="form-label">Tên học sinh</label>
+              <div className="col-md-3 mb-2">
                 <input
                   type="text"
                   className="form-control"
                   value={filters.studentName}
                   onChange={e => setFilters(prev => ({ ...prev, studentName: e.target.value }))}
-                  placeholder="Nhập tên học sinh..."
+                  placeholder="Tên học sinh"
                 />
               </div>
-              <div className="col-lg-3 col-md-6">
-                <label className="form-label">Trạng thái</label>
+              <div className="col-md-3 mb-2">
                 <select
                   className="form-select"
                   value={filterStatus}
@@ -623,14 +585,10 @@ const HealthRecord = () => {
                 </select>
               </div>
             </div>
-            <div className="row mt-3">
-              <div className="col-12 d-flex gap-2">
-                <button className="btn btn-primary" onClick={handleApplyFilters}>
-                  <i className="fas fa-search me-2"></i>Lọc
-                </button>
-                <button className="btn btn-outline-secondary" onClick={handleResetFilters}>
-                  <i className="fas fa-undo me-2"></i>Đặt lại
-                </button>
+            <div className="row mt-2">
+              <div className="col-md-12 d-flex align-items-end">
+                <button className="btn btn-primary me-2" onClick={handleApplyFilters}>Lọc</button>
+                <button className="btn btn-secondary" onClick={handleResetFilters}>Đặt lại</button>
               </div>
             </div>
           </div>
@@ -652,84 +610,73 @@ const HealthRecord = () => {
             <p className="mt-3">Đang tải dữ liệu hồ sơ sức khỏe...</p>
           </div>
         ) : (
-          <div className="records-grid">
+          <div className="records-list">
             {filteredRecords.length > 0 ? (
-              <div className="row g-3">
-                {filteredRecords.map((record) => (
-                  <div key={record.healthRecordID || record.id} className="col-xl-6 col-lg-12">
-                    <div className="record-card">
-                      <div className="record-header">
-                        <div className="record-title">
-                          <h3 className="record-student-name">{record.childName || 'Không rõ tên'}</h3>
-                          <div className="record-meta-inline">
-                            <span className="record-date">
-                              <i className="fas fa-calendar me-2"></i>
-                              {record.recordDate ? new Date(record.recordDate).toLocaleDateString('vi-VN') : ''}
-                            </span>
-                            <span className="record-class">
-                              <i className="fas fa-users me-2"></i>
-                              {getClassName(record)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="record-status-wrapper">
-                          <span className="status-badge" style={{ backgroundColor: getStatusColor(record.status) }}>
-                            {getStatusText(record.status)}
+              filteredRecords.map((record) => (
+                <div key={record.healthRecordID || record.id} className="record-card">
+                  <div className="record-header">
+                    <div className="record-title">
+                      <h3>{record.childName || 'Không rõ tên'}</h3>
+                      <span className="record-date">
+                        <i className="fas fa-calendar"></i>
+                        {record.recordDate ? new Date(record.recordDate).toLocaleDateString('vi-VN') : ''}
+                      </span>
+                    </div>
+                    <div className="record-meta">
+                      <span className="record-class"><b>Lớp:</b> {getClassName(record)}</span>
+                      <span className="record-status">
+                        <b>Trạng thái:</b> 
+                        <span className="status-badge" style={{ backgroundColor: getStatusColor(record.status), color: 'white', padding: '2px 8px', borderRadius: '4px', marginLeft: '5px' }}>
+                          {getStatusText(record.status)}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="record-content">
+                    <div className="record-description">
+                      <div className="row">
+                        <div className="col-md-6">
+                          <b>Tình trạng sức khỏe:</b> 
+                          <span className="health-status-badge" style={{ backgroundColor: getHealthStatusColor(record.healthStatus), color: 'white', padding: '2px 8px', borderRadius: '4px', marginLeft: '5px' }}>
+                            {record.healthStatus || 'Chưa đánh giá'}
                           </span>
                         </div>
-                      </div>
-                      
-                      <div className="record-content">
-                        <div className="health-info-grid">
-                          <div className="health-info-item">
-                            <strong>Tình trạng:</strong>
-                            <span className="health-status-badge" style={{ backgroundColor: getHealthStatusColor(record.healthStatus) }}>
-                              {record.healthStatus || 'Chưa đánh giá'}
-                            </span>
-                          </div>
-                          <div className="health-info-item">
-                            <strong>Triệu chứng:</strong>
-                            <span className="symptom-count">
-                              {getSymptomCount(record)} triệu chứng
-                              {getSymptomCount(record) > 3 && <i className="fas fa-exclamation-triangle text-warning ms-2"></i>}
-                            </span>
-                          </div>
+                        <div className="col-md-6">
+                          <b>Số triệu chứng:</b> {getSymptomCount(record)}
+                          {getSymptomCount(record) > 3 && <i className="fas fa-exclamation-triangle text-warning ms-2"></i>}
                         </div>
-                        
-                        {record.note && (
-                          <div className="record-note">
-                            <strong>Ghi chú:</strong> {record.note.length > 100 ? record.note.substring(0, 100) + '...' : record.note}
-                          </div>
-                        )}
-                        
-                        <div className="record-actions">
-                          <button className="btn btn-outline-info btn-sm" onClick={() => handleViewDetails(record)}>
-                            <i className="fas fa-eye me-1"></i> Chi tiết
-                          </button>
-                          <button className="btn btn-outline-secondary btn-sm" onClick={() => handleEditRecord(record)}>
-                            <i className="fas fa-edit me-1"></i> Sửa
-                          </button>
-                          {record.status === 'Submitted' && (
-                            <>
-                              <button className="btn btn-outline-success btn-sm" onClick={() => handleApproveRecord(record)}>
-                                <i className="fas fa-check me-1"></i> Duyệt
-                              </button>
-                              <button className="btn btn-outline-danger btn-sm" onClick={() => handleRejectRecord(record)}>
-                                <i className="fas fa-times me-1"></i> Từ chối
-                              </button>
-                            </>
-                          )}
+                      </div>
+                      <div className="row mt-2">
+                        <div className="col-md-12">
+                          <b>Ghi chú:</b> {record.note || 'Không có ghi chú'}
                         </div>
                       </div>
                     </div>
+                    <div className="record-actions mt-2">
+                      <button className="btn btn-info btn-sm me-2" onClick={() => handleViewDetails(record)}>
+                        <i className="fas fa-eye"></i> Xem chi tiết
+                      </button>
+                      <button className="btn btn-secondary btn-sm me-2" onClick={() => handleEditRecord(record)}>
+                        <i className="fas fa-edit"></i> Chỉnh sửa
+                      </button>
+                      {record.status === 'Submitted' && (
+                        <>
+                          <button className="btn btn-success btn-sm me-2" onClick={() => handleApproveRecord(record)}>
+                            <i className="fas fa-check"></i> Phê duyệt
+                          </button>
+                          <button className="btn btn-danger btn-sm" onClick={() => handleRejectRecord(record)}>
+                            <i className="fas fa-times"></i> Từ chối
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))
             ) : (
               <div className="no-results text-center my-5">
                 <i className="fas fa-file-medical fa-3x mb-3" style={{color:'#bdbdbd'}}></i>
-                <h4>Không tìm thấy hồ sơ sức khỏe</h4>
-                <p className="text-muted">Thử thay đổi bộ lọc hoặc tạo hồ sơ mới</p>
+                <p>Không tìm thấy hồ sơ sức khỏe nào</p>
               </div>
             )}
           </div>

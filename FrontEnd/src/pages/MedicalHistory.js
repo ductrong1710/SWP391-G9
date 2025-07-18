@@ -252,37 +252,43 @@ const MedicalHistory = () => {
   ];
   function ParentHealthResultTableTemp({ planName, childName }) {
     return (
-      <div className="history-card">
-        <div className="history-header">
-          <div className="history-title">
-            <h3>Kiểm tra - {childName || 'Học sinh'}</h3>
-            <span className="type-badge" style={{ backgroundColor: '#d69e2e' }}>Định kỳ</span>
-            <span className="status-badge" style={{ backgroundColor: '#d69e2e' }}>Đang đợi kết quả</span>
-          </div>
-          <div className="history-date">
-            <i className="fas fa-calendar"></i> -
+      <div className="temp-consent-plan">
+        <div className="temp-plan-header">
+          <h3 className="temp-plan-title">Kiểm tra - {childName || 'Học sinh'}</h3>
+          <div className="history-badges">
+            <span className="type-badge">Định kỳ</span>
+            <span className="status-badge" style={{ backgroundColor: '#f59e0b' }}>Đang đợi kết quả</span>
           </div>
         </div>
-        <div className="history-content">
-          <div className="basic-info">
-            <h4>Thông tin cơ bản</h4>
-            <div className="info-grid">
-              <div className="info-item">
-                <span className="info-label">Học sinh:</span>
-                <span className="info-value">{childName || 'Học sinh'}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Kế hoạch:</span>
-                <span className="info-value">{planName || '-'}</span>
-              </div>
-            </div>
+        
+        <div className="temp-plan-info">
+          <div className="temp-info-item">
+            <span className="temp-info-label">Học sinh</span>
+            <span className="temp-info-value">{childName || 'Học sinh'}</span>
           </div>
-          <table className="table table-bordered" style={{ marginTop: 12, marginBottom: 12 }}>
+          <div className="temp-info-item">
+            <span className="temp-info-label">Kế hoạch</span>
+            <span className="temp-info-value">{planName || 'Kiểm tra sức khỏe định kỳ'}</span>
+          </div>
+        </div>
+        
+        <div className="temp-results-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Chỉ số khám</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
             <tbody>
               {tempFields.map(f => (
                 <tr key={f.key}>
-                  <td><b>{f.label}</b></td>
-                  <td>Đang đợi kết quả</td>
+                  <td><strong>{f.label}</strong></td>
+                  <td>
+                    <span className="temp-waiting-status">
+                      Đang đợi kết quả
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -322,10 +328,10 @@ const MedicalHistory = () => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f6ff' }}>
+      <div style={{ display: 'flex', minHeight: '100vh' }}>
         <Sidebar />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0' }}>
-          <div style={{ maxWidth: 600, width: '100%', background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: 24, minHeight: 400 }}>
+        <div className="medical-history-container">
+          <div className="medical-history-content">
             <div className="loading-spinner"></div>
           </div>
         </div>
@@ -334,57 +340,59 @@ const MedicalHistory = () => {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f6ff' }}>
+    <div style={{minHeight: '100vh' }}>
       <Sidebar />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0' }}>
-        <div style={{ maxWidth: 600, width: '100%', background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', padding: 24, minHeight: 400 }}>
-          <h2 style={{ textAlign: 'center', fontWeight: 700, fontSize: 32, marginBottom: 24 }}>Lịch sử kiểm tra y tế</h2>
-          <div className="history-header">
+      <div className="medical-history-container">
+        <div className="medical-history-content">
+          <div className="medical-history-header">
+            <h1>Lịch sử kiểm tra y tế</h1>
             <p>Xem lịch sử các lần kiểm tra sức khỏe và kết quả chi tiết</p>
           </div>
 
           {/* Filters */}
           <div className="filters-section">
-            {getUserRole() === 'Parent' && (
+            <div className="filters-container">
+              {getUserRole() === 'Parent' && (
+                <div className="filter-group">
+                  <label>Con em</label>
+                  <select 
+                    value={selectedChild ?? ""} 
+                    onChange={(e) => setSelectedChild(e.target.value)}
+                  >
+                    <option value="all">Tất cả con em</option>
+                    {children.map(child => (
+                      <option key={child.id || child.userID || child.UserID} value={child.id}>
+                        {child.name} - {child.className}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              
               <div className="filter-group">
-                <label>Con em:</label>
+                <label>Năm</label>
                 <select 
-                  value={selectedChild ?? ""} 
-                  onChange={(e) => setSelectedChild(e.target.value)}
+                  value={filterYear ?? ""} 
+                  onChange={(e) => setFilterYear(parseInt(e.target.value))}
                 >
-                  <option value="all">Tất cả con em</option>
-                  {children.map(child => (
-                    <option key={child.id || child.userID || child.UserID} value={child.id}>
-                      {child.name} - {child.className}
-                    </option>
+                  {uniqueYears.sort((a, b) => b - a).map(year => (
+                    <option key={year} value={year}>{year}</option>
                   ))}
                 </select>
               </div>
-            )}
-            
-            <div className="filter-group">
-              <label>Năm:</label>
-              <select 
-                value={filterYear ?? ""} 
-                onChange={(e) => setFilterYear(parseInt(e.target.value))}
-              >
-                {uniqueYears.sort((a, b) => b - a).map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
 
-            <div className="filter-group">
-              <label>Loại kiểm tra:</label>
-              <select 
-                value={filterType ?? ""} 
-                onChange={(e) => setFilterType(e.target.value)}
-              >
-                <option value="all">Tất cả loại</option>
-                <option value="Periodic">Định kỳ</option>
-                <option value="Special">Đặc biệt</option>
-                <option value="Follow-up">Theo dõi</option>
-              </select>
+              <div className="filter-group">
+                <label>Loại kiểm tra</label>
+                <select 
+                  value={filterType ?? ""} 
+                  onChange={(e) => setFilterType(e.target.value)}
+                >
+                  <option value="all">Tất cả loại</option>
+                  <option value="Periodic">Định kỳ</option>
+                  <option value="Special">Đặc biệt</option>
+                  <option value="Follow-up">Theo dõi</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -618,6 +626,14 @@ const MedicalHistory = () => {
             {medicalHistory.length === 0 && getUserRole() === 'Parent' && (
               <TempConsentPlanList children={children} />
             )}
+
+            {medicalHistory.length === 0 && getUserRole() !== 'Parent' && (
+              <div className="no-results">
+                <i className="fas fa-stethoscope"></i>
+                <h3>Không có lịch sử kiểm tra</h3>
+                <p>Chưa có bản ghi kiểm tra y tế nào trong hệ thống.</p>
+              </div>
+            )}
           </div>
 
           {/* Details Modal */}
@@ -625,209 +641,198 @@ const MedicalHistory = () => {
             <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
               <div className="details-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                  <h3>Chi tiết kiểm tra - {selectedRecord.childName || 'Học sinh'}</h3>
+                  <h3>Chi tiết kiểm tra y tế</h3>
                   <button 
-                    className="close-btn"
+                    className="modal-close"
                     onClick={() => setShowDetailsModal(false)}
                   >
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
-                <div className="modal-body">
+
+                <div className="detail-section">
+                  <h4><i className="fas fa-user"></i> Thông tin cơ bản</h4>
+                  <div className="detail-grid">
+                    <div className="detail-item">
+                      <label>Học sinh:</label>
+                      <span>{selectedRecord.childName || 'Học sinh'}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Lớp:</label>
+                      <span>{selectedRecord.className}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Loại kiểm tra:</label>
+                      <span>{getTypeText(selectedRecord.checkupType)}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Ngày kiểm tra:</label>
+                      <span>{new Date(selectedRecord.checkupDate).toLocaleDateString('vi-VN')}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Trạng thái:</label>
+                      <span>{getStatusText(selectedRecord.status)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {selectedRecord.result && (
+                  <>
+                    <div className="detail-section">
+                      <h4><i className="fas fa-heartbeat"></i> Thông tin sức khỏe</h4>
+                      <div className="detail-grid">
+                        {selectedRecord.result.height && (
+                          <div className="detail-item">
+                            <label>Chiều cao:</label>
+                            <span>{selectedRecord.result.height}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.weight && (
+                          <div className="detail-item">
+                            <label>Cân nặng:</label>
+                            <span>{selectedRecord.result.weight}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.bloodPressure && (
+                          <div className="detail-item">
+                            <label>Huyết áp:</label>
+                            <span>{selectedRecord.result.bloodPressure}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.heartRate && (
+                          <div className="detail-item">
+                            <label>Nhịp tim:</label>
+                            <span>{selectedRecord.result.heartRate} bpm</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="detail-section">
+                      <h4><i className="fas fa-eye"></i> Khám lâm sàng</h4>
+                      <div className="detail-grid">
+                        {selectedRecord.result.vision && (
+                          <div className="detail-item">
+                            <label>Thị lực:</label>
+                            <span>{selectedRecord.result.vision}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.hearing && (
+                          <div className="detail-item">
+                            <label>Thính lực:</label>
+                            <span>{selectedRecord.result.hearing}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.dental && (
+                          <div className="detail-item">
+                            <label>Răng miệng:</label>
+                            <span>{selectedRecord.result.dental}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.skin && (
+                          <div className="detail-item">
+                            <label>Da:</label>
+                            <span>{selectedRecord.result.skin}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="detail-section">
+                      <h4><i className="fas fa-lungs"></i> Khám hệ thống</h4>
+                      <div className="detail-grid">
+                        {selectedRecord.result.respiratory && (
+                          <div className="detail-item">
+                            <label>Hô hấp:</label>
+                            <span>{selectedRecord.result.respiratory}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.cardiovascular && (
+                          <div className="detail-item">
+                            <label>Tim mạch:</label>
+                            <span>{selectedRecord.result.cardiovascular}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.gastrointestinal && (
+                          <div className="detail-item">
+                            <label>Tiêu hóa:</label>
+                            <span>{selectedRecord.result.gastrointestinal}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.musculoskeletal && (
+                          <div className="detail-item">
+                            <label>Cơ xương khớp:</label>
+                            <span>{selectedRecord.result.musculoskeletal}</span>
+                          </div>
+                        )}
+                        {selectedRecord.result.neurological && (
+                          <div className="detail-item">
+                            <label>Thần kinh:</label>
+                            <span>{selectedRecord.result.neurological}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {selectedRecord.result.notes && (
+                      <div className="detail-section">
+                        <h4><i className="fas fa-sticky-note"></i> Ghi chú</h4>
+                        <p>{selectedRecord.result.notes}</p>
+                      </div>
+                    )}
+
+                    {selectedRecord.result.recommendations && (
+                      <div className="detail-section">
+                        <h4><i className="fas fa-lightbulb"></i> Khuyến nghị</h4>
+                        <p>{selectedRecord.result.recommendations}</p>
+                      </div>
+                    )}
+
+                    {selectedRecord.result.followUpRequired && (
+                      <div className="detail-section">
+                        <h4><i className="fas fa-calendar-alt"></i> Theo dõi</h4>
+                        <div className="detail-grid">
+                          <div className="detail-item">
+                            <label>Ngày theo dõi:</label>
+                            <span>{new Date(selectedRecord.result.followUpDate).toLocaleDateString('vi-VN')}</span>
+                          </div>
+                          <div className="detail-item">
+                            <label>Lý do:</label>
+                            <span>{selectedRecord.result.followUpReason}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {selectedRecord.checkupType === 'Vaccination' && (
                   <div className="detail-section">
-                    <h4>Thông tin cơ bản</h4>
+                    <h4><i className="fas fa-syringe"></i> Kết quả tiêm chủng</h4>
                     <div className="detail-grid">
                       <div className="detail-item">
-                        <label>Học sinh:</label>
-                        <span>{selectedRecord.childName || 'Học sinh'}</span>
+                        <label>Loại vắc xin:</label>
+                        <span>{selectedRecord.result?.vaccineType}</span>
                       </div>
                       <div className="detail-item">
-                        <label>Lớp:</label>
-                        <span>{selectedRecord.className}</span>
-                      </div>
-                      <div className="detail-item">
-                        <label>Loại kiểm tra:</label>
-                        <span>{getTypeText(selectedRecord.checkupType)}</span>
-                      </div>
-                      <div className="detail-item">
-                        <label>Ngày kiểm tra:</label>
+                        <label>Ngày tiêm:</label>
                         <span>{new Date(selectedRecord.checkupDate).toLocaleDateString('vi-VN')}</span>
                       </div>
                       <div className="detail-item">
-                        <label>Trạng thái:</label>
-                        <span>{getStatusText(selectedRecord.status)}</span>
+                        <label>Người thực hiện:</label>
+                        <span>{selectedRecord.doctor}</span>
+                      </div>
+                      <div className="detail-item">
+                        <label>Phản ứng sau tiêm:</label>
+                        <span>{selectedRecord.result?.postVaccinationReaction || 'Không có'}</span>
+                      </div>
+                      <div className="detail-item">
+                        <label>Ghi chú:</label>
+                        <span>{selectedRecord.result?.notes || 'Không có'}</span>
                       </div>
                     </div>
                   </div>
-
-                  {selectedRecord.result && (
-                    <>
-                      <div className="detail-section">
-                        <h4>Thông tin sức khỏe</h4>
-                        <div className="detail-grid">
-                          {selectedRecord.result.height && (
-                            <div className="detail-item">
-                              <label>Chiều cao:</label>
-                              <span>{selectedRecord.result.height}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.weight && (
-                            <div className="detail-item">
-                              <label>Cân nặng:</label>
-                              <span>{selectedRecord.result.weight}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.bloodPressure && (
-                            <div className="detail-item">
-                              <label>Huyết áp:</label>
-                              <span>{selectedRecord.result.bloodPressure}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.heartRate && (
-                            <div className="detail-item">
-                              <label>Nhịp tim:</label>
-                              <span>{selectedRecord.result.heartRate} bpm</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="detail-section">
-                        <h4>Khám lâm sàng</h4>
-                        <div className="detail-grid">
-                          {selectedRecord.result.vision && (
-                            <div className="detail-item">
-                              <label>Thị lực:</label>
-                              <span>{selectedRecord.result.vision}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.hearing && (
-                            <div className="detail-item">
-                              <label>Thính lực:</label>
-                              <span>{selectedRecord.result.hearing}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.dental && (
-                            <div className="detail-item">
-                              <label>Răng miệng:</label>
-                              <span>{selectedRecord.result.dental}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.skin && (
-                            <div className="detail-item">
-                              <label>Da:</label>
-                              <span>{selectedRecord.result.skin}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="detail-section">
-                        <h4>Khám hệ thống</h4>
-                        <div className="detail-grid">
-                          {selectedRecord.result.respiratory && (
-                            <div className="detail-item">
-                              <label>Hô hấp:</label>
-                              <span>{selectedRecord.result.respiratory}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.cardiovascular && (
-                            <div className="detail-item">
-                              <label>Tim mạch:</label>
-                              <span>{selectedRecord.result.cardiovascular}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.gastrointestinal && (
-                            <div className="detail-item">
-                              <label>Tiêu hóa:</label>
-                              <span>{selectedRecord.result.gastrointestinal}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.musculoskeletal && (
-                            <div className="detail-item">
-                              <label>Cơ xương khớp:</label>
-                              <span>{selectedRecord.result.musculoskeletal}</span>
-                            </div>
-                          )}
-                          {selectedRecord.result.neurological && (
-                            <div className="detail-item">
-                              <label>Thần kinh:</label>
-                              <span>{selectedRecord.result.neurological}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {selectedRecord.result.notes && (
-                        <div className="detail-section">
-                          <h4>Ghi chú</h4>
-                          <p>{selectedRecord.result.notes}</p>
-                        </div>
-                      )}
-
-                      {selectedRecord.result.recommendations && (
-                        <div className="detail-section">
-                          <h4>Khuyến nghị</h4>
-                          <p>{selectedRecord.result.recommendations}</p>
-                        </div>
-                      )}
-
-                      {selectedRecord.result.followUpRequired && (
-                        <div className="detail-section">
-                          <h4>Theo dõi</h4>
-                          <div className="detail-grid">
-                            <div className="detail-item">
-                              <label>Ngày theo dõi:</label>
-                              <span>{new Date(selectedRecord.result.followUpDate).toLocaleDateString('vi-VN')}</span>
-                            </div>
-                            <div className="detail-item">
-                              <label>Lý do:</label>
-                              <span>{selectedRecord.result.followUpReason}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {selectedRecord.checkupType === 'Vaccination' ? (
-                    <div className="detail-section">
-                      <h4>Kết quả tiêm chủng</h4>
-                      <div className="detail-grid">
-                        <div className="detail-item">
-                          <label>Loại vắc xin:</label>
-                          <span>{selectedRecord.result?.vaccineType}</span>
-                        </div>
-                        <div className="detail-item">
-                          <label>Ngày tiêm:</label>
-                          <span>{new Date(selectedRecord.checkupDate).toLocaleDateString('vi-VN')}</span>
-                        </div>
-                        <div className="detail-item">
-                          <label>Người thực hiện:</label>
-                          <span>{selectedRecord.doctor}</span>
-                        </div>
-                        <div className="detail-item">
-                          <label>Phản ứng sau tiêm:</label>
-                          <span>{selectedRecord.result?.postVaccinationReaction || 'Không có'}</span>
-                        </div>
-                        <div className="detail-item">
-                          <label>Ghi chú:</label>
-                          <span>{selectedRecord.result?.notes || 'Không có'}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="history-actions">
-                      <button 
-                        className="view-details-btn"
-                        onClick={() => handleViewDetails(selectedRecord)}
-                      >
-                        <i className="fas fa-eye"></i>
-                        Xem chi tiết
-                      </button>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           )}

@@ -281,53 +281,108 @@ export default function Notifications() {
 
         {/* Health Check Modal */}
         {showHealthCheckModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">
-                  <i className="fas fa-heartbeat me-2" style={{color: '#43e97b'}}></i>
-                  Xác nhận khám sức khỏe
-                </h2>
-                <p className="modal-subtitle">
-                  Bạn có đồng ý cho con tham gia khám sức khỏe định kỳ không?
-                </p>
-              </div>
-              
-              <div className="modal-actions">
-                <button
-                  className="modal-btn modal-btn-approve"
-                  onClick={async () => {
-                    await handleApproveHealthCheck(selectedConsentFormId);
-                    setShowHealthCheckModal(false);
-                  }}
-                >
-                  <i className="fas fa-check me-2"></i>
-                  Đồng ý
-                </button>
-                <button
-                  className="modal-btn modal-btn-reject"
-                  onClick={() => setDenyError(denyError ? '' : 'show')}
-                >
-                  <i className="fas fa-times me-2"></i>
-                  Từ chối
-                </button>
+          <div className="modal-overlay" onClick={() => setShowHealthCheckModal(false)}>
+            <div className="modern-modal-content" onClick={(e) => e.stopPropagation()}>
+              {/* Modal Close Button */}
+              <button 
+                className="modal-close-btn"
+                onClick={() => {
+                  setShowHealthCheckModal(false);
+                  setDenyReason('');
+                  setDenyError('');
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+
+              {/* Modal Icon & Animation */}
+              <div className="modal-icon-container">
+                <div className="modal-icon health-check">
+                  <i className="fas fa-heartbeat"></i>
+                </div>
+                <div className="pulse-ring"></div>
               </div>
 
+              {/* Modal Header */}
+              <div className="modern-modal-header">
+                <h2 className="modern-modal-title">Xác nhận khám sức khỏe</h2>
+                <p className="modern-modal-subtitle">
+                  Bạn có đồng ý cho con em tham gia chương trình khám sức khỏe định kỳ của nhà trường không?
+                </p>
+                <div className="modal-divider"></div>
+              </div>
+
+              {!denyError && (
+                <div className="modern-modal-actions">
+                  <button
+                    className="modern-btn modern-btn-approve"
+                    onClick={async () => {
+                      await handleApproveHealthCheck(selectedConsentFormId);
+                      setShowHealthCheckModal(false);
+                    }}
+                  >
+                    <div className="btn-content">
+                      <i className="fas fa-check"></i>
+                      <span>ĐỒNG Ý</span>
+                    </div>
+                    <div className="btn-shine"></div>
+                  </button>
+                  
+                  <button
+                    className="modern-btn modern-btn-reject"
+                    onClick={() => setDenyError('show')}
+                  >
+                    <div className="btn-content">
+                      <i className="fas fa-times"></i>
+                      <span>TỪ CHỐI</span>
+                    </div>
+                    <div className="btn-shine"></div>
+                  </button>
+                  
+                  <button
+                    className="modern-btn modern-btn-neutral"
+                    onClick={() => {
+                      setShowHealthCheckModal(false);
+                      setDenyReason('');
+                      setDenyError('');
+                    }}
+                  >
+                    <div className="btn-content">
+                      <i className="fas fa-pause"></i>
+                      <span>ĐÓNG</span>
+                    </div>
+                    <div className="btn-shine"></div>
+                  </button>
+                </div>
+              )}
+
               {denyError === 'show' && (
-                <div>
-                  <textarea
-                    className="reason-input"
-                    placeholder="Nhập lý do từ chối khám sức khỏe..."
-                    value={denyReason}
-                    onChange={e => setDenyReason(e.target.value)}
-                    rows={4}
-                  />
-                  {denyError && denyError !== 'show' && (
-                    <div className="error-message">{denyError}</div>
-                  )}
-                  <div className="modal-actions">
+                <div className="modern-modal-form">
+                  <div className="form-header">
+                    <i className="fas fa-edit"></i>
+                    <h3>Lý do từ chối</h3>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label">Vui lòng cho biết lý do từ chối:</label>
+                    <textarea
+                      className="modern-reason-input"
+                      placeholder="Nhập lý do từ chối chương trình khám sức khỏe..."
+                      value={denyReason}
+                      onChange={e => setDenyReason(e.target.value)}
+                      rows={4}
+                    />
+                    {denyError && denyError !== 'show' && (
+                      <div className="modern-error-message">
+                        <i className="fas fa-exclamation-triangle"></i>
+                        {denyError}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="modern-modal-actions">
                     <button
-                      className="modal-btn modal-btn-reject"
+                      className="modern-btn modern-btn-confirm-reject"
                       onClick={async () => {
                         if (!denyReason.trim()) {
                           setDenyError('Vui lòng nhập lý do từ chối!');
@@ -339,35 +394,28 @@ export default function Notifications() {
                         setDenyError('');
                       }}
                     >
-                      <i className="fas fa-paper-plane me-2"></i>
-                      Xác nhận từ chối
+                      <div className="btn-content">
+                        <i className="fas fa-paper-plane"></i>
+                        <span>XÁC NHẬN TỪ CHỐI</span>
+                      </div>
+                      <div className="btn-shine"></div>
                     </button>
+                    
                     <button
-                      className="modal-btn modal-btn-cancel"
+                      className="modern-btn modern-btn-back"
                       onClick={() => {
                         setDenyError('');
                         setDenyReason('');
                       }}
                     >
-                      <i className="fas fa-arrow-left me-2"></i>
-                      Quay lại
+                      <div className="btn-content">
+                        <i className="fas fa-arrow-left"></i>
+                        <span>QUAY LẠI</span>
+                      </div>
+                      <div className="btn-shine"></div>
                     </button>
                   </div>
                 </div>
-              )}
-
-              {!denyError && (
-                <button
-                  className="modal-btn modal-btn-close"
-                  onClick={() => {
-                    setShowHealthCheckModal(false);
-                    setDenyReason('');
-                    setDenyError('');
-                  }}
-                >
-                  <i className="fas fa-times me-2"></i>
-                  Đóng
-                </button>
               )}
             </div>
           </div>
@@ -375,53 +423,107 @@ export default function Notifications() {
 
         {/* Vaccination Modal */}
         {showVaccineModal && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h2 className="modal-title">
-                  <i className="fas fa-syringe me-2" style={{color: '#4facfe'}}></i>
-                  Xác nhận tiêm chủng
-                </h2>
-                <p className="modal-subtitle">
-                  Bạn có đồng ý cho con tham gia tiêm chủng theo kế hoạch không?
-                </p>
-              </div>
-              
-              <div className="modal-actions">
-                <button
-                  className="modal-btn modal-btn-approve"
-                  onClick={async () => {
-                    await handleApproveConsent(selectedVaccineConsentFormId);
-                    setShowVaccineModal(false);
-                  }}
-                >
-                  <i className="fas fa-check me-2"></i>
-                  Đồng ý
-                </button>
-                <button
-                  className="modal-btn modal-btn-reject"
-                  onClick={() => setVaccineDenyError(vaccineDenyError ? '' : 'show')}
-                >
-                  <i className="fas fa-times me-2"></i>
-                  Từ chối
-                </button>
+          <div className="modal-overlay" onClick={() => setShowVaccineModal(false)}>
+            <div className="modern-modal-content" onClick={(e) => e.stopPropagation()}>
+              {/* Modal Close Button */}
+              <button 
+                className="modal-close-btn"
+                onClick={() => {
+                  setShowVaccineModal(false);
+                  setVaccineDenyReason('');
+                  setVaccineDenyError('');
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+
+              {/* Modal Icon & Animation */}
+              <div className="modal-icon-container">
+                <div className="modal-icon vaccination">
+                  <i className="fas fa-syringe"></i>
+                </div>
+                <div className="pulse-ring"></div>
               </div>
 
+              {/* Modal Header */}
+              <div className="modern-modal-header">
+                <h2 className="modern-modal-title">Xác nhận tiêm chủng</h2>
+                <p className="modern-modal-subtitle">
+                  Bạn có đồng ý cho con em tham gia chương trình tiêm chủng theo kế hoạch của nhà trường không?
+                </p>
+                <div className="modal-divider"></div>
+              </div>
+
+              {!vaccineDenyError && (
+                <div className="modern-modal-actions">
+                  <button
+                    className="modern-btn modern-btn-approve"
+                    onClick={async () => {
+                      await handleApproveConsent(selectedVaccineConsentFormId);
+                      setShowVaccineModal(false);
+                    }}
+                  >
+                    <div className="btn-content">
+                      <i className="fas fa-check"></i>
+                      <span>ĐỒNG Ý</span>
+                    </div>
+                    <div className="btn-shine"></div>
+                  </button>
+                  
+                  <button
+                    className="modern-btn modern-btn-reject"
+                    onClick={() => setVaccineDenyError('show')}
+                  >
+                    <div className="btn-content">
+                      <i className="fas fa-times"></i>
+                      <span>TỪ CHỐI</span>
+                    </div>
+                    <div className="btn-shine"></div>
+                  </button>
+                  
+                  <button
+                    className="modern-btn modern-btn-neutral"
+                    onClick={() => {
+                      setShowVaccineModal(false);
+                      setVaccineDenyReason('');
+                      setVaccineDenyError('');
+                    }}
+                  >
+                    <div className="btn-content">
+                      <i className="fas fa-pause"></i>
+                      <span>ĐÓNG</span>
+                    </div>
+                    <div className="btn-shine"></div>
+                  </button>
+                </div>
+              )}
               {vaccineDenyError === 'show' && (
-                <div>
-                  <textarea
-                    className="reason-input"
-                    placeholder="Nhập lý do từ chối tiêm chủng..."
-                    value={vaccineDenyReason}
-                    onChange={e => setVaccineDenyReason(e.target.value)}
-                    rows={4}
-                  />
-                  {vaccineDenyError && vaccineDenyError !== 'show' && (
-                    <div className="error-message">{vaccineDenyError}</div>
-                  )}
-                  <div className="modal-actions">
+                <div className="modern-modal-form">
+                  <div className="form-header">
+                    <i className="fas fa-edit"></i>
+                    <h3>Lý do từ chối</h3>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label">Vui lòng cho biết lý do từ chối:</label>
+                    <textarea
+                      className="modern-reason-input"
+                      placeholder="Nhập lý do từ chối chương trình tiêm chủng..."
+                      value={vaccineDenyReason}
+                      onChange={e => setVaccineDenyReason(e.target.value)}
+                      rows={4}
+                    />
+                    {vaccineDenyError && vaccineDenyError !== 'show' && (
+                      <div className="modern-error-message">
+                        <i className="fas fa-exclamation-triangle"></i>
+                        {vaccineDenyError}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="modern-modal-actions">
                     <button
-                      className="modal-btn modal-btn-reject"
+                      className="modern-btn modern-btn-confirm-reject"
                       onClick={async () => {
                         if (!vaccineDenyReason.trim()) {
                           setVaccineDenyError('Vui lòng nhập lý do từ chối!');
@@ -433,35 +535,28 @@ export default function Notifications() {
                         setVaccineDenyError('');
                       }}
                     >
-                      <i className="fas fa-paper-plane me-2"></i>
-                      Xác nhận từ chối
+                      <div className="btn-content">
+                        <i className="fas fa-paper-plane"></i>
+                        <span>XÁC NHẬN TỪ CHỐI</span>
+                      </div>
+                      <div className="btn-shine"></div>
                     </button>
+                    
                     <button
-                      className="modal-btn modal-btn-cancel"
+                      className="modern-btn modern-btn-back"
                       onClick={() => {
                         setVaccineDenyError('');
                         setVaccineDenyReason('');
                       }}
                     >
-                      <i className="fas fa-arrow-left me-2"></i>
-                      Quay lại
+                      <div className="btn-content">
+                        <i className="fas fa-arrow-left"></i>
+                        <span>QUAY LẠI</span>
+                      </div>
+                      <div className="btn-shine"></div>
                     </button>
                   </div>
                 </div>
-              )}
-
-              {!vaccineDenyError && (
-                <button
-                  className="modal-btn modal-btn-close"
-                  onClick={() => {
-                    setShowVaccineModal(false);
-                    setVaccineDenyReason('');
-                    setVaccineDenyError('');
-                  }}
-                >
-                  <i className="fas fa-times me-2"></i>
-                  Đóng
-                </button>
               )}
             </div>
           </div>

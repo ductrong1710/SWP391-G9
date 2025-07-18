@@ -140,8 +140,8 @@ export default function Notifications() {
 
   // Calculate statistics
   const unreadCount = notifications.filter(n => !n.isRead).length;
-  const healthCount = notifications.filter(n => n.title && n.title.toLowerCase().includes('sức khỏe')).length;
-  const vaccineCount = notifications.filter(n => n.title && n.title.toLowerCase().includes('tiêm chủng')).length;
+  const approvedCount = notifications.filter(n => n.isRead || n.resultStatus === 'Completed').length;
+  const pendingCount = notifications.filter(n => !n.isRead && !hasResult(n)).length;
   const totalCount = notifications.length;
 
   if (loading) {
@@ -169,19 +169,15 @@ export default function Notifications() {
           <div className="notifications-stats">
             <div className="stat-item">
               <span className="stat-number">{totalCount}</span>
-              <span className="stat-label">Tổng thông báo</span>
+              <span className="stat-label">Hồ sơ đã nộp</span>
             </div>
             <div className="stat-item">
-              <span className="stat-number">{unreadCount}</span>
-              <span className="stat-label">Chưa đọc</span>
+              <span className="stat-number">{approvedCount}</span>
+              <span className="stat-label">Đã phê duyệt</span>
             </div>
             <div className="stat-item">
-              <span className="stat-number">{healthCount}</span>
-              <span className="stat-label">Sức khỏe</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">{vaccineCount}</span>
-              <span className="stat-label">Tiêm chủng</span>
+              <span className="stat-number">{pendingCount}</span>
+              <span className="stat-label">Đang xử lý</span>
             </div>
           </div>
         </div>

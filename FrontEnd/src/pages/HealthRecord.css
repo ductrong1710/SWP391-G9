@@ -556,509 +556,496 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .health-record-container.parent-view {
-    padding: 1rem 0.5rem;
+  .health-record-management-container {
+    padding: 10px 0;
   }
   
-  .declaration-header {
-    border-radius: 15px;
-    margin-bottom: 1.5rem;
-  }
-  
-  .header-content {
-    padding: 2rem 1.5rem;
-  }
-  
-  .header-icon {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 1rem;
-  }
-  
-  .header-icon i {
-    font-size: 2rem;
-  }
-  
-  .main-title {
-    font-size: 2rem;
-  }
-  
-  .sub-title {
-    font-size: 1rem;
-  }
-  
-  .health-status-cards {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .status-card {
-    padding: 1rem;
-  }
-  
-  .status-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
-  }
-  
-  .daily-declaration-form {
-    border-radius: 15px;
-  }
-  
-  .form-header {
-    padding: 1.5rem;
-  }
-  
-  .form-header h2 {
-    font-size: 1.25rem;
-  }
-  
-  .form-section {
-    padding: 1.5rem;
-  }
-  
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .checkbox-group {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .emergency-contact-info {
-    padding: 1rem;
-  }
-  
-  .contact-items {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .form-actions {
-    padding: 1.5rem;
-  }
-  
-  .submit-btn {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-  }
-  
-  .history-section {
-    padding: 1.5rem;
-  }
-  
-  .history-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-  
-  .history-stats {
-    gap: 1rem;
-  }
-  
-  .timeline-item {
-    margin-bottom: 1.5rem;
-  }
-  
-  .timeline-marker {
-    margin-right: 1rem;
-  }
-  
-  .timeline-dot {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
-  }
-  
-  .record-header-modern {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-  
-  .record-meta {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .health-item {
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-  
-  .no-records {
-    padding: 2rem 1rem;
-  }
-  
-  .no-records-icon {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .no-records-icon i {
-    font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .main-title {
+  .health-record-management-container h1 {
     font-size: 1.75rem;
   }
   
-  .header-content {
-    padding: 1.5rem 1rem;
-  }
-  
-  .status-card {
+  .stats-cards-container .health-stat-card .d-flex {
     flex-direction: column;
     text-align: center;
     gap: 0.75rem;
   }
   
-  .form-header h2 {
-    font-size: 1.125rem;
+  .stats-cards-container .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
   }
   
-  .section-header h3 {
-    font-size: 1.125rem;
+  .stats-cards-container .card-number {
+    font-size: 1.75rem;
   }
   
-  .timeline-marker {
-    margin-right: 0.75rem;
+  .filter-card .row.g-3 > * {
+    margin-bottom: 1rem;
   }
   
-  .timeline-dot {
-    width: 25px;
-    height: 25px;
-    font-size: 0.7rem;
+  .record-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
   
-  .record-card-modern {
-    border-radius: 10px;
+  .record-status-wrapper {
+    align-items: flex-start;
   }
   
-  .record-header-modern {
-    padding: 1rem;
+  .health-info-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   
-  .record-body-modern {
-    padding: 1rem;
-  }
-}
-
-/* Loading state improvements */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-  font-size: 1.125rem;
-  color: #6b7280;
-  background: white;
-  border-radius: 15px;
-  margin: 2rem 0;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.loading-container::before {
-  content: '';
-  width: 40px;
-  height: 40px;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Accessibility improvements */
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-.checkbox-item:focus-within .checkmark {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.submit-btn:focus {
-  outline: 2px solid #1d4ed8;
-  outline-offset: 2px;
-}
-
-.btn-view-detail:focus {
-  outline: 2px solid #1d4ed8;
-  outline-offset: 2px;
-}
-
-/* Animation improvements */
-.status-card,
-.record-card-modern,
-.timeline-item {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.timeline-item:nth-child(2) {
-  animation-delay: 0.1s;
-}
-
-.timeline-item:nth-child(3) {
-  animation-delay: 0.2s;
-}
-
-.timeline-item:nth-child(4) {
-  animation-delay: 0.3s;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Print styles */
-@media print {
-  .health-record-container.parent-view {
-    background: white;
-    padding: 0;
-  }
-  
-  .declaration-header {
-    background: #f8fafc !important;
-    color: #1e293b !important;
-    box-shadow: none;
-  }
-  
-  .health-status-cards,
-  .form-actions,
   .record-actions {
-    display: none;
+    flex-direction: column;
   }
   
-  .daily-declaration-form,
-  .history-section {
-    box-shadow: none;
-    border: 1px solid #e5e7eb;
+  .record-actions .btn {
+    width: 100%;
+    text-align: center;
+    flex: none;
+  }
+  
+  .records-grid .row.g-3 > * {
+    margin-bottom: 1rem;
   }
 }
 
-/* Modern Health Record Declaration Form Styles */
-.declaration-form {
+@media (max-width: 576px) {
+  .filter-card .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .btn-export-import {
+    text-align: center;
+  }
+  
+  .btn-export-import .btn {
+    width: 100%;
+  }
+  
+  .record-meta-inline {
+    gap: 0.5rem;
+  }
+  
+  .no-results {
+    padding: 2rem 1rem;
+  }
+  
+  .no-results i {
+    font-size: 3rem;
+  }
+}
+
+/* Parent view styles (existing) */
+.health-record-container.parent-view {
   max-width: 800px;
-  margin: 2rem auto;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.declaration-form:hover {
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-}
-
-.declaration-form form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  margin: 0 auto;
   padding: 2rem;
 }
 
-/* Card styles for form sections */
-.info-card,
-.health-card,
-.vision-hearing-card,
-.vaccination-card,
-.contact-notes-card {
-  background: rgba(248, 250, 252, 0.8);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid rgba(226, 232, 240, 0.5);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+.main-title {
+  color: #1e3a8a;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
-.info-card::before,
-.health-card::before,
-.vision-hearing-card::before,
-.vaccination-card::before,
-.contact-notes-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-  border-radius: 16px 16px 0 0;
+.sub-title {
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-.health-card::before {
-  background: linear-gradient(90deg, #10b981, #059669);
+.daily-declaration-form {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
-.vision-hearing-card::before {
-  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
-}
-
-.vaccination-card::before {
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-}
-
-.contact-notes-card::before {
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-}
-
-.info-card:hover,
-.health-card:hover,
-.vision-hearing-card:hover,
-.vaccination-card:hover,
-.contact-notes-card:hover {
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-/* Section headers */
-.info-card h3,
-.health-card h3,
-.vision-hearing-card h3,
-.vaccination-card h3,
-.contact-notes-card h3 {
-  margin: 0 0 1.5rem 0;
-  color: #1e293b;
-  font-size: 1.2rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.info-card h3 i,
-.health-card h3 i,
-.vision-hearing-card h3 i,
-.vaccination-card h3 i,
-.contact-notes-card h3 i {
-  color: #3b82f6;
-  font-size: 1.1rem;
-}
-
-/* Form layout */
-.form-row {
+.form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-.form-field {
+.form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
-.form-field label {
-  font-weight: 600;
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
   color: #374151;
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 
-/* Input styles */
-.form-field input,
-.form-field textarea {
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(5px);
+.form-group input,
+.form-group textarea,
+.form-group select {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
 }
 
-.form-field input:focus,
-.form-field textarea:focus {
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  background: rgba(255, 255, 255, 0.95);
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
 }
 
-.form-field input::placeholder,
-.form-field textarea::placeholder {
-  color: #9ca3af;
-  font-style: italic;
+.form-actions {
+  text-align: center;
+  margin-top: 2rem;
 }
 
-.form-field textarea {
-  resize: vertical;
-  min-height: 80px;
-  line-height: 1.5;
-}
-
-/* Submit button */
 .submit-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background-color: #1e3a8a;
   color: white;
   border: none;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  font-size: 1rem;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #1e40af;
+  transform: translateY(-1px);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+/* Modern Parent View Styles */
+.parent-view {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Header hiện đại */
+.declaration-header {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 30px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  position: relative;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.header-icon i {
+  color: white;
+  font-size: 2rem;
+}
+
+.main-title {
+  color: #1e3a8a;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sub-title {
+  color: #64748b;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Status Cards */
+.health-status-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.status-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.status-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.status-card.submitted {
+  border-left: 4px solid #3b82f6;
+}
+
+.status-card.approved {
+  border-left: 4px solid #10b981;
+}
+
+.status-card.pending {
+  border-left: 4px solid #f59e0b;
+}
+
+.status-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.status-card.submitted .status-icon {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+.status-card.approved .status-icon {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.status-card.pending .status-icon {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.status-content h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1e293b;
+}
+
+.status-content p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Form hiện đại */
+.health-declaration-form {
+  background: white;
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
 }
 
-.submit-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
+.form-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.form-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.form-header p {
+  opacity: 0.9;
+  margin: 0;
+}
+
+.modern-form {
+  padding: 40px;
+}
+
+.form-section {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.section-header h3 {
+  color: #1e293b;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-header h3 i {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.section-desc {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.form-group label i {
+  color: #667eea;
+  font-size: 0.9rem;
+}
+
+.form-input, .form-textarea {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-  transition: left 0.3s ease;
-  z-index: 0;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fafbfc;
 }
 
-.submit-btn:hover::before {
-  left: 0;
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Rating Input */
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+}
+
+.rating-input input[type="range"] {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.rating-input input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.rating-value {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Submit Button */
+.form-actions {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 2px solid #f1f5f9;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
 }
 
 .submit-btn:disabled {
@@ -1067,98 +1054,191 @@
   transform: none;
 }
 
-.submit-btn i,
-.submit-btn span {
-  position: relative;
-  z-index: 1;
+/* Records History */
+.health-records-history {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive design */
+.history-header {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.history-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.history-header p {
+  opacity: 0.9;
+  margin: 0;
+}
+
+.records-grid {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.record-card.modern {
+  background: white;
+  border-radius: 15px;
+  border: 2px solid #f1f5f9;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.record-card.modern:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.record-card.modern .record-header {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.record-info h4 {
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.record-class {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-badge.status-submitted {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-badge.status-approved {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.status-badge.status-review {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.record-body {
+  padding: 20px;
+}
+
+.record-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.record-meta p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.record-meta i {
+  color: #667eea;
+  width: 16px;
+}
+
+.record-note {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.record-note p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* No Records State */
+.no-records {
+  text-align: center;
+  padding: 60px 30px;
+  color: #64748b;
+}
+
+.no-records-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.no-records-icon i {
+  font-size: 2rem;
+  color: #94a3b8;
+}
+
+.no-records h3 {
+  color: #475569;
+  margin-bottom: 10px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .declaration-form {
-    margin: 1rem;
-    border-radius: 16px;
+  .parent-view {
+    padding: 15px;
   }
   
-  .declaration-form form {
-    padding: 1.5rem;
-    gap: 1.25rem;
-  }
-  
-  .form-row {
+  .form-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
   
-  .info-card,
-  .health-card,
-  .vision-hearing-card,
-  .vaccination-card,
-  .contact-notes-card {
-    padding: 1.25rem;
+  .health-status-cards {
+    grid-template-columns: 1fr;
   }
   
-  .info-card h3,
-  .health-card h3,
-  .vision-hearing-card h3,
-  .vaccination-card h3,
-  .contact-notes-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 1.25rem;
+  .records-grid {
+    grid-template-columns: 1fr;
+    padding: 20px;
   }
   
-  .form-field input,
-  .form-field textarea {
-    padding: 0.75rem;
-    font-size: 0.9rem;
+  .main-title {
+    font-size: 2rem;
   }
   
-  .submit-btn {
-    padding: 1rem;
-    font-size: 0.95rem;
+  .declaration-header, .form-header, .history-header {
+    padding: 25px 20px;
+  }
+  
+  .modern-form {
+    padding: 25px 20px;
   }
 }
-
-@media (max-width: 480px) {
-  .declaration-form {
-    margin: 0.5rem;
-  }
-  
-  .declaration-form form {
-    padding: 1rem;
-  }
-  
-  .info-card,
-  .health-card,
-  .vision-hearing-card,
-  .vaccination-card,
-  .contact-notes-card {
-    padding: 1rem;
-  }
-}
-
-/* Animation for form cards */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.info-card,
-.health-card,
-.vision-hearing-card,
-.vaccination-card,
-.contact-notes-card {
-  animation: slideInUp 0.6s ease-out;
-}
-
-.health-card { animation-delay: 0.1s; }
-.vision-hearing-card { animation-delay: 0.2s; }
-.vaccination-card { animation-delay: 0.3s; }
-.contact-notes-card { animation-delay: 0.4s; }
-.submit-btn { animation: slideInUp 0.6s ease-out 0.5s both; }

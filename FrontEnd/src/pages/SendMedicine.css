@@ -3,14 +3,47 @@
   padding: 20px 0;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .send-medicine-container h1 {
   color: #2c3e50;
   font-weight: 700;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  letter-spacing: -0.5px;
+}
+
+/* Improved Typography */
+.send-medicine-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.send-medicine-container h5,
+.send-medicine-container .card-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1.2rem;
+  letter-spacing: -0.2px;
+}
+
+.send-medicine-container .form-label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.7rem;
+  letter-spacing: 0.2px;
+}
+
+.send-medicine-container .form-control,
+.send-medicine-container .form-select {
+  font-size: 1.05rem;
+  padding: 12px 16px;
+  border-radius: 8px;
+  line-height: 1.5;
 }
 
 /* Card Styling */
@@ -35,9 +68,16 @@
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 20px;
+  padding: 25px;
   margin-bottom: 30px;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.alert-info strong {
+  font-size: 1.15rem;
+  font-weight: 700;
 }
 
 /* Health Stat Cards */
@@ -84,10 +124,24 @@
 }
 
 .card-number {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 700;
-  margin: 10px 0;
+  margin: 15px 0;
   text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  letter-spacing: -1px;
+}
+
+.health-stat-card .card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: white;
+}
+
+.health-stat-card .card-text {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  margin-bottom: 0;
 }
 
 /* Button Styling */
@@ -95,8 +149,9 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   border-radius: 25px;
-  padding: 12px 25px;
+  padding: 14px 28px;
   font-weight: 600;
+  font-size: 1.05rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
@@ -113,8 +168,9 @@
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   border: none;
   border-radius: 25px;
-  padding: 12px 20px;
+  padding: 14px 24px;
   font-weight: 600;
+  font-size: 1.05rem;
   transition: all 0.3s ease;
 }
 
@@ -127,8 +183,9 @@
   border: 2px solid #43e97b;
   color: #43e97b;
   border-radius: 25px;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-weight: 600;
+  font-size: 1.05rem;
   transition: all 0.3s ease;
 }
 
@@ -136,14 +193,16 @@
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
   border-color: #43e97b;
   transform: translateY(-2px);
+  color: white;
 }
 
 .btn-outline-primary {
   border: 2px solid #4facfe;
   color: #4facfe;
   border-radius: 25px;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-weight: 600;
+  font-size: 1.05rem;
   transition: all 0.3s ease;
 }
 
@@ -180,10 +239,11 @@
 .form-section-title {
   color: #2c3e50;
   font-weight: 700;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
   border-bottom: 2px solid #e9ecef;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  letter-spacing: -0.2px;
 }
 
 /* Table Styling */
@@ -191,22 +251,31 @@
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  font-size: 1.05rem;
 }
 
 .table thead th {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 15px;
+  padding: 18px 15px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-size: 1rem;
 }
 
 .table tbody td {
-  padding: 15px;
+  padding: 16px 15px;
   border-bottom: 1px solid #f8f9fa;
   vertical-align: middle;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.table tbody td strong {
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 .table-hover tbody tr:hover {
@@ -217,12 +286,13 @@
 
 /* Badge Styling */
 .badge {
-  padding: 8px 15px;
+  padding: 10px 16px;
   font-weight: 600;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
 }
 
 .bg-success {
@@ -264,7 +334,8 @@
 
 .modal-title {
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.5px;
 }
 
 .btn-close {
@@ -275,12 +346,63 @@
 }
 
 .modal-body {
-  padding: 25px;
+  padding: 30px;
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 
 .modal-footer {
   border-top: none;
-  padding: 20px 25px;
+  padding: 25px 30px;
+}
+
+/* Info Group Styling in Modal */
+.info-group {
+  margin-bottom: 1.5rem;
+}
+
+.info-label {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.info-value {
+  font-size: 1.05rem;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+/* Enhanced Text Readability */
+.send-medicine-container p,
+.send-medicine-container .text-muted {
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.send-medicine-container small {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Spinner text */
+.send-medicine-container .spinner-border + p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* Alert styling improvements */
+.alert-warning {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.alert-warning strong {
+  font-weight: 700;
 }
 
 /* Animation Classes */

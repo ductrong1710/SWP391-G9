@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../services/apiClient';
 import { useAuth } from '../context/AuthContext';
+import './Notifications.css';
 
 export default function Notifications() {
   const { user } = useAuth();
@@ -90,6 +91,44 @@ export default function Notifications() {
     }
   };
 
+  // Helper functions
+  const getNotificationIcon = (notification) => {
+    if (notification.title && notification.title.toLowerCase().includes('sức khỏe')) {
+      return 'fas fa-heartbeat';
+    } else if (notification.title && notification.title.toLowerCase().includes('tiêm chủng')) {
+      return 'fas fa-syringe';
+    } else if (notification.title && notification.title.toLowerCase().includes('thuốc')) {
+      return 'fas fa-pills';
+    }
+    return 'fas fa-bell';
+  };
+
+  const getNotificationCategory = (notification) => {
+    if (notification.title && notification.title.toLowerCase().includes('sức khỏe')) {
+      return { class: 'health-check', text: 'Khám sức khỏe', categoryClass: 'category-health' };
+    } else if (notification.title && notification.title.toLowerCase().includes('tiêm chủng')) {
+      return { class: 'vaccination', text: 'Tiêm chủng', categoryClass: 'category-vaccination' };
+    } else if (notification.title && notification.title.toLowerCase().includes('thuốc')) {
+      return { class: 'medication', text: 'Thuốc', categoryClass: 'category-medication' };
+    }
+    return { class: '', text: 'Thông báo', categoryClass: 'category-general' };
+  };
+
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+      return `Hôm qua, ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+    } else if (diffDays < 7) {
+      return `${diffDays} ngày trước`;
+    } else {
+      return date.toLocaleDateString('vi-VN') + ', ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    }
+  };
+
   // Thêm hàm kiểm tra notification đã có kết quả hoặc là thông báo kết quả
   function hasResult(n) {
     // Nếu notification có trường resultStatus hoặc isConfirmed hoặc trạng thái đã hoàn thành, thì không hiện nút xác nhận
@@ -99,242 +138,339 @@ export default function Notifications() {
     return false;
   }
 
-  if (loading) return <div>Đang tải thông báo...</div>;
+  // Calculate statistics
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const healthCount = notifications.filter(n => n.title && n.title.toLowerCase().includes('sức khỏe')).length;
+  const vaccineCount = notifications.filter(n => n.title && n.title.toLowerCase().includes('tiêm chủng')).length;
+  const totalCount = notifications.length;
+
+  if (loading) {
+    return (
+      <div className="notifications-container">
+        <div className="container py-4">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <div className="loading-text">Đang tải thông báo...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
-      <h2>Thông báo của bạn</h2>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {notifications.map((n, idx) => {
-          // Log chi tiết các trường liên quan đến button xác nhận
-          console.log('Notification item:', n);
-          console.log('DEBUG: title:', n.title, '| consentFormID:', n.ConsentFormID, '| consentFormID (camel):', n.consentFormID, '| hasResult:', hasResult(n));
-          const consentFormId = n.ConsentFormID || n.consentFormID || n.consentformid;
-          // Sửa key để đảm bảo duy nhất
-          const uniqueKey = n.notificationID ? n.notificationID : `notif-${idx}`;
-          return (
-            <li key={uniqueKey} style={{
-              background: n.isRead ? '#f0f0f0' : '#e6f7ff',
-              marginBottom: 12,
-              padding: 16,
-              borderRadius: 8,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-            }}>
-              <div style={{ fontWeight: n.isRead ? 'normal' : 'bold' }}>{n.title}</div>
-              <div style={{ margin: '8px 0' }}>{n.message}</div>
-              <div style={{ fontSize: 12, color: '#888' }}>{new Date(n.createdAt).toLocaleString()}</div>
-              {/* Nút xác nhận khám sức khỏe cho mọi notification có consentFormID, chỉ hiện nếu chưa có kết quả */}
-              {n.title && n.title.toLowerCase().includes('sức khỏe') && consentFormId && !hasResult(n) && (
-                <div style={{ marginTop: 8 }}>
-                  <button
-                    style={{ padding: '4px 12px', borderRadius: 4, border: 'none', background: '#38a169', color: '#fff', cursor: 'pointer' }}
-                    onClick={() => {
-                      setSelectedConsentFormId(consentFormId);
-                      setShowHealthCheckModal(true);
-                    }}
-                  >
-                    Xác nhận khám sức khỏe
-                  </button>
+    <div className="notifications-container">
+      <div className="container py-4">
+        {/* Header with Statistics */}
+        <div className="notifications-header fade-in-up">
+          <h2>
+            <i className="fas fa-bell me-3"></i>
+            Trung tâm thông báo
+          </h2>
+          <div className="notifications-stats">
+            <div className="stat-item">
+              <span className="stat-number">{totalCount}</span>
+              <span className="stat-label">Tổng thông báo</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">{unreadCount}</span>
+              <span className="stat-label">Chưa đọc</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">{healthCount}</span>
+              <span className="stat-label">Sức khỏe</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-number">{vaccineCount}</span>
+              <span className="stat-label">Tiêm chủng</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Notifications List */}
+        {notifications.length === 0 ? (
+          <div className="empty-state fade-in-up">
+            <div className="empty-icon">
+              <i className="fas fa-bell-slash"></i>
+            </div>
+            <div className="empty-title">Không có thông báo nào</div>
+            <div className="empty-message">Bạn chưa có thông báo nào. Các thông báo mới sẽ hiển thị ở đây.</div>
+          </div>
+        ) : (
+          <ul className="notifications-list">
+            {notifications.map((n, idx) => {
+              const consentFormId = n.ConsentFormID || n.consentFormID || n.consentformid;
+              const uniqueKey = n.notificationID ? n.notificationID : `notif-${idx}`;
+              const category = getNotificationCategory(n);
+              const iconClass = getNotificationIcon(n);
+              
+              return (
+                <li 
+                  key={uniqueKey} 
+                  className={`notification-item ${!n.isRead ? 'unread' : ''} ${category.class} fade-in-up`}
+                  style={{animationDelay: `${idx * 0.1}s`}}
+                >
+                  {!n.isRead && <div className="priority-high"></div>}
+                  
+                  <div className="notification-content">
+                    <div className="notification-header">
+                      <div className="d-flex align-items-start">
+                        <div className={`notification-icon ${category.class}`}>
+                          <i className={iconClass}></i>
+                        </div>
+                        <div className="flex-grow-1">
+                          <div className={`notification-category ${category.categoryClass}`}>
+                            {category.text}
+                          </div>
+                          <div className="notification-title">{n.title}</div>
+                          <div className="notification-message">{n.message}</div>
+                        </div>
+                      </div>
+                      <div className="notification-meta">
+                        <div className="notification-time">
+                          <i className="fas fa-clock me-1"></i>
+                          {formatDateTime(n.createdAt)}
+                        </div>
+                        <div className={`notification-status ${n.isRead ? 'status-read' : 'status-unread'}`}>
+                          {n.isRead ? 'Đã đọc' : 'Chưa đọc'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="notification-actions">
+                      {/* Health Check Confirmation Button */}
+                      {n.title && n.title.toLowerCase().includes('sức khỏe') && consentFormId && !hasResult(n) && (
+                        <button
+                          className="btn-notification btn-confirm"
+                          onClick={() => {
+                            setSelectedConsentFormId(consentFormId);
+                            setShowHealthCheckModal(true);
+                          }}
+                        >
+                          <i className="fas fa-heartbeat"></i>
+                          Xác nhận khám sức khỏe
+                        </button>
+                      )}
+
+                      {/* Vaccination Confirmation Button */}
+                      {n.title && n.title.toLowerCase().includes('tiêm chủng') && (n.ConsentFormID || n.consentFormID) && !hasResult(n) && (
+                        <button
+                          className="btn-notification btn-confirm"
+                          onClick={() => {
+                            setSelectedVaccineConsentFormId(n.ConsentFormID || n.consentFormID);
+                            setShowVaccineModal(true);
+                          }}
+                        >
+                          <i className="fas fa-syringe"></i>
+                          Xác nhận tiêm chủng
+                        </button>
+                      )}
+
+                      {/* Mark as Read Button */}
+                      {!n.isRead && (
+                        <button 
+                          className="btn-notification btn-mark-read"
+                          onClick={() => handleMarkAsRead(n.notificationID)}
+                        >
+                          <i className="fas fa-check"></i>
+                          Đánh dấu đã đọc
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+        {/* Health Check Modal */}
+        {showHealthCheckModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h2 className="modal-title">
+                  <i className="fas fa-heartbeat me-2" style={{color: '#43e97b'}}></i>
+                  Xác nhận khám sức khỏe
+                </h2>
+                <p className="modal-subtitle">
+                  Bạn có đồng ý cho con tham gia khám sức khỏe định kỳ không?
+                </p>
+              </div>
+              
+              <div className="modal-actions">
+                <button
+                  className="modal-btn modal-btn-approve"
+                  onClick={async () => {
+                    await handleApproveHealthCheck(selectedConsentFormId);
+                    setShowHealthCheckModal(false);
+                  }}
+                >
+                  <i className="fas fa-check me-2"></i>
+                  Đồng ý
+                </button>
+                <button
+                  className="modal-btn modal-btn-reject"
+                  onClick={() => setDenyError(denyError ? '' : 'show')}
+                >
+                  <i className="fas fa-times me-2"></i>
+                  Từ chối
+                </button>
+              </div>
+
+              {denyError === 'show' && (
+                <div>
+                  <textarea
+                    className="reason-input"
+                    placeholder="Nhập lý do từ chối khám sức khỏe..."
+                    value={denyReason}
+                    onChange={e => setDenyReason(e.target.value)}
+                    rows={4}
+                  />
+                  {denyError && denyError !== 'show' && (
+                    <div className="error-message">{denyError}</div>
+                  )}
+                  <div className="modal-actions">
+                    <button
+                      className="modal-btn modal-btn-reject"
+                      onClick={async () => {
+                        if (!denyReason.trim()) {
+                          setDenyError('Vui lòng nhập lý do từ chối!');
+                          return;
+                        }
+                        await handleDenyHealthCheck(selectedConsentFormId, denyReason);
+                        setShowHealthCheckModal(false);
+                        setDenyReason('');
+                        setDenyError('');
+                      }}
+                    >
+                      <i className="fas fa-paper-plane me-2"></i>
+                      Xác nhận từ chối
+                    </button>
+                    <button
+                      className="modal-btn modal-btn-cancel"
+                      onClick={() => {
+                        setDenyError('');
+                        setDenyReason('');
+                      }}
+                    >
+                      <i className="fas fa-arrow-left me-2"></i>
+                      Quay lại
+                    </button>
+                  </div>
                 </div>
               )}
-              {/* Nút xác nhận tiêm chủng - chỉ 1 nút, chỉ hiện nếu chưa có kết quả */}
-              {n.title && n.title.toLowerCase().includes('tiêm chủng') && (n.ConsentFormID || n.consentFormID) && !hasResult(n) && (
-                <div style={{ marginTop: 8 }}>
-                  <button
-                    style={{ padding: '4px 12px', borderRadius: 4, border: 'none', background: '#38a169', color: '#fff', cursor: 'pointer' }}
-                    onClick={() => {
-                      setSelectedVaccineConsentFormId(n.ConsentFormID || n.consentFormID);
-                      setShowVaccineModal(true);
-                    }}
-                  >
-                    Xác nhận tiêm chủng
-                  </button>
-                </div>
-              )}
-              {/* Nút đánh dấu đã đọc */}
-              {!n.isRead && (
-                <button onClick={() => handleMarkAsRead(n.notificationID)} style={{ marginTop: 8, marginLeft: 8, padding: '4px 12px', borderRadius: 4, border: 'none', background: '#3182ce', color: '#fff', cursor: 'pointer' }}>
-                  Đánh dấu đã đọc
+
+              {!denyError && (
+                <button
+                  className="modal-btn modal-btn-close"
+                  onClick={() => {
+                    setShowHealthCheckModal(false);
+                    setDenyReason('');
+                    setDenyError('');
+                  }}
+                >
+                  <i className="fas fa-times me-2"></i>
+                  Đóng
                 </button>
               )}
-            </li>
-          );
-        })}
-      </ul>
-      {/* Modal xác nhận khám sức khỏe */}
-      {showHealthCheckModal && (
-        <div style={{
-          position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.25)', zIndex: 1000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s'
-        }}>
-          <div style={{
-            background: '#fff', borderRadius: 18, padding: '36px 32px 28px 32px', minWidth: 340, maxWidth: '90vw',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.18)', fontFamily: 'Segoe UI, Arial, sans-serif', animation: 'fadeInModal 0.25s', position: 'relative'
-          }}>
-            <h2 style={{ fontWeight: 700, fontSize: 24, marginBottom: 24, color: '#222', textAlign: 'center' }}>
-              Bạn có đồng ý cho con tham gia khám sức khỏe không?
-            </h2>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 18, marginBottom: 24 }}>
-              <button
-                onClick={async () => {
-                  await handleApproveHealthCheck(selectedConsentFormId);
-                  setShowHealthCheckModal(false);
-                }}
-                style={{ background: '#38a169', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 18, fontWeight: 600, boxShadow: '0 2px 8px rgba(56,161,105,0.08)', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseOver={e => e.currentTarget.style.background = '#2f855a'}
-                onMouseOut={e => e.currentTarget.style.background = '#38a169'}
-              >
-                Đồng ý
-              </button>
-              <button
-                style={{ background: '#e53e3e', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 18, fontWeight: 600, boxShadow: '0 2px 8px rgba(229,62,62,0.08)', cursor: 'pointer', transition: 'background 0.2s' }}
-                onClick={() => setDenyError(denyError ? '' : 'show')}
-                onMouseOver={e => e.currentTarget.style.background = '#c53030'}
-                onMouseOut={e => e.currentTarget.style.background = '#e53e3e'}
-              >
-                Từ chối
-              </button>
             </div>
-            {denyError === 'show' && (
-              <div style={{ marginTop: 8, marginBottom: 8 }}>
-                <textarea
-                  placeholder="Nhập lý do từ chối..."
-                  value={denyReason}
-                  onChange={e => setDenyReason(e.target.value)}
-                  rows={3}
-                  style={{ width: '100%', borderRadius: 8, border: '1.5px solid #e2e8f0', padding: 12, fontSize: 16, fontFamily: 'inherit', resize: 'vertical', marginBottom: 8 }}
-                />
-                <div style={{ color: 'red', fontSize: 14, marginBottom: 8 }}>{denyError && denyError !== 'show' ? denyError : ''}</div>
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-                  <button
-                    onClick={async () => {
-                      if (!denyReason.trim()) {
-                        setDenyError('Vui lòng nhập lý do từ chối!');
-                        return;
-                      }
-                      await handleDenyHealthCheck(selectedConsentFormId, denyReason);
-                      setShowHealthCheckModal(false);
-                      setDenyReason('');
-                      setDenyError('');
-                    }}
-                    style={{ background: '#e53e3e', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => e.currentTarget.style.background = '#c53030'}
-                    onMouseOut={e => e.currentTarget.style.background = '#e53e3e'}
-                  >
-                    Xác nhận từ chối
-                  </button>
-                  <button
-                    onClick={() => { setShowHealthCheckModal(false); setDenyReason(''); setDenyError(''); }}
-                    style={{ background: '#a0aec0', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => e.currentTarget.style.background = '#718096'}
-                    onMouseOut={e => e.currentTarget.style.background = '#a0aec0'}
-                  >
-                    Hủy
-                  </button>
-                </div>
-              </div>
-            )}
-            {denyError !== 'show' && denyError && <div style={{ color: 'red', marginTop: 8, textAlign: 'center' }}>{denyError}</div>}
-            {!denyError && denyError !== 'show' && (
-              <button
-                onClick={() => { setShowHealthCheckModal(false); setDenyReason(''); setDenyError(''); }}
-                style={{ background: '#a0aec0', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, fontWeight: 600, cursor: 'pointer', margin: '0 auto', display: 'block', marginTop: 18, transition: 'background 0.2s' }}
-                onMouseOver={e => e.currentTarget.style.background = '#718096'}
-                onMouseOut={e => e.currentTarget.style.background = '#a0aec0'}
-              >
-                Đóng
-              </button>
-            )}
           </div>
-        </div>
-      )}
-      {/* Modal xác nhận tiêm chủng */}
-      {showVaccineModal && (
-        <div style={{
-          position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.25)', zIndex: 1000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s'
-        }}>
-          <div style={{
-            background: '#fff', borderRadius: 18, padding: '36px 32px 28px 32px', minWidth: 340, maxWidth: '90vw',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.18)', fontFamily: 'Segoe UI, Arial, sans-serif', animation: 'fadeInModal 0.25s', position: 'relative'
-          }}>
-            <h2 style={{ fontWeight: 700, fontSize: 24, marginBottom: 24, color: '#222', textAlign: 'center' }}>
-              Bạn có đồng ý cho con tham gia tiêm chủng không?
-            </h2>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 18, marginBottom: 24 }}>
-              <button
-                onClick={async () => {
-                  await handleApproveConsent(selectedVaccineConsentFormId);
-                  setShowVaccineModal(false);
-                }}
-                style={{ background: '#38a169', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 18, fontWeight: 600, boxShadow: '0 2px 8px rgba(56,161,105,0.08)', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseOver={e => e.currentTarget.style.background = '#2f855a'}
-                onMouseOut={e => e.currentTarget.style.background = '#38a169'}
-              >
-                Đồng ý
-              </button>
-              <button
-                style={{ background: '#e53e3e', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontSize: 18, fontWeight: 600, boxShadow: '0 2px 8px rgba(229,62,62,0.08)', cursor: 'pointer', transition: 'background 0.2s' }}
-                onClick={() => setVaccineDenyError(vaccineDenyError ? '' : 'show')}
-                onMouseOver={e => e.currentTarget.style.background = '#c53030'}
-                onMouseOut={e => e.currentTarget.style.background = '#e53e3e'}
-              >
-                Từ chối
-              </button>
+        )}
+
+        {/* Vaccination Modal */}
+        {showVaccineModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h2 className="modal-title">
+                  <i className="fas fa-syringe me-2" style={{color: '#4facfe'}}></i>
+                  Xác nhận tiêm chủng
+                </h2>
+                <p className="modal-subtitle">
+                  Bạn có đồng ý cho con tham gia tiêm chủng theo kế hoạch không?
+                </p>
+              </div>
+              
+              <div className="modal-actions">
+                <button
+                  className="modal-btn modal-btn-approve"
+                  onClick={async () => {
+                    await handleApproveConsent(selectedVaccineConsentFormId);
+                    setShowVaccineModal(false);
+                  }}
+                >
+                  <i className="fas fa-check me-2"></i>
+                  Đồng ý
+                </button>
+                <button
+                  className="modal-btn modal-btn-reject"
+                  onClick={() => setVaccineDenyError(vaccineDenyError ? '' : 'show')}
+                >
+                  <i className="fas fa-times me-2"></i>
+                  Từ chối
+                </button>
+              </div>
+
+              {vaccineDenyError === 'show' && (
+                <div>
+                  <textarea
+                    className="reason-input"
+                    placeholder="Nhập lý do từ chối tiêm chủng..."
+                    value={vaccineDenyReason}
+                    onChange={e => setVaccineDenyReason(e.target.value)}
+                    rows={4}
+                  />
+                  {vaccineDenyError && vaccineDenyError !== 'show' && (
+                    <div className="error-message">{vaccineDenyError}</div>
+                  )}
+                  <div className="modal-actions">
+                    <button
+                      className="modal-btn modal-btn-reject"
+                      onClick={async () => {
+                        if (!vaccineDenyReason.trim()) {
+                          setVaccineDenyError('Vui lòng nhập lý do từ chối!');
+                          return;
+                        }
+                        await handleDenyConsent(selectedVaccineConsentFormId, vaccineDenyReason);
+                        setShowVaccineModal(false);
+                        setVaccineDenyReason('');
+                        setVaccineDenyError('');
+                      }}
+                    >
+                      <i className="fas fa-paper-plane me-2"></i>
+                      Xác nhận từ chối
+                    </button>
+                    <button
+                      className="modal-btn modal-btn-cancel"
+                      onClick={() => {
+                        setVaccineDenyError('');
+                        setVaccineDenyReason('');
+                      }}
+                    >
+                      <i className="fas fa-arrow-left me-2"></i>
+                      Quay lại
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!vaccineDenyError && (
+                <button
+                  className="modal-btn modal-btn-close"
+                  onClick={() => {
+                    setShowVaccineModal(false);
+                    setVaccineDenyReason('');
+                    setVaccineDenyError('');
+                  }}
+                >
+                  <i className="fas fa-times me-2"></i>
+                  Đóng
+                </button>
+              )}
             </div>
-            {vaccineDenyError === 'show' && (
-              <div style={{ marginTop: 8, marginBottom: 8 }}>
-                <textarea
-                  placeholder="Nhập lý do từ chối..."
-                  value={vaccineDenyReason}
-                  onChange={e => setVaccineDenyReason(e.target.value)}
-                  rows={3}
-                  style={{ width: '100%', borderRadius: 8, border: '1.5px solid #e2e8f0', padding: 12, fontSize: 16, fontFamily: 'inherit', resize: 'vertical', marginBottom: 8 }}
-                />
-                <div style={{ color: 'red', fontSize: 14, marginBottom: 8 }}>{vaccineDenyError && vaccineDenyError !== 'show' ? vaccineDenyError : ''}</div>
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-                  <button
-                    onClick={async () => {
-                      if (!vaccineDenyReason.trim()) {
-                        setVaccineDenyError('Vui lòng nhập lý do từ chối!');
-                        return;
-                      }
-                      await handleDenyConsent(selectedVaccineConsentFormId, vaccineDenyReason);
-                      setShowVaccineModal(false);
-                      setVaccineDenyReason('');
-                      setVaccineDenyError('');
-                    }}
-                    style={{ background: '#e53e3e', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => e.currentTarget.style.background = '#c53030'}
-                    onMouseOut={e => e.currentTarget.style.background = '#e53e3e'}
-                  >
-                    Xác nhận từ chối
-                  </button>
-                  <button
-                    onClick={() => { setShowVaccineModal(false); setVaccineDenyReason(''); setVaccineDenyError(''); }}
-                    style={{ background: '#a0aec0', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => e.currentTarget.style.background = '#718096'}
-                    onMouseOut={e => e.currentTarget.style.background = '#a0aec0'}
-                  >
-                    Hủy
-                  </button>
-                </div>
-              </div>
-            )}
-            {vaccineDenyError !== 'show' && vaccineDenyError && <div style={{ color: 'red', marginTop: 8, textAlign: 'center' }}>{vaccineDenyError}</div>}
-            {!vaccineDenyError && vaccineDenyError !== 'show' && (
-              <button
-                onClick={() => { setShowVaccineModal(false); setVaccineDenyReason(''); setVaccineDenyError(''); }}
-                style={{ background: '#a0aec0', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 16, fontWeight: 600, cursor: 'pointer', margin: '0 auto', display: 'block', marginTop: 18, transition: 'background 0.2s' }}
-                onMouseOver={e => e.currentTarget.style.background = '#718096'}
-                onMouseOut={e => e.currentTarget.style.background = '#a0aec0'}
-              >
-                Đóng
-              </button>
-            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 } 

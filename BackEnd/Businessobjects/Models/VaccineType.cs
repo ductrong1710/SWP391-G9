@@ -9,9 +9,12 @@ namespace Businessobjects.Models
     {
         [Key]
         [Column("VaccinationID")]
-        public string? VaccinationID { get; set; }
+        [StringLength(6)]
+        public string VaccinationID { get; set; } = null!;
         [Required]
+        [StringLength(100)]
         public string VaccineName { get; set; } = null!;
+        [StringLength(255)]
         public string? Description { get; set; }
         [JsonIgnore]
         public virtual ICollection<VaccinationResult>? VaccinationResults { get; set; }

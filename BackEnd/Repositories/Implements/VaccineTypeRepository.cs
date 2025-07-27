@@ -36,8 +36,27 @@ namespace Repositories.Implements
 
         public async Task UpdateVaccineTypeAsync(VaccineType vaccineType)
         {
-            _context.Entry(vaccineType).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            Console.WriteLine($"Repository: Updating vaccine {vaccineType.VaccinationID}");
+            
+            // Lấy entity hiện tại từ database
+            var existingVaccine = await _context.VaccinationTypes
+                .FirstOrDefaultAsync(v => v.VaccinationID == vaccineType.VaccinationID);
+            
+            if (existingVaccine != null)
+            {
+                // Update properties của entity hiện tại
+                existingVaccine.VaccineName = vaccineType.VaccineName;
+                existingVaccine.Description = vaccineType.Description;
+                
+                Console.WriteLine($"Repository: Updated existing entity properties");
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"Repository: SaveChanges completed successfully");
+            }
+            else
+            {
+                Console.WriteLine($"Repository: Vaccine not found in database");
+                throw new KeyNotFoundException($"Vaccine with ID {vaccineType.VaccinationID} not found");
+            }
         }
 
         public async Task DeleteVaccineTypeAsync(string id)

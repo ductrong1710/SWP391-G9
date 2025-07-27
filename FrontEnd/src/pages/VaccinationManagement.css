@@ -1,17 +1,428 @@
+/* EMERGENCY OVERRIDE - Bright Medical Theme for Vaccination Management */
+body .vaccination-management-container .row .col-md-3 .card,
+body .vaccination-management-container .row .col-md-3 .health-stat-card,
+body .vaccination-management-container .row .col-md-3 .card.health-stat-card,
+body .vaccination-management-container .health-stat-card,
+body .health-stat-card,
+body .vaccination-management-container .card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+  border: 2px solid #e2e8f0 !important;
+  border-left: 2px solid #e2e8f0 !important;
+  color: #1e3a8a !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(0) !important;
+  transition: all 0.3s ease !important;
+}
+
+body .vaccination-management-container .row .col-md-3 .card:hover,
+body .vaccination-management-container .row .col-md-3 .health-stat-card:hover,
+body .vaccination-management-container .row .col-md-3 .card.health-stat-card:hover,
+body .vaccination-management-container .health-stat-card:hover,
+body .health-stat-card:hover,
+body .vaccination-management-container .card:hover {
+  background: linear-gradient(135deg, #ffffff, #f1f5f9) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18) !important;
+  transform: translateY(-3px) !important;
+}
+
+body .vaccination-management-container .row .col-md-3 .card h5,
+body .vaccination-management-container .row .col-md-3 .card p,
+body .vaccination-management-container .row .col-md-3 .card .card-title,
+body .vaccination-management-container .row .col-md-3 .card .card-number,
+body .vaccination-management-container .row .col-md-3 .card .card-text,
+body .vaccination-management-container .health-stat-card h5,
+body .vaccination-management-container .health-stat-card p,
+body .vaccination-management-container .health-stat-card .card-title,
+body .vaccination-management-container .health-stat-card .card-number,
+body .vaccination-management-container .health-stat-card .card-text,
+body .health-stat-card h5,
+body .health-stat-card p,
+body .health-stat-card .card-title,
+body .health-stat-card .card-number,
+body .health-stat-card .card-text {
+  color: #1e3a8a !important;
+}
+
+body .vaccination-management-container .row .col-md-3 .card .card-text,
+body .vaccination-management-container .health-stat-card .card-text,
+body .health-stat-card .card-text {
+  color: #475569 !important;
+}
+
+/* Table Styles - Synchronized with HealthCheckManagement */
+.table {
+  margin-bottom: 0 !important;
+}
+
+.table th {
+  background-color: #f8fafc !important;
+  font-weight: 600 !important;
+  color: #4b5563 !important;
+  border-bottom: 2px solid #e5e7eb !important;
+}
+
+.table td {
+  vertical-align: middle !important;
+  padding: 12px 8px !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Modal Styles - Synchronized with HealthCheckManagement */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-content {
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+}
+
+.modal-header {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.modal-title {
+  color: #1e3a8a !important;
+  font-weight: 600 !important;
+}
+
+.modal-footer {
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Form Styles - Synchronized with HealthCheckManagement */
+.form-label {
+  font-weight: 500 !important;
+  color: #4b5563 !important;
+}
+
+/* Enhanced Table Header Styling */
+.table-hover thead th {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.5px !important;
+  border: none !important;
+  padding: 12px 8px !important;
+  text-align: center !important;
+  position: relative !important;
+}
+
+.table-hover thead th:first-child {
+  border-top-left-radius: 8px !important;
+}
+
+.table-hover thead th:last-child {
+  border-top-right-radius: 8px !important;
+}
+
+.table-hover thead th::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4) !important;
+}
+
+.table-hover tbody tr:hover {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.table-hover tbody td {
+  border-top: 1px solid #e2e8f0 !important;
+  padding: 12px 8px !important;
+  vertical-align: middle !important;
+}
+
+/* Vaccine table specific styling */
+.vaccine-list-section .table-hover thead th {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.5px !important;
+  border: none !important;
+  padding: 12px 8px !important;
+  text-align: center !important;
+  position: relative !important;
+}
+
+.vaccine-list-section .table-hover thead th::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4) !important;
+}
+
+/* Vaccination Management - Bright Medical/School Health Theme */
 .vaccination-management-container {
   padding: 20px 0;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  min-height: 100vh;
+}
+
+/* Search Section - Synchronized with HealthCheckManagement */
+.card.mb-4 {
+  background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+  border: 2px solid #e2e8f0 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+}
+
+.card-title {
+  color: #1e3a8a !important;
+  font-weight: 600 !important;
+  margin-bottom: 1rem !important;
+}
+
+.form-control, .form-select {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+  outline: none !important;
+}
+
+.form-control:hover, .form-select:hover {
+  border-color: #cbd5e1 !important;
+}
+
+/* Button Styles - Synchronized with HealthCheckManagement */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  border: 2px solid #3b82f6 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border-color: #2563eb !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0) !important;
+  border: 2px solid #d1d5db !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1) !important;
+  border-color: #9ca3af !important;
+  color: #1f2937 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border: 2px solid #10b981 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  border-color: #059669 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+
+.btn-info {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+  border: 2px solid #8b5cf6 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-info:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  border-color: #7c3aed !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  border: 2px solid #3b82f6 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border-color: #2563eb !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
 }
 
 .vaccination-management-container h1 {
-  color: #333;
+  color: #1e3a8a;
   font-weight: 600;
 }
 
 .vaccination-management-container .card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  border-radius: 12px;
   border: none;
   margin-bottom: 20px;
+  background: white;
+}
+
+/* Bright Medical Theme for Health Stat Cards */
+.health-stat-card {
+  transition: all 0.3s ease !important;
+  height: 100% !important;
+  border: none !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+  border: 2px solid #e0f2fe !important;
+}
+
+/* Override any existing dark backgrounds */
+.vaccination-management-container .card.health-stat-card,
+.vaccination-management-container .health-stat-card,
+.health-stat-card {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+  border: 2px solid #e0f2fe !important;
+  color: #1e3a8a !important;
+}
+
+/* Force bright backgrounds for all cards in vaccination management */
+.vaccination-management-container .row .col-md-3 .card,
+.vaccination-management-container .card,
+.vaccination-management-container .health-stat-card,
+.vaccination-management-container .health-stat-card,
+.health-stat-card {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+  border: 2px solid #e0f2fe !important;
+  border-left: 2px solid #e0f2fe !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Override any dark backgrounds from other CSS files */
+.vaccination-management-container .health-stat-card,
+.health-stat-card {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+  border: 2px solid #e0f2fe !important;
+  border-left: 2px solid #e0f2fe !important;
+}
+
+/* Ensure text is dark in all cards */
+.vaccination-management-container .row .col-md-3 .card *,
+.vaccination-management-container .card *,
+.vaccination-management-container .health-stat-card *,
+.health-stat-card * {
+  color: #1e3a8a !important;
+}
+
+.vaccination-management-container .row .col-md-3 .card .card-text,
+.vaccination-management-container .card .card-text,
+.vaccination-management-container .health-stat-card .card-text,
+.health-stat-card .card-text {
+  color: #475569 !important;
+}
+
+/* Additional override for any remaining dark backgrounds */
+.vaccination-management-container .row .col-md-3 .card,
+.vaccination-management-container .row .col-md-3 .health-stat-card,
+.vaccination-management-container .row .col-md-3 .card.health-stat-card {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+  border: 2px solid #e0f2fe !important;
+  border-left: 2px solid #e0f2fe !important;
+}
+
+.health-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+}
+
+.health-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  border-color: #7dd3fc;
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+}
+
+.health-stat-card .card-body {
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.health-stat-card .card-title {
+  color: #1e40af !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.health-stat-card .card-number {
+  color: #1e3a8a !important;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+.health-stat-card .card-text {
+  color: #475569 !important;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Ensure all text in health stat cards is dark */
+.health-stat-card h5,
+.health-stat-card p,
+.health-stat-card .card-title,
+.health-stat-card .card-number,
+.health-stat-card .card-text {
+  color: #1e3a8a !important;
+}
+
+.health-stat-card .card-text {
+  color: #475569 !important;
 }
 
 .nav-tabs .nav-link {
@@ -73,11 +484,18 @@
 .search-box {
   display: flex;
   align-items: center;
-  background: #f1f5f9;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
   border-radius: 8px;
   padding: 6px 14px;
   flex: 1 1 300px;
   max-width: 400px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.search-box:hover {
+  border-color: #cbd5e1;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
 }
 .search-box i {
   color: #3182ce;
@@ -94,9 +512,21 @@
 .filter-controls select {
   border-radius: 6px;
   padding: 6px 12px;
-  border: 1px solid #cbd5e1;
-  background: #fff;
+  border: 2px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
   color: #2d3748;
+  transition: all 0.3s ease;
+}
+
+.filter-controls select:hover {
+  border-color: #cbd5e1;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+
+.filter-controls select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .create-plan-btn {
@@ -118,115 +548,183 @@
 
 .vaccination-plans-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 .vaccination-plan-card {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(49, 130, 206, 0.08);
-  padding: 24px 20px 18px 20px;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px 14px 12px 14px;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s, transform 0.2s;
-  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
 }
 .vaccination-plan-card:hover {
-  box-shadow: 0 8px 32px rgba(49, 130, 206, 0.16);
-  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.005);
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
 }
 .plan-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .plan-title h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: #2b6cb0;
   font-weight: 600;
 }
 .status-badge {
   display: inline-block;
-  padding: 4px 14px;
-  border-radius: 12px;
+  padding: 3px 10px;
+  border-radius: 10px;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  margin-left: 10px;
+  margin-left: 8px;
 }
 .plan-date {
   color: #718096;
-  font-size: 0.98rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 .plan-content {
   display: flex;
-  flex-wrap: wrap;
-  gap: 18px 32px;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+.plan-info-row {
+  display: flex;
+  gap: 20px;
+}
+
+.plan-description, .plan-target {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-stats {
+  flex: 1;
+  min-width: 0;
   margin-top: 8px;
 }
-.plan-description, .plan-target, .plan-stats {
-  flex: 1 1 180px;
-  min-width: 180px;
-}
 .plan-description h4, .plan-target h4, .plan-stats h4 {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: #3182ce;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 .plan-description p, .plan-target p {
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
   color: #2d3748;
+  font-size: 0.9rem;
 }
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px 12px;
 }
 .stat-item {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.98rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 0.85rem;
+  gap: 2px;
+}
+
+.stat-value {
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 .stat-value.confirmed {
   color: #38a169;
-  font-weight: 600;
 }
 .stat-value.pending {
   color: #d69e2e;
-  font-weight: 600;
 }
 .stat-value.completed {
   color: #3182ce;
-  font-weight: 600;
 }
 .plan-actions {
-  margin-top: 12px;
+  margin-top: 10px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
 }
-.view-details-btn, .send-notifications-btn {
+
+.plan-actions .view-details-btn,
+.plan-actions .edit-btn,
+.plan-actions .send-notifications-btn {
+  margin-top: 0 !important;
+}
+.view-details-btn, .send-notifications-btn, .edit-btn {
   background: #f1f5f9;
   color: #2b6cb0;
-  border: none;
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 7px 16px;
-  font-size: 1rem;
+  padding: 8px 16px;
+  font-size: 0.9rem;
   font-weight: 500;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 120px;
+  justify-content: center;
+  height: 36px;
+  margin-top: 0 !important;
 }
-.view-details-btn:hover, .send-notifications-btn:hover {
-  background: #3182ce;
+.view-details-btn {
+  background: #8b5cf6;
   color: #fff;
+  border-color: #8b5cf6;
+  margin-top: 0 !important;
+}
+
+.view-details-btn:hover {
+  background: #7c3aed;
+  color: #fff;
+  border-color: #7c3aed;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.edit-btn {
+  background: #fff;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.edit-btn:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.send-notifications-btn {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+}
+
+.send-notifications-btn:hover {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 .no-results {
   text-align: center;
@@ -445,10 +943,17 @@
 
 .detail-section {
   margin-bottom: 32px;
-  background: #f9fafc;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.detail-section:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
 }
 
 .detail-section h4 {
@@ -494,10 +999,18 @@
 }
 
 .description-box, .notes-box {
-  background: white;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
   border-radius: 8px;
   padding: 16px;
-  border: 1px solid #e0e0e0;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.description-box:hover, .notes-box:hover {
+  border-color: #cbd5e1;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .description-box p, .notes-box p {
@@ -514,18 +1027,21 @@
 }
 
 .stat-card {
-  background: white;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
   border-radius: 12px;
   padding: 16px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
 }
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
 }
 
 .stat-icon {
@@ -631,4 +1147,43 @@
 
 .action-btn.record-results:hover {
   background-color: #1565c0;
+}
+
+/* Final comprehensive override for all cards to ensure bright backgrounds */
+.vaccination-management-container .row .col-md-3 .card,
+.vaccination-management-container .row .col-md-3 .health-stat-card,
+.vaccination-management-container .row .col-md-3 .card.health-stat-card,
+.vaccination-management-container .health-stat-card,
+.health-stat-card,
+.vaccination-management-container .card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+  border: 2px solid #e2e8f0 !important;
+  border-left: 2px solid #e2e8f0 !important;
+  color: #1e3a8a !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Ensure all text elements are dark */
+.vaccination-management-container .row .col-md-3 .card h5,
+.vaccination-management-container .row .col-md-3 .card p,
+.vaccination-management-container .row .col-md-3 .card .card-title,
+.vaccination-management-container .row .col-md-3 .card .card-number,
+.vaccination-management-container .row .col-md-3 .card .card-text,
+.vaccination-management-container .health-stat-card h5,
+.vaccination-management-container .health-stat-card p,
+.vaccination-management-container .health-stat-card .card-title,
+.vaccination-management-container .health-stat-card .card-number,
+.vaccination-management-container .health-stat-card .card-text,
+.health-stat-card h5,
+.health-stat-card p,
+.health-stat-card .card-title,
+.health-stat-card .card-number,
+.health-stat-card .card-text {
+  color: #1e3a8a !important;
+}
+
+.vaccination-management-container .row .col-md-3 .card .card-text,
+.vaccination-management-container .health-stat-card .card-text,
+.health-stat-card .card-text {
+  color: #475569 !important;
 }

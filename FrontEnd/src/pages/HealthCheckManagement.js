@@ -144,7 +144,17 @@ const HealthCheckManagement = () => {
   }, []);
 
   useEffect(() => {
-    apiClient.get('/User').then(res => setAvailableCreators(res.data)).catch(() => setAvailableCreators([]));
+    console.log('=== FETCHING CREATORS ===');
+    apiClient.get('/User')
+      .then(res => {
+        console.log('Creators API Response:', res);
+        console.log('Creators data:', res.data);
+        setAvailableCreators(res.data);
+      })
+      .catch(err => {
+        console.error('Creators API Error:', err);
+        setAvailableCreators([]);
+      });
   }, []);
 
   const handleViewDetails = async (healthCheck) => {
@@ -609,39 +619,108 @@ const HealthCheckManagement = () => {
   
   console.log('classStudents:', classStudents);
   
-  // Lọc danh sách kế hoạch theo filters
-  const filteredPlans = plans.filter(plan => {
-    const matchDate = !filters.scheduleDate || (plan.scheduleDate && plan.scheduleDate.startsWith(filters.scheduleDate));
-    const matchCreator = !filters.creatorId || (plan.creatorID && plan.creatorID.toLowerCase().includes(filters.creatorId.toLowerCase()));
-    const matchClass = !filters.className || (plan.classID && plan.classID.toLowerCase().includes(filters.className.toLowerCase()));
-    return matchDate && matchCreator && matchClass;
-  });
-  
-  // Thêm log trước khi render danh sách kế hoạch
-  console.log('filteredPlans:', filteredPlans);
-  filteredPlans.forEach((plan, idx) => {
-    console.log(`Plan[${idx}]:`, plan);
-  });
-  
-  // Lọc chỉ lấy user có RoleType là MedicalStaff hoặc Admin cho dropdown người tạo
-  const filteredCreators = availableCreators.filter(user => {
-    const role = user.RoleType || user.roleType || user.Role?.RoleType || user.role?.roleType;
-    return role === 'MedicalStaff' || role === 'Admin';
-  });
-  
-  // Thêm hàm này vào đầu component HealthCheckManagement
+  // Hàm helper để lấy tên lớp
   const getClassName = (plan) => {
     if (plan.className) return plan.className;
     if (plan.ClassName) return plan.ClassName;
     const cls = availableClasses.find(c => String(c.ClassID) === String(plan.classID || plan.ClassID));
     return cls ? cls.ClassName : '---';
   };
-  
-  // Thêm hàm này vào đầu component HealthCheckManagement
+
+  // Hàm helper để lấy tên người tạo
   const getCreatorName = (creatorId) => {
-    const user = availableCreators.find(u => u.userID === creatorId);
-    return user ? user.username : creatorId;
+    if (!creatorId) return '---';
+    
+    // Tìm trong availableCreators
+    const user = availableCreators.find(u => 
+      u.userID === creatorId || 
+      u.UserID === creatorId || 
+      u.username === creatorId || 
+      u.Username === creatorId
+    );
+    
+    if (user) {
+      return user.username || user.Username || user.FullName || user.fullName || creatorId;
+    }
+    
+    // Nếu không tìm thấy, trả về creatorId
+    return creatorId;
   };
+
+  // Lọc danh sách kế hoạch theo filters
+  const filteredPlans = plans.filter(plan => {
+    console.log('=== FILTER DEBUG ===');
+    console.log('Current plan:', plan);
+    console.log('Current filters:', filters);
+    
+    // Filter theo ngày
+    const matchDate = !filters.scheduleDate || (plan.scheduleDate && plan.scheduleDate.startsWith(filters.scheduleDate));
+    console.log('Date match:', matchDate, 'Plan date:', plan.scheduleDate, 'Filter date:', filters.scheduleDate);
+    
+    // Filter theo creator - so sánh với tên hiển thị
+    let matchCreator = true;
+    if (filters.creatorId) {
+      // Lấy tên hiển thị của creator từ availableCreators
+      const creatorUser = availableCreators.find(u => 
+        u.UserID === plan.creatorID || 
+        u.userID === plan.creatorID ||
+        u.Username === plan.creatorID ||
+        u.username === plan.creatorID
+      );
+      
+      const planCreatorDisplayName = creatorUser ? 
+        (creatorUser.Username || creatorUser.username || creatorUser.FullName || creatorUser.fullName || plan.creatorID) : 
+        plan.creatorID;
+      
+      const filterCreator = filters.creatorId;
+      
+      console.log('Creator comparison:', {
+        planCreatorID: plan.creatorID,
+        planCreatorDisplayName: planCreatorDisplayName,
+        filterCreator: filterCreator,
+        creatorUser: creatorUser
+      });
+      
+      matchCreator = planCreatorDisplayName.toString().toLowerCase().includes(filterCreator.toLowerCase());
+      console.log('Creator match:', matchCreator);
+    }
+    
+    // Filter theo lớp
+    let matchClass = true;
+    if (filters.className) {
+      const planClassName = getClassName(plan);
+      matchClass = planClassName.toLowerCase().includes(filters.className.toLowerCase());
+      console.log('Class match:', matchClass, 'Plan class:', planClassName, 'Filter class:', filters.className);
+    }
+    
+    const finalMatch = matchDate && matchCreator && matchClass;
+    console.log('Final match:', finalMatch, 'for plan ID:', plan.id);
+    console.log('=== END FILTER DEBUG ===');
+    
+    return finalMatch;
+  });
+  
+  // Debug logs
+  console.log('=== DATA DEBUG ===');
+  console.log('All plans:', plans);
+  console.log('Available creators:', availableCreators);
+  console.log('Filters:', filters);
+  console.log('Filtered plans:', filteredPlans);
+  console.log('=== END DATA DEBUG ===');
+  
+  // Lọc chỉ lấy user có RoleType là MedicalStaff hoặc Admin cho dropdown người tạo
+  const filteredCreators = availableCreators.filter(user => {
+    const role = user.RoleType || user.roleType || user.Role?.RoleType || user.role?.roleType;
+    return role === 'MedicalStaff' || role === 'Admin';
+  });
+
+  // Thêm lựa chọn mặc định nếu không có dữ liệu
+  const defaultCreators = [
+    { UserID: 'medstaff01', FullName: 'medstaff01', Username: 'medstaff01' },
+    { UserID: 'admin01', FullName: 'admin01', Username: 'admin01' }
+  ];
+
+  const finalCreators = filteredCreators.length > 0 ? filteredCreators : defaultCreators;
   
   // Thêm hàm gửi thông báo cho toàn bộ phụ huynh của kế hoạch
   const handleSendNotificationsForPlan = async (plan) => {
@@ -682,13 +761,17 @@ const HealthCheckManagement = () => {
   
   // Fetch danh sách kế hoạch khám sức khỏe khi vào trang
   useEffect(() => {
+    console.log('=== FETCHING PLANS ===');
     setLoading(true);
     apiClient.get('/PeriodicHealthCheckPlan')
       .then(res => {
+        console.log('API Response:', res);
+        console.log('Plans data:', res.data);
         setPlans(res.data);
         setLoading(false);
       })
       .catch(err => {
+        console.error('API Error:', err);
         setPlans([]);
         setLoading(false);
         console.error('Lỗi khi tải danh sách kế hoạch:', err);
@@ -835,16 +918,8 @@ const HealthCheckManagement = () => {
 
   return (
     <div className="health-check-management-container">
-      <div className="container py-4">        <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="container py-4">        <div className="text-center mb-4">
           <h1>Khám sức khỏe định kỳ</h1>
-          <div>
-            <button className="btn btn-success me-2" onClick={handleBatchSchedule}>
-              <i className="fas fa-users me-2"></i>Tạo lịch theo lớp
-            </button>
-            <button className="btn btn-primary" onClick={handleNewHealthCheck}>
-              <i className="fas fa-plus-circle me-2"></i>Tạo lịch cá nhân
-            </button>
-          </div>
         </div>
 
         <div className="row mb-4">
@@ -908,7 +983,7 @@ const HealthCheckManagement = () => {
                   onChange={e => setFilters(prev => ({ ...prev, creatorId: e.target.value }))}
                 >
                   <option value="">Chọn người tạo</option>
-                  {filteredCreators.map(user => (
+                  {finalCreators.map(user => (
                     <option key={user.UserID || user.userID} value={user.UserID || user.userID}>
                       {user.FullName || user.fullName || user.Username || user.username || user.UserID || user.userID}
                     </option>
@@ -931,19 +1006,18 @@ const HealthCheckManagement = () => {
                 </select>
               </div>
               <div className="col-md-4 mb-2 d-flex align-items-end">
-                <button className="btn btn-primary me-2" onClick={handleApplyFilters}>Lọc</button>
                 <button className="btn btn-secondary" onClick={handleResetFilters}>Đặt lại</button>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="d-flex justify-content-end mb-3 btn-export-import">
-          <button className="btn btn-outline-success me-2" onClick={handleExportToExcel}>
-            <i className="fas fa-file-excel me-2"></i>Xuất Excel
+        <div className="d-flex justify-content-end mb-3">
+          <button className="btn btn-success me-2" onClick={handleBatchSchedule}>
+            <i className="fas fa-users me-2"></i>TẠO LỊCH THEO LỚP
           </button>
-          <button className="btn btn-outline-primary" onClick={handleImportFromExcel}>
-            <i className="fas fa-file-import me-2"></i>Nhập danh sách
+          <button className="btn btn-primary" onClick={handleNewHealthCheck}>
+            <i className="fas fa-plus-circle me-2"></i>TẠO LỊCH CÁ NHÂN
           </button>
         </div>
 
@@ -965,29 +1039,54 @@ const HealthCheckManagement = () => {
                     <div className="plan-header">
                       <div className="plan-title">
                         <h3>{plan.planName}</h3>
-                        <span className="plan-date">
-                          <i className="fas fa-calendar"></i>
-                          {plan.scheduleDate ? new Date(plan.scheduleDate).toLocaleDateString('vi-VN') : ''}
-                        </span>
                       </div>
-                      <div className="plan-meta">
-                        <span className="plan-class"><b>Lớp:</b> {className}</span>
-                        <span className="plan-creator"><b>Người tạo:</b> {creatorName}</span>
+                      <div className="plan-date">
+                        <i className="fas fa-calendar"></i>
+                        {plan.scheduleDate ? new Date(plan.scheduleDate).toLocaleDateString('vi-VN') : ''}
                       </div>
                     </div>
                     <div className="plan-content">
-                      <div className="plan-description">
-                        <b>Nội dung:</b> {'Khám sức khỏe định kỳ'}
+                      <div className="plan-info-row">
+                        <div className="plan-description">
+                          <h4>Nội dung</h4>
+                          <p>Khám sức khỏe định kỳ</p>
+                        </div>
+                        <div className="plan-target">
+                          <h4>Thông tin</h4>
+                          <p><strong>Lớp:</strong> {className}</p>
+                          <p><strong>Người tạo:</strong> {creatorName}</p>
+                        </div>
                       </div>
-                      <div className="plan-actions mt-2">
-                        <button className="btn btn-info btn-sm me-2" onClick={() => handleViewDetails(plan)}>
+                      <div className="plan-stats">
+                        <h4>Thống kê</h4>
+                        <div className="stats-grid">
+                          <div className="stat-item">
+                            <span className="stat-label">Tổng học sinh:</span>
+                            <span className="stat-value">-</span>
+                          </div>
+                          <div className="stat-item">
+                            <span className="stat-label">Đã xác nhận:</span>
+                            <span className="stat-value confirmed">-</span>
+                          </div>
+                          <div className="stat-item">
+                            <span className="stat-label">Chờ phản hồi:</span>
+                            <span className="stat-value pending">-</span>
+                          </div>
+                          <div className="stat-item">
+                            <span className="stat-label">Đã khám:</span>
+                            <span className="stat-value completed">-</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="plan-actions">
+                        <button className="btn btn-info" onClick={() => handleViewDetails(plan)}>
                           <i className="fas fa-eye"></i> Xem
                         </button>
-                        <button className="btn btn-secondary btn-sm me-2" onClick={() => handleEditHealthCheck(plan)}>
+                        <button className="btn btn-secondary" onClick={() => handleEditHealthCheck(plan)}>
                           <i className="fas fa-edit"></i> Sửa
                         </button>
                         {plan.status === 'Đã lên lịch' && (
-                          <button className="btn btn-warning btn-sm" onClick={() => handleSendNotificationsForPlan(plan)}>
+                          <button className="btn btn-warning" onClick={() => handleSendNotificationsForPlan(plan)}>
                             <i className="fas fa-bell"></i> Gửi thông báo
                           </button>
                         )}

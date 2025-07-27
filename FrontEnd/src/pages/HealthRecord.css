@@ -1,8 +1,8 @@
-/* Health Record Management Styles - Synchronized with HealthCheckManagement */
+/* Health Record Management Styles - Bright Medical/School Health Theme */
 .health-record-management-container {
   padding: 20px 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #f8fafc;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
   min-height: 100vh;
 }
 
@@ -123,13 +123,19 @@
   margin: 0;
 }
 
-/* Bộ lọc nâng cao */
+/* Bộ lọc nâng cao - Bright Medical Theme */
 .filter-card {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border: 2px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
   margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.filter-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.15);
 }
 
 .filter-card .card-body {
@@ -189,21 +195,22 @@
 }
 
 .record-card {
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 2px solid #e2e8f0;
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .record-card:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
   transform: translateY(-2px);
-  border-color: #1e3a8a;
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
 }
 
 .record-header {
@@ -310,13 +317,13 @@
 }
 
 .record-note {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 2px solid #e0f2fe;
   border-radius: 8px;
   padding: 0.75rem;
   margin-bottom: 1rem;
   font-size: 0.875rem;
-  color: #4b5563;
+  color: #1e40af;
 }
 
 .record-note strong {
@@ -799,7 +806,7 @@
   margin: 0;
 }
 
-/* Status Cards */
+/* Status Cards - Bright Medical/School Health Theme */
 .health-status-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -808,31 +815,54 @@
 }
 
 .status-card {
-  background: white;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
   border-radius: 15px;
   padding: 25px;
   display: flex;
   align-items: center;
   gap: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
   transition: all 0.3s ease;
+  border: 2px solid #e0f2fe;
 }
 
 .status-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.25);
+  border-color: #7dd3fc;
 }
 
 .status-card.submitted {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
   border-left: 4px solid #3b82f6;
+  border-color: #dbeafe;
+}
+
+.status-card.submitted:hover {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #93c5fd;
 }
 
 .status-card.approved {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
   border-left: 4px solid #10b981;
+  border-color: #dcfce7;
+}
+
+.status-card.approved:hover {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-color: #86efac;
 }
 
 .status-card.pending {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
   border-left: 4px solid #f59e0b;
+  border-color: #fef3c7;
+}
+
+.status-card.pending:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #fcd34d;
 }
 
 .status-icon {
@@ -843,6 +873,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .status-card.submitted .status-icon {
@@ -864,12 +895,12 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
-  color: #1e293b;
+  color: #1e40af;
 }
 
 .status-content p {
   margin: 5px 0 0;
-  color: #64748b;
+  color: #475569;
   font-weight: 500;
 }
 
@@ -1088,25 +1119,28 @@
 }
 
 .record-card.modern {
-  background: white;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
   border-radius: 15px;
-  border: 2px solid #f1f5f9;
+  border: 2px solid #e2e8f0;
   overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
 }
 
 .record-card.modern:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
 }
 
 .record-card.modern .record-header {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
   padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  border-bottom: 2px solid #e0f2fe;
 }
 
 .record-info h4 {
@@ -1171,15 +1205,16 @@
 }
 
 .record-note {
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
   padding: 15px;
   border-radius: 10px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #3b82f6;
+  border: 2px solid #e0f2fe;
 }
 
 .record-note p {
   margin: 0;
-  color: #475569;
+  color: #1e40af;
   line-height: 1.5;
 }
 

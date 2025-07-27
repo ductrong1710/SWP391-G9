@@ -52,6 +52,8 @@ namespace Services.Implements
 
         public async Task UpdateVaccineTypeAsync(string id, VaccineType vaccineType)
         {
+            Console.WriteLine($"UpdateVaccineTypeAsync called with id: {id}, vaccineType.VaccinationID: {vaccineType.VaccinationID}");
+            
             if (id != vaccineType.VaccinationID)
                 throw new ArgumentException("ID mismatch");
 
@@ -59,11 +61,26 @@ namespace Services.Implements
                 throw new KeyNotFoundException("Vaccine type not found");
 
             var existingVaccineType = await _vaccineTypeRepository.GetVaccineTypeByIdAsync(id);
-            if (existingVaccineType?.VaccineName != vaccineType.VaccineName &&
-                await _vaccineTypeRepository.VaccineTypeExistsByNameAsync(vaccineType.VaccineName))
-                throw new InvalidOperationException("A vaccine type with this name already exists");
+            Console.WriteLine($"Existing vaccine: {existingVaccineType?.VaccineName}, New vaccine: {vaccineType.VaccineName}");
+            
+            bool nameChanged = existingVaccineType?.VaccineName != vaccineType.VaccineName;
+            Console.WriteLine($"Name changed: {nameChanged}");
+            
+            if (nameChanged)
+            {
+                bool nameExists = await _vaccineTypeRepository.VaccineTypeExistsByNameAsync(vaccineType.VaccineName);
+                Console.WriteLine($"Name exists check: {nameExists}");
+                
+                if (nameExists)
+                {
+                    Console.WriteLine($"Vaccine name conflict detected: {vaccineType.VaccineName}");
+                    throw new InvalidOperationException("A vaccine type with this name already exists");
+                }
+            }
 
+            Console.WriteLine($"Updating vaccine {id} with new data: {vaccineType.VaccineName} - {vaccineType.Description}");
             await _vaccineTypeRepository.UpdateVaccineTypeAsync(vaccineType);
+            Console.WriteLine($"Vaccine {id} updated successfully");
         }
 
         public async Task DeleteVaccineTypeAsync(string id)

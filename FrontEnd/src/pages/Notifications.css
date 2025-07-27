@@ -426,7 +426,7 @@
 /* Modal Header */
 .modern-modal-header {
   text-align: center;
-  padding: 0 40px 30px;
+  padding: 0 40px 0px;
 }
 
 .modern-modal-title {
@@ -568,7 +568,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 25px;
+  margin-bottom: 0;
   padding-bottom: 15px;
   border-bottom: 2px solid #e9ecef;
 }
@@ -935,6 +935,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

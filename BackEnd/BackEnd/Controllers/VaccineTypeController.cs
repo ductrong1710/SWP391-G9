@@ -54,19 +54,64 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVaccineType(string id, VaccineType vaccineType)
         {
-            if (id != vaccineType.VaccinationID)
-                return BadRequest();
+            try
+            {
+                Console.WriteLine($"Controller: UpdateVaccineType called with id: {id}");
+                Console.WriteLine($"Controller: Request body - VaccinationID: {vaccineType.VaccinationID}, VaccineName: {vaccineType.VaccineName}, Description: {vaccineType.Description}");
+                
+                if (id != vaccineType.VaccinationID)
+                {
+                    Console.WriteLine($"Controller: ID mismatch - {id} != {vaccineType.VaccinationID}");
+                    return BadRequest("ID mismatch");
+                }
 
-            await _vaccineTypeService.UpdateVaccineTypeAsync(id, vaccineType);
-            return NoContent();
+                await _vaccineTypeService.UpdateVaccineTypeAsync(id, vaccineType);
+                Console.WriteLine($"Controller: Update completed successfully, returning NoContent");
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                Console.WriteLine($"Controller: KeyNotFoundException - {ex.Message}");
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Controller: ArgumentException - {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Controller: InvalidOperationException - {ex.Message}");
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Controller: Exception - {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // DELETE: api/VaccineType/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVaccineType(string id)
         {
-            await _vaccineTypeService.DeleteVaccineTypeAsync(id);
-            return NoContent();
+            try
+            {
+                await _vaccineTypeService.DeleteVaccineTypeAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

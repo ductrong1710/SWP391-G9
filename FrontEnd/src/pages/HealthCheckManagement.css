@@ -1,5 +1,7 @@
 .health-check-management-container {
   padding: 20px 0;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -19,34 +21,229 @@
 
 /* Thẻ thống kê */
 .health-stat-card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px 12px;
+  text-align: center;
   transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
   height: 100%;
-  border-left: 4px solid #1e3a8a;
 }
 
 .health-stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.005);
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
 }
 
 .health-stat-card .card-title {
   color: #4b5563;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .health-stat-card .card-number {
   color: #1e3a8a;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   line-height: 1;
 }
 
 .health-stat-card .card-text {
   color: #6b7280;
+  font-size: 0.8rem;
+}
+
+/* Plan Card Styles - giống với vaccination-management */
+.plan-card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px 14px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.plan-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.005);
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #ffffff, #f0f9ff);
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.plan-title h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2b6cb0;
+  font-weight: 600;
+}
+
+.plan-date {
+  color: #718096;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.plan-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.plan-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.plan-info-row {
+  display: flex;
+  gap: 20px;
+}
+
+.plan-description, .plan-target {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-description h4, .plan-target h4 {
+  font-size: 0.95rem;
+  color: #3182ce;
+  margin-bottom: 3px;
+}
+
+.plan-description p, .plan-target p {
+  margin: 0 0 3px 0;
+  color: #2d3748;
+  font-size: 0.9rem;
+}
+
+.plan-stats {
+  flex: 1;
+  min-width: 0;
+  margin-top: 8px;
+}
+
+.plan-stats h4 {
+  font-size: 0.95rem;
+  color: #3182ce;
+  margin-bottom: 3px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px 12px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 0.85rem;
+  gap: 2px;
+}
+
+.stat-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.stat-value.confirmed {
+  color: #10b981;
+}
+
+.stat-value.pending {
+  color: #f59e0b;
+}
+
+.stat-value.completed {
+  color: #3182ce;
+}
+
+.plan-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.plan-actions .btn {
+  min-width: 120px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  margin-top: 0 !important;
+}
+
+.plan-actions .btn-info {
+  background: #8b5cf6;
+  color: #fff;
+  border-color: #8b5cf6;
+}
+
+.plan-actions .btn-info:hover {
+  background: #7c3aed;
+  color: #fff;
+  border-color: #7c3aed;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.plan-actions .btn-secondary {
+  background: #fff;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.plan-actions .btn-secondary:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.plan-actions .btn-warning {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+}
+
+.plan-actions .btn-warning:hover {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* Bảng dữ liệu */
@@ -64,6 +261,80 @@
 .table td {
   vertical-align: middle;
   padding: 12px 8px;
+}
+
+/* Filter Section - đồng bộ với theme sáng */
+.card {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Đặc biệt cho filter card */
+.card.mb-4 {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+  color: #2b6cb0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.form-control, .form-select {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  background: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.form-control:hover, .form-select:hover {
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border: 2px solid #d1d5db;
+  color: #374151;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+  border-color: #9ca3af;
+  color: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Badge styling */
@@ -86,13 +357,18 @@
 }
 
 .btn-success {
-  background-color: #047857;
-  border-color: #047857;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: 2px solid #10b981;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .btn-success:hover {
-  background-color: #065f46;
-  border-color: #065f46;
+  background: linear-gradient(135deg, #059669, #047857);
+  border-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .btn-info {

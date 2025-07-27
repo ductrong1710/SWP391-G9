@@ -15,6 +15,8 @@ export default function Notifications() {
   const [selectedVaccineConsentFormId, setSelectedVaccineConsentFormId] = useState(null);
   const [vaccineDenyReason, setVaccineDenyReason] = useState('');
   const [vaccineDenyError, setVaccineDenyError] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const fetchNotifications = async () => {
     try {
@@ -68,26 +70,34 @@ export default function Notifications() {
   const handleApproveConsent = async (consentFormId) => {
     try {
       await apiClient.post(`/VaccinationConsentForm/${consentFormId}/approve`);
-      alert('Đã xác nhận đồng ý tiêm chủng!');
+      setToastMessage('Đã xác nhận đồng ý tiêm chủng!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
       fetchNotifications();
     } catch (err) {
       // Kiểm tra lỗi đã qua ngày tiêm chủng
       const msg = err?.response?.data?.message || err?.response?.data || err?.message || '';
       if (msg && msg.toLowerCase().includes('past vaccination plan')) {
-        alert('Kế hoạch đã qua ngày tiêm chủng, không thể xác nhận!');
+        setToastMessage('Kế hoạch đã qua ngày tiêm chủng, không thể xác nhận!');
       } else {
-        alert('Lỗi khi xác nhận đồng ý tiêm chủng!');
+        setToastMessage('Lỗi khi xác nhận đồng ý tiêm chủng!');
       }
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
   const handleDenyConsent = async (consentFormId, reason) => {
     try {
       await apiClient.post(`/VaccinationConsentForm/${consentFormId}/deny`, { Reason: reason });
-      alert('Đã gửi từ chối tiêm chủng!');
+      setToastMessage('Đã gửi từ chối tiêm chủng!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
       fetchNotifications();
     } catch (err) {
-      alert('Lỗi khi gửi từ chối tiêm chủng!');
+      setToastMessage('Lỗi khi gửi từ chối tiêm chủng!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
     }
   };
 
@@ -168,16 +178,8 @@ export default function Notifications() {
           </h2>
           <div className="notifications-stats">
             <div className="stat-item">
-              <span className="stat-number">{totalCount}</span>
-              <span className="stat-label">Hồ sơ đã nộp</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">{approvedCount}</span>
-              <span className="stat-label">Đã phê duyệt</span>
-            </div>
-            <div className="stat-item">
               <span className="stat-number">{pendingCount}</span>
-              <span className="stat-label">Đang xử lý</span>
+              <span className="stat-label">Thông báo chưa đọc</span>
             </div>
           </div>
         </div>
@@ -562,6 +564,31 @@ export default function Notifications() {
           </div>
         )}
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+          color: 'white',
+          padding: '16px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 8px 32px rgba(67, 233, 123, 0.3)',
+          zIndex: 10000,
+          animation: 'slideInRight 0.3s ease',
+          maxWidth: '400px',
+          fontWeight: '600',
+          fontSize: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <i className="fas fa-check-circle" style={{ fontSize: '1.2rem' }}></i>
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 } 

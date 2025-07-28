@@ -1169,3 +1169,207 @@
 .stat-item:nth-child(3)::before {
   background: linear-gradient(135deg, #ff9500 0%, #ffa726 100%);
 }
+
+/* Mark All Read Button */
+.mark-all-read-container {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+}
+
+.btn-mark-all-read {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 15px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-mark-all-read::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-mark-all-read:hover::before {
+  left: 100%;
+}
+
+.btn-mark-all-read:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.btn-mark-all-read:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-mark-all-read.disabled {
+  background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: 0 4px 15px rgba(189, 195, 199, 0.3);
+}
+
+.btn-mark-all-read.disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 15px rgba(189, 195, 199, 0.3);
+  background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+}
+
+.btn-mark-all-read.disabled::before {
+  display: none;
+}
+
+.btn-mark-all-read i {
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
+}
+
+.btn-mark-all-read:hover i {
+  transform: scale(1.1);
+}
+
+/* Responsive design for mark all read button */
+@media (max-width: 768px) {
+  .btn-mark-all-read {
+    padding: 12px 25px;
+    font-size: 0.9rem;
+  }
+  
+  .mark-all-read-container {
+    margin-top: 20px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-mark-all-read {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Mark All Read Header Button */
+.mark-all-read-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.btn-mark-all-read-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-mark-all-read-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-mark-all-read-header:hover::before {
+  left: 100%;
+}
+
+.btn-mark-all-read-header:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.btn-mark-all-read-header:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+.btn-mark-all-read-header.disabled {
+  background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: 0 3px 10px rgba(189, 195, 199, 0.3);
+}
+
+.btn-mark-all-read-header.disabled:hover {
+  transform: none;
+  box-shadow: 0 3px 10px rgba(189, 195, 199, 0.3);
+  background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+}
+
+.btn-mark-all-read-header.disabled::before {
+  display: none;
+}
+
+.btn-mark-all-read-header i {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.btn-mark-all-read-header:hover i {
+  transform: scale(1.1);
+}
+
+/* Responsive design for header button */
+@media (max-width: 768px) {
+  .btn-mark-all-read-header {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+  
+  .mark-all-read-header {
+    margin-bottom: 15px;
+    padding: 0 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-mark-all-read-header {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    width: auto;
+  }
+  
+  .mark-all-read-header {
+    justify-content: center;
+  }
+}

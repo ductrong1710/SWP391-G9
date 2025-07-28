@@ -95,6 +95,8 @@ const VaccinationManagement = () => {
   const [recordResultsList, setRecordResultsList] = useState([]);
   const [showVaccinationDetailModal, setShowVaccinationDetailModal] = useState(false);
   const [selectedStudentIndex, setSelectedStudentIndex] = useState(null);
+  const [recordResultsSearch, setRecordResultsSearch] = useState('');
+  const [studentsListSearch, setStudentsListSearch] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -124,6 +126,20 @@ const VaccinationManagement = () => {
   }, []);
 
 
+
+  // Filter logic cho studentsList
+  const filteredStudentsList = studentsList.filter(student => {
+    if (!studentsListSearch.trim()) return true;
+    
+    const searchTerm = studentsListSearch.toLowerCase();
+    const studentId = (student.userID || student.UserID || '').toLowerCase();
+    const studentName = (student.name || student.Name || student.fullName || student.FullName || '').toLowerCase();
+    const className = (student.className || student.ClassName || student.class || student.Class || '').toLowerCase();
+    
+    return studentId.includes(searchTerm) || 
+           studentName.includes(searchTerm) || 
+           className.includes(searchTerm);
+  });
 
   // Filter logic giống HealthCheckManagement
   const filteredPlans = vaccinationPlans.filter(plan => {
@@ -375,6 +391,20 @@ const VaccinationManagement = () => {
     }
   };
 
+  // Filter danh sách học sinh trong modal ghi nhận kết quả
+  const filteredRecordResultsList = recordResultsList.filter(student => {
+    if (!recordResultsSearch.trim()) return true;
+    
+    const searchTerm = recordResultsSearch.toLowerCase();
+    const studentId = (student.userID || '').toLowerCase();
+    const studentName = (student.name || '').toLowerCase();
+    const status = getVaccinationStatusText(student.vaccinationStatus).toLowerCase();
+    
+    return studentId.includes(searchTerm) || 
+           studentName.includes(searchTerm) || 
+           status.includes(searchTerm);
+  });
+
 
 
   const handleCreatePlan = async (e) => {
@@ -501,9 +531,11 @@ const VaccinationManagement = () => {
             let existingResult = null;
             try {
               const resultRes = await apiClient.get(`/VaccinationResult/consentform/${f.id || f.ID || f.consentFormID}`);
+              console.log(`API response for student ${f.studentID}:`, resultRes);
               if (resultRes.data) {
                 existingResult = resultRes.data; // API trả về object, không phải array
                 console.log(`Found existing result for student ${f.studentID}:`, existingResult);
+                console.log(`VaccinationStatus from API:`, existingResult.vaccinationStatus || existingResult.VaccinationStatus);
               }
             } catch (resultErr) {
               console.log(`No existing result found for student ${f.studentID}:`, resultErr.message);
@@ -517,7 +549,7 @@ const VaccinationManagement = () => {
                 classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
                 consentFormID: f.id || f.ID || f.consentFormID,
                 status: f.status || f.statusID || 'Pending',
-                vaccinationStatus: existingResult.vaccinationStatus || existingResult.VaccinationStatus || 'Completed',
+                vaccinationStatus: existingResult.vaccinationStatus || existingResult.VaccinationStatus || 'Pending',
                 notes: existingResult.notes || existingResult.Notes || '',
                 actualVaccinationDate: existingResult.actualVaccinationDate || existingResult.ActualVaccinationDate ? 
                   new Date(existingResult.actualVaccinationDate || existingResult.ActualVaccinationDate).toISOString().split('T')[0] : 
@@ -537,7 +569,7 @@ const VaccinationManagement = () => {
                 classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
                 consentFormID: f.id || f.ID || f.consentFormID,
                 status: f.status || f.statusID || 'Pending',
-                vaccinationStatus: 'Completed', // Default status
+                vaccinationStatus: 'Pending', // Chưa ghi kết quả thì là Pending
                 notes: '',
                 actualVaccinationDate: new Date().toISOString().split('T')[0], // Default to today
                 performer: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định',
@@ -555,7 +587,7 @@ const VaccinationManagement = () => {
               classID: 'Không rõ',
               consentFormID: f.id || f.ID || f.consentFormID,
               status: f.status || f.statusID || 'Pending',
-              vaccinationStatus: 'Completed', // Default status
+              vaccinationStatus: 'Pending', // Chưa ghi kết quả thì là Pending
               notes: '',
               actualVaccinationDate: new Date().toISOString().split('T')[0], // Default to today
               performer: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định',
@@ -569,6 +601,10 @@ const VaccinationManagement = () => {
         })
       );
       console.log('Student profiles created:', studentProfiles);
+      console.log('Final vaccination statuses:');
+      studentProfiles.forEach((student, index) => {
+        console.log(`Student ${index + 1} (${student.name}): ${student.vaccinationStatus}`);
+      });
       
       // Kiểm tra xem có học sinh nào đã có dữ liệu trong database không
       const studentsWithData = studentProfiles.filter(student => 
@@ -626,7 +662,7 @@ const VaccinationManagement = () => {
           PostVaccinationReaction: student.vaccinationStatus === 'Completed' ? student.postVaccinationReaction : null,
           Notes: student.notes,
           NeedToContactParent: student.needToContactParent || false,
-          VaccinationStatus: student.vaccinationStatus || 'Completed', // Default to Completed if not set
+          VaccinationStatus: student.vaccinationStatus || 'Pending', // Default to Pending if not set
           PostponementReason: student.vaccinationStatus === 'Postponed' ? student.postponementReason : null,
           FailureReason: student.vaccinationStatus === 'Failed' ? student.failureReason : null,
           RefusalReason: student.vaccinationStatus === 'Refused' ? student.refusalReason : null,
@@ -815,6 +851,7 @@ const VaccinationManagement = () => {
       // Show success message
       setShowRecordResultsModal(false);
       setRecordResultsList([]);
+      setRecordResultsSearch('');
       
       // Refresh data để cập nhật thống kê
       console.log('Refreshing data after successful vaccination result save...');
@@ -1047,13 +1084,38 @@ const VaccinationManagement = () => {
     try {
       console.log('Adding vaccine with data:', addVaccineData);
       
-      if (!addVaccineData.VaccineName || !addVaccineData.Description) {
+      if (!addVaccineData.VaccineName?.trim() || !addVaccineData.Description?.trim()) {
         setNotifyMessage('Vui lòng nhập đầy đủ tên vaccine và mô tả!');
         setAddVaccineLoading(false);
         return;
       }
       
+      // Kiểm tra độ dài tên vaccine (max 100 ký tự)
+      if (addVaccineData.VaccineName.length > 100) {
+        setNotifyMessage('Tên vaccine không được vượt quá 100 ký tự!');
+        setAddVaccineLoading(false);
+        return;
+      }
+      
+      // Kiểm tra độ dài mô tả (max 255 ký tự)
+      if (addVaccineData.Description.length > 255) {
+        setNotifyMessage('Mô tả không được vượt quá 255 ký tự!');
+        setAddVaccineLoading(false);
+        return;
+      }
+      
+      // Kiểm tra tên vaccine không được trùng
+      const existingVaccine = vaccineList.find(v => 
+        (v.vaccineName || v.VaccineName || '').toLowerCase() === addVaccineData.VaccineName.toLowerCase()
+      );
+      if (existingVaccine) {
+        setNotifyMessage('Tên vaccine đã tồn tại! Vui lòng chọn tên khác.');
+        setAddVaccineLoading(false);
+        return;
+      }
+      
       await apiClient.post('/VaccineType', {
+        VaccinationID: '', // Để backend tự sinh mã
         VaccineName: addVaccineData.VaccineName,
         Description: addVaccineData.Description
       });
@@ -2519,7 +2581,10 @@ const VaccinationManagement = () => {
                 </h3>
               </div>
               <button
-                onClick={() => setShowStudentsModal(false)}
+                onClick={() => {
+                  setShowStudentsModal(false);
+                  setStudentsListSearch('');
+                }}
                 style={{
                   background: 'rgba(255, 255, 255, 0.2)',
                   border: 'none',
@@ -2548,15 +2613,97 @@ const VaccinationManagement = () => {
 
             {/* Body */}
             <div style={{ padding: '24px', maxHeight: '60vh', overflowY: 'auto' }}>
-              {studentsList.length === 0 ? (
+              {/* Search Box */}
+              <div style={{
+                marginBottom: '20px',
+                position: 'relative'
+              }}>
+                <div style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm theo mã học sinh, họ tên hoặc lớp..."
+                    value={studentsListSearch}
+                    onChange={(e) => setStudentsListSearch(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px 12px 44px',
+                      border: '2px solid #e2e8f0',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                      background: '#fff'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#3b82f6';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e2e8f0';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                  <i 
+                    className="fas fa-search" 
+                    style={{
+                      position: 'absolute',
+                      left: '16px',
+                      color: '#9ca3af',
+                      fontSize: '0.9rem'
+                    }}
+                  ></i>
+                  {studentsListSearch && (
+                    <button
+                      onClick={() => setStudentsListSearch('')}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        background: 'none',
+                        border: 'none',
+                        color: '#9ca3af',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        borderRadius: '4px',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.color = '#ef4444';
+                        e.target.style.background = '#fef2f2';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.color = '#9ca3af';
+                        e.target.style.background = 'none';
+                      }}
+                    >
+                      <i className="fas fa-times"></i>
+                    </button>
+                  )}
+                </div>
+                {studentsListSearch && (
+                  <div style={{
+                    marginTop: '8px',
+                    fontSize: '0.85rem',
+                    color: '#6b7280',
+                    fontWeight: '500'
+                  }}>
+                    Tìm thấy {filteredStudentsList.length} học sinh
+                  </div>
+                )}
+              </div>
+
+              {filteredStudentsList.length === 0 ? (
                 <div style={{
                   textAlign: 'center',
                   padding: '40px 20px',
                   color: '#6b7280'
                 }}>
-                  <i className="fas fa-user-times" style={{ fontSize: '3rem', marginBottom: '16px', color: '#d1d5db' }}></i>
+                  <i className="fas fa-search" style={{ fontSize: '3rem', marginBottom: '16px', color: '#d1d5db' }}></i>
                   <div style={{ fontSize: '1.1rem', fontWeight: '500' }}>
-                    Không có học sinh nào đã xác nhận tiêm chủng
+                    {studentsListSearch ? 'Không tìm thấy học sinh nào phù hợp' : 'Không có học sinh nào đã xác nhận tiêm chủng'}
                   </div>
                 </div>
               ) : (
@@ -2613,7 +2760,7 @@ const VaccinationManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {studentsList.map((student, idx) => (
+                      {filteredStudentsList.map((student, idx) => (
                         <tr key={student?.userID || idx} style={{
                           borderBottom: '1px solid #f1f5f9',
                           transition: 'background-color 0.2s ease'
@@ -2716,7 +2863,10 @@ const VaccinationManagement = () => {
                 </h3>
               </div>
               <button
-                onClick={() => setShowRecordResultsModal(false)}
+                onClick={() => {
+                  setShowRecordResultsModal(false);
+                  setRecordResultsSearch('');
+                }}
                 style={{
                   background: 'rgba(255, 255, 255, 0.2)',
                   border: 'none',
@@ -2745,6 +2895,82 @@ const VaccinationManagement = () => {
 
             {/* Body */}
             <div style={{ padding: '24px', maxHeight: '70vh', overflowY: 'auto' }}>
+              {/* Search Box */}
+              {recordResultsList.length > 0 && (
+                <div style={{
+                  marginBottom: '20px',
+                  padding: '16px',
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    maxWidth: '400px'
+                  }}>
+                    <i className="fas fa-search" style={{ color: '#6b7280', fontSize: '1rem' }}></i>
+                    <input
+                      type="text"
+                      placeholder="Tìm kiếm theo mã học sinh, tên học sinh hoặc trạng thái..."
+                      value={recordResultsSearch}
+                      onChange={(e) => setRecordResultsSearch(e.target.value)}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                        transition: 'border-color 0.2s ease'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#667eea';
+                        e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#d1d5db';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                    {recordResultsSearch && (
+                      <button
+                        onClick={() => setRecordResultsSearch('')}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#6b7280',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          borderRadius: '4px',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = '#e5e7eb';
+                          e.target.style.color = '#374151';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'none';
+                          e.target.style.color = '#6b7280';
+                        }}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    )}
+                  </div>
+                  {recordResultsSearch && (
+                    <div style={{
+                      marginTop: '8px',
+                      fontSize: '0.85rem',
+                      color: '#6b7280'
+                    }}>
+                      Tìm thấy {filteredRecordResultsList.length} học sinh
+                    </div>
+                  )}
+                </div>
+              )}
+              
               {recordResultsList.length === 0 ? (
                 <div style={{
                   textAlign: 'center',
@@ -2819,7 +3045,7 @@ const VaccinationManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {recordResultsList.map((student, idx) => (
+                                              {filteredRecordResultsList.map((student, idx) => (
                         <tr key={student?.userID || idx} style={{
                           borderBottom: '1px solid #f1f5f9',
                           transition: 'background-color 0.2s ease'
@@ -2908,7 +3134,7 @@ const VaccinationManagement = () => {
               alignItems: 'center'
             }}>
               <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>
-                Tổng cộng: <strong>{recordResultsList.length}</strong> học sinh
+                                  Tổng cộng: <strong>{recordResultsSearch ? filteredRecordResultsList.length : recordResultsList.length}</strong> học sinh
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button
@@ -3092,7 +3318,7 @@ const VaccinationManagement = () => {
                              fontSize: '0.95rem',
                              background: '#fff'
                            }}
-                           value={student.vaccinationStatus || 'Completed'}
+                           value={student.vaccinationStatus || 'Pending'}
                            onChange={(e) => handleVaccinationStatusChange(selectedStudentIndex, e.target.value)}
                          >
                            <option value="Completed">Đã tiêm thành công</option>

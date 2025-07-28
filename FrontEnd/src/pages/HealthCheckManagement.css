@@ -60,6 +60,30 @@
   font-size: 0.8rem;
 }
 
+/* Health Check Plans List - giống với vaccination-management */
+.health-check-plans-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+/* Responsive design cho grid layout */
+@media (max-width: 768px) {
+  .health-check-plans-list {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .health-check-plans-list {
+    gap: 12px;
+    margin-top: 12px;
+  }
+}
+
 /* Plan Card Styles - giống với vaccination-management */
 .plan-card {
   background: linear-gradient(135deg, #ffffff, #f8fafc);
@@ -70,7 +94,7 @@
   flex-direction: column;
   transition: all 0.3s ease;
   border: 2px solid #e2e8f0;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .plan-card:hover {
@@ -92,6 +116,18 @@
   font-size: 1.1rem;
   color: #2b6cb0;
   font-weight: 600;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .plan-date {
@@ -184,24 +220,28 @@
 }
 
 .plan-actions {
-  margin-top: 10px;
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
 }
 
 .plan-actions .btn {
-  min-width: 120px;
-  height: 36px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  margin-top: 0 !important;
+  gap: 8px;
+  text-decoration: none;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: auto;
+  height: auto;
 }
 
 .plan-actions .btn-info {
@@ -210,12 +250,13 @@
   border-color: #8b5cf6;
 }
 
+.plan-actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
 .plan-actions .btn-info:hover {
-  background: #7c3aed;
-  color: #fff;
-  border-color: #7c3aed;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
 }
 
 .plan-actions .btn-secondary {
@@ -225,11 +266,7 @@
 }
 
 .plan-actions .btn-secondary:hover {
-  background: #f3f4f6;
-  color: #1f2937;
-  border-color: #9ca3af;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #4b5563, #374151);
 }
 
 .plan-actions .btn-warning {
@@ -239,11 +276,7 @@
 }
 
 .plan-actions .btn-warning:hover {
-  background: #2563eb;
-  color: #fff;
-  border-color: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #d97706, #b45309);
 }
 
 /* Bảng dữ liệu */

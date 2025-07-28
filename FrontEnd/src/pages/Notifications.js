@@ -65,6 +65,32 @@ export default function Notifications() {
     }
   };
 
+  const handleMarkAllAsRead = async () => {
+    try {
+      // Lấy danh sách ID của các thông báo chưa đọc
+      const unreadNotifications = notifications.filter(n => !n.isRead);
+      const unreadIds = unreadNotifications.map(n => n.notificationID);
+      
+      if (unreadIds.length === 0) {
+        // Không hiển thị alert khi không có thông báo chưa đọc
+        return;
+      }
+
+      // Gọi API để đánh dấu từng thông báo đã đọc
+      const promises = unreadIds.map(id => 
+        apiClient.post(`/Notification/mark-as-read/${id}`)
+      );
+      
+      await Promise.all(promises);
+      
+      alert('Đã đánh dấu tất cả thông báo là đã đọc!');
+      fetchNotifications();
+    } catch (err) {
+      console.error('Lỗi khi đánh dấu tất cả đã đọc:', err);
+      alert('Lỗi khi đánh dấu tất cả đã đọc!');
+    }
+  };
+
   const handleApproveConsent = async (consentFormId) => {
     try {
       await apiClient.post(`/VaccinationConsentForm/${consentFormId}/approve`);
@@ -138,11 +164,8 @@ export default function Notifications() {
     return false;
   }
 
-  // Calculate statistics
+  // Calculate statistics - chỉ tính thông báo chưa đọc
   const unreadCount = notifications.filter(n => !n.isRead).length;
-  const approvedCount = notifications.filter(n => n.isRead || n.resultStatus === 'Completed').length;
-  const pendingCount = notifications.filter(n => !n.isRead && !hasResult(n)).length;
-  const totalCount = notifications.length;
 
   if (loading) {
     return (
@@ -168,16 +191,8 @@ export default function Notifications() {
           </h2>
           <div className="notifications-stats">
             <div className="stat-item">
-              <span className="stat-number">{totalCount}</span>
-              <span className="stat-label">Hồ sơ đã nộp</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">{approvedCount}</span>
-              <span className="stat-label">Đã phê duyệt</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">{pendingCount}</span>
-              <span className="stat-label">Đang xử lý</span>
+              <span className="stat-number">{unreadCount}</span>
+              <span className="stat-label">Thông báo chưa đọc</span>
             </div>
           </div>
         </div>
@@ -192,7 +207,20 @@ export default function Notifications() {
             <div className="empty-message">Bạn chưa có thông báo nào. Các thông báo mới sẽ hiển thị ở đây.</div>
           </div>
         ) : (
-          <ul className="notifications-list">
+          <>
+            {/* Nút đánh dấu đọc hết tất cả - ở trên bên phải */}
+            <div className="mark-all-read-header fade-in-up" style={{animationDelay: '0.2s'}}>
+              <button 
+                className={`btn-mark-all-read-header ${unreadCount === 0 ? 'disabled' : ''}`}
+                onClick={handleMarkAllAsRead}
+                disabled={unreadCount === 0}
+              >
+                <i className="fas fa-check-double"></i>
+                {unreadCount > 0 ? 'ĐÁNH DẤU ĐỌC HẾT TẤT CẢ' : 'TẤT CẢ ĐÃ ĐỌC'}
+              </button>
+            </div>
+            
+            <ul className="notifications-list">
             {notifications.map((n, idx) => {
               const consentFormId = n.ConsentFormID || n.consentFormID || n.consentformid;
               const uniqueKey = n.notificationID ? n.notificationID : `notif-${idx}`;
@@ -277,6 +305,7 @@ export default function Notifications() {
               );
             })}
           </ul>
+          </>
         )}
 
         {/* Health Check Modal */}

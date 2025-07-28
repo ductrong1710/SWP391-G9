@@ -1028,7 +1028,8 @@ const HealthCheckManagement = () => {
             </div>
             <p className="mt-3">Đang tải dữ liệu khám sức khỏe...</p>
           </div>
-        ) : (          <div className="plans-list">
+        ) : (
+          <div className="health-check-plans-list">
             {filteredPlans.length > 0 ? (
               filteredPlans.map((plan) => {
                 const className = getClassName(plan);
@@ -1039,6 +1040,17 @@ const HealthCheckManagement = () => {
                     <div className="plan-header">
                       <div className="plan-title">
                         <h3>{plan.planName}</h3>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: plan.status === 'Đang thực hiện' ? '#3b82f6' : 
+                                           plan.status === 'Đã hoàn thành' ? '#10b981' : 
+                                           plan.status === 'Bị hủy' ? '#ef4444' : 
+                                           plan.status === 'Dời lịch' ? '#f59e0b' : '#6b7280'
+                          }}
+                        >
+                          {plan.status}
+                        </span>
                       </div>
                       <div className="plan-date">
                         <i className="fas fa-calendar"></i>
@@ -1048,13 +1060,14 @@ const HealthCheckManagement = () => {
                     <div className="plan-content">
                       <div className="plan-info-row">
                         <div className="plan-description">
-                          <h4>Nội dung</h4>
+                          <h4>Mô tả</h4>
                           <p>Khám sức khỏe định kỳ</p>
+                          <p><strong>Người tạo:</strong> {creatorName}</p>
                         </div>
                         <div className="plan-target">
-                          <h4>Thông tin</h4>
+                          <h4>Đối tượng</h4>
                           <p><strong>Lớp:</strong> {className}</p>
-                          <p><strong>Người tạo:</strong> {creatorName}</p>
+                          <p><strong>Nội dung:</strong> Khám sức khỏe định kỳ</p>
                         </div>
                       </div>
                       <div className="plan-stats">

@@ -70,18 +70,44 @@ const VaccinationManagement = () => {
 
   // Thống kê
   const totalStudents = vaccinationPlans.reduce((sum, plan) => sum + (plan.totalStudents || 0), 0);
+  const confirmed = vaccinationPlans.reduce((sum, plan) => sum + (plan.confirmedCount || 0), 0);
   const completed = vaccinationPlans.reduce((sum, plan) => sum + (plan.completedCount || 0), 0);
   const pending = vaccinationPlans.reduce((sum, plan) => sum + (plan.pendingCount || 0), 0);
   const totalRounds = vaccinationPlans.length;
+
+  // Debug thống kê
+  console.log('=== THỐNG KÊ DEBUG ===');
+  console.log('vaccinationPlans:', vaccinationPlans);
+  console.log('totalStudents:', totalStudents);
+  console.log('confirmed:', confirmed);
+  console.log('completed:', completed);
+  console.log('pending:', pending);
+  console.log('totalRounds:', totalRounds);
+  console.log('=== END THỐNG KÊ DEBUG ===');
 
   // Toast notification
   const [showToast, setShowToast] = useState(false);
   const [showDateErrorModal, setShowDateErrorModal] = useState(false);
   const [dateErrorMessage, setDateErrorMessage] = useState('');
+  const [showStudentsModal, setShowStudentsModal] = useState(false);
+  const [studentsList, setStudentsList] = useState([]);
+  const [showRecordResultsModal, setShowRecordResultsModal] = useState(false);
+  const [recordResultsList, setRecordResultsList] = useState([]);
+  const [showVaccinationDetailModal, setShowVaccinationDetailModal] = useState(false);
+  const [selectedStudentIndex, setSelectedStudentIndex] = useState(null);
 
   useEffect(() => {
     fetchData();
   }, [searchTerm, filterStatus]);
+
+  // Thêm interval để tự động refresh dữ liệu mỗi 30 giây
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData();
+    }, 30000); // 30 giây
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Fetch available creators
   useEffect(() => {
@@ -190,24 +216,78 @@ const VaccinationManagement = () => {
       const plansResponse = await apiClient.get(`/VaccinationPlan?${params.toString()}`);
       const plans = plansResponse.data;
 
-      // Fetch consent forms cho mỗi plan để tính toán thống kê
+      // Fetch consent forms và thông tin người tạo cho mỗi plan
       const plansWithStats = await Promise.all(plans.map(async (plan) => {
         try {
           const consentResponse = await apiClient.get(`/VaccinationConsentForm/plan/${plan.vaccinationPlanID || plan.id}`);
           const consents = consentResponse.data || [];
           
-          // Tính toán thống kê
+          // Debug raw consent data
+          console.log(`=== RAW CONSENT DATA FOR PLAN ${plan.id} ===`);
+          consents.forEach((consent, index) => {
+            console.log(`Consent ${index}:`, {
+              id: consent.id,
+              studentID: consent.studentID,
+              consentStatus: consent.consentStatus,
+              status: consent.status,
+              statusID: consent.statusID
+            });
+          });
+          console.log('=== END RAW CONSENT DATA ===');
+          
+          // Tính toán thống kê từ consent forms
           const totalStudents = consents.length;
-          const confirmedCount = consents.filter(c => c.status === 'Approved').length;
-          const pendingCount = consents.filter(c => c.status === 'Pending').length;
-          const completedCount = consents.filter(c => c.status === 'Completed').length;
+          const confirmedCount = consents.filter(c => c.consentStatus === 'Approved').length;
+          const pendingCount = consents.filter(c => c.consentStatus === 'Pending' || !c.consentStatus).length;
+          
+          // Tính completedCount từ VaccinationResult thay vì consentStatus
+          let completedCount = 0;
+          try {
+            // Lấy tất cả kết quả tiêm chủng cho plan này
+            const resultsResponse = await apiClient.get(`/VaccinationResult/plan/${plan.vaccinationPlanID || plan.id}`);
+            const results = resultsResponse.data || [];
+            
+            // Đếm số kết quả có status "Completed"
+            completedCount = results.filter(result => 
+              result.vaccinationStatus === 'Completed' || result.VaccinationStatus === 'Completed'
+            ).length;
+            
+            console.log(`=== VACCINATION RESULTS FOR PLAN ${plan.id} ===`);
+            console.log('results:', results);
+            console.log('completedCount from results:', completedCount);
+            console.log('=== END VACCINATION RESULTS ===');
+          } catch (error) {
+            console.error(`Error fetching vaccination results for plan ${plan.id}:`, error);
+            completedCount = 0;
+          }
+          
+          // Debug thống kê cho từng plan
+          console.log(`=== THỐNG KÊ PLAN ${plan.id} ===`);
+          console.log('consents:', consents);
+          console.log('totalStudents:', totalStudents);
+          console.log('confirmedCount:', confirmedCount);
+          console.log('pendingCount:', pendingCount);
+          console.log('completedCount:', completedCount);
+          console.log('=== END THỐNG KÊ PLAN ===');
+          
+          // Fetch thông tin người tạo
+          let creatorInfo = null;
+          if (plan.creatorID || plan.CreatorID) {
+            try {
+              const creatorResponse = await apiClient.get(`/User/${plan.creatorID || plan.CreatorID}`);
+              creatorInfo = creatorResponse.data;
+            } catch (error) {
+              console.error(`Error fetching creator info for plan ${plan.id}:`, error);
+            }
+          }
           
           return {
             ...plan,
             totalStudents,
             confirmedCount,
             pendingCount,
-            completedCount
+            completedCount,
+            creatorInfo
           };
         } catch (error) {
           console.error(`Error fetching consents for plan ${plan.vaccinationPlanID}:`, error);
@@ -261,6 +341,42 @@ const VaccinationManagement = () => {
     }
   };
 
+  const getVaccinationStatusText = (status) => {
+    switch (status) {
+      case 'Completed':
+        return 'Đã tiêm thành công';
+      case 'Failed':
+        return 'Tiêm không thành công';
+      case 'Postponed':
+        return 'Hoãn tiêm';
+      case 'Refused':
+        return 'Từ chối tiêm';
+      case 'Pending':
+        return 'Chờ tiêm';
+      default:
+        return status || 'Chưa ghi nhận';
+    }
+  };
+
+  const getVaccinationStatusColor = (status) => {
+    switch (status) {
+      case 'Completed':
+        return '#10b981'; // Green
+      case 'Failed':
+        return '#ef4444'; // Red
+      case 'Postponed':
+        return '#f59e0b'; // Yellow
+      case 'Refused':
+        return '#6b7280'; // Gray
+      case 'Pending':
+        return '#3b82f6'; // Blue
+      default:
+        return '#9ca3af'; // Light gray
+    }
+  };
+
+
+
   const handleCreatePlan = async (e) => {
     e.preventDefault();
     try {
@@ -304,9 +420,509 @@ const VaccinationManagement = () => {
     }
   };
 
-  const handleViewDetails = (plan) => {
-    setSelectedPlan(plan);
-    setShowDetailsModal(true);
+  const handleViewDetails = async (plan) => {
+    try {
+      console.log('=== OPENING PLAN DETAILS ===');
+      console.log('Plan object:', plan);
+      console.log('Plan statistics:', {
+        totalStudents: plan.totalStudents,
+        confirmedCount: plan.confirmedCount,
+        pendingCount: plan.pendingCount,
+        completedCount: plan.completedCount
+      });
+      console.log('=== END PLAN DETAILS DEBUG ===');
+      
+      // Sử dụng plan hiện tại thay vì fetch lại để tránh mất thống kê đã tính
+      setSelectedPlan(plan);
+      setShowDetailsModal(true);
+    } catch (error) {
+      console.error('Error opening plan details:', error);
+      setSelectedPlan(plan);
+      setShowDetailsModal(true);
+    }
+  };
+
+  const handleViewStudents = async (plan) => {
+    try {
+      const res = await apiClient.get(`/VaccinationConsentForm/plan/${plan.id || plan.vaccinationPlanID}`);
+      // Lọc các học sinh đã xác nhận
+      const confirmed = res.data.filter(f => f.consentStatus === "Approved" && f.studentID);
+      // Lấy thông tin profile cho từng studentID
+      const studentProfiles = await Promise.all(
+        confirmed.map(async (f) => {
+          try {
+            const profileRes = await apiClient.get(`/Profile/user/${f.studentID}`);
+            return {
+              userID: f.studentID,
+              name: profileRes.data?.name || profileRes.data?.Name || 'Không rõ tên',
+              classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
+            };
+          } catch {
+            return {
+              userID: f.studentID,
+              name: 'Không rõ tên',
+              classID: 'Không rõ',
+            };
+          }
+        })
+      );
+      setStudentsList(studentProfiles);
+      setShowStudentsModal(true);
+    } catch (err) {
+      console.error('Lỗi khi lấy danh sách học sinh:', err);
+      setStudentsList([]);
+      setShowStudentsModal(true);
+    }
+  };
+
+  const handleRecordResults = async (plan) => {
+    try {
+      console.log('=== DEBUG RECORD RESULTS ===');
+      console.log('Plan:', plan);
+      
+      const res = await apiClient.get(`/VaccinationConsentForm/plan/${plan.id || plan.vaccinationPlanID}`);
+      console.log('Consent forms response:', res.data);
+      
+      // Lọc các học sinh đã xác nhận
+      const confirmed = res.data.filter(f => f.consentStatus === "Approved" && f.studentID);
+      console.log('=== DEBUG CONFIRMED STUDENTS ===');
+      console.log('All consent forms:', res.data);
+      console.log('Confirmed consent forms:', confirmed);
+      console.log('Confirmed count:', confirmed.length);
+      console.log('=== END DEBUG CONFIRMED STUDENTS ===');
+      
+      // Lấy thông tin profile và kết quả tiêm chủng cho từng studentID
+      const studentProfiles = await Promise.all(
+        confirmed.map(async (f) => {
+          try {
+            const profileRes = await apiClient.get(`/Profile/user/${f.studentID}`);
+            
+            // Kiểm tra xem đã có kết quả tiêm chủng trong database chưa
+            let existingResult = null;
+            try {
+              const resultRes = await apiClient.get(`/VaccinationResult/consentform/${f.id || f.ID || f.consentFormID}`);
+              if (resultRes.data) {
+                existingResult = resultRes.data; // API trả về object, không phải array
+                console.log(`Found existing result for student ${f.studentID}:`, existingResult);
+              }
+            } catch (resultErr) {
+              console.log(`No existing result found for student ${f.studentID}:`, resultErr.message);
+            }
+            
+            // Nếu có kết quả trong database, sử dụng dữ liệu đó
+            if (existingResult) {
+              return {
+                userID: f.studentID,
+                name: profileRes.data?.name || profileRes.data?.Name || 'Không rõ tên',
+                classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
+                consentFormID: f.id || f.ID || f.consentFormID,
+                status: f.status || f.statusID || 'Pending',
+                vaccinationStatus: existingResult.vaccinationStatus || existingResult.VaccinationStatus || 'Completed',
+                notes: existingResult.notes || existingResult.Notes || '',
+                actualVaccinationDate: existingResult.actualVaccinationDate || existingResult.ActualVaccinationDate ? 
+                  new Date(existingResult.actualVaccinationDate || existingResult.ActualVaccinationDate).toISOString().split('T')[0] : 
+                  new Date().toISOString().split('T')[0],
+                performer: existingResult.performer || existingResult.Performer || currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định',
+                postVaccinationReaction: existingResult.postVaccinationReaction || existingResult.PostVaccinationReaction || '',
+                postponementReason: existingResult.postponementReason || existingResult.PostponementReason || '',
+                failureReason: existingResult.failureReason || existingResult.FailureReason || '',
+                refusalReason: existingResult.refusalReason || existingResult.RefusalReason || '',
+                needToContactParent: existingResult.needToContactParent || existingResult.NeedToContactParent || false
+              };
+            } else {
+              // Nếu chưa có kết quả, sử dụng default values
+              return {
+                userID: f.studentID,
+                name: profileRes.data?.name || profileRes.data?.Name || 'Không rõ tên',
+                classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
+                consentFormID: f.id || f.ID || f.consentFormID,
+                status: f.status || f.statusID || 'Pending',
+                vaccinationStatus: 'Completed', // Default status
+                notes: '',
+                actualVaccinationDate: new Date().toISOString().split('T')[0], // Default to today
+                performer: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định',
+                postVaccinationReaction: '',
+                postponementReason: '',
+                failureReason: '',
+                refusalReason: '',
+                needToContactParent: false
+              };
+            }
+          } catch {
+            return {
+              userID: f.studentID,
+              name: 'Không rõ tên',
+              classID: 'Không rõ',
+              consentFormID: f.id || f.ID || f.consentFormID,
+              status: f.status || f.statusID || 'Pending',
+              vaccinationStatus: 'Completed', // Default status
+              notes: '',
+              actualVaccinationDate: new Date().toISOString().split('T')[0], // Default to today
+              performer: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định',
+              postVaccinationReaction: '',
+              postponementReason: '',
+              failureReason: '',
+              refusalReason: '',
+              needToContactParent: false
+            };
+          }
+        })
+      );
+      console.log('Student profiles created:', studentProfiles);
+      
+      // Kiểm tra xem có học sinh nào đã có dữ liệu trong database không
+      const studentsWithData = studentProfiles.filter(student => 
+        student.vaccinationStatus !== 'Completed' || 
+        student.notes || 
+        student.postVaccinationReaction || 
+        student.postponementReason || 
+        student.failureReason || 
+        student.refusalReason
+      );
+      
+      if (studentsWithData.length > 0) {
+        console.log('Found students with existing data:', studentsWithData);
+        setNotifyMessage(`Đã tìm thấy ${studentsWithData.length} học sinh có dữ liệu đã lưu. Dữ liệu sẽ được hiển thị trong form.`);
+        setTimeout(() => setNotifyMessage(''), 3000);
+      }
+      
+      setSelectedPlan(plan);
+      setRecordResultsList(studentProfiles);
+      setShowRecordResultsModal(true);
+      
+      // Không refresh data ở đây để tránh mất thống kê đã tính
+      console.log('=== RECORD RESULTS MODAL DEBUG ===');
+      console.log('Student profiles count:', studentProfiles.length);
+      console.log('Student profiles:', studentProfiles);
+      console.log('=== END RECORD RESULTS MODAL DEBUG ===');
+    } catch (err) {
+      console.error('Lỗi khi lấy danh sách học sinh để ghi nhận kết quả:', err);
+      setRecordResultsList([]);
+      setShowRecordResultsModal(true);
+    }
+  };
+
+  const handleSaveVaccinationResults = async () => {
+    try {
+      console.log('=== DEBUG SAVE VACCINATION RESULTS ===');
+      console.log('recordResultsList:', recordResultsList);
+      console.log('selectedPlan:', selectedPlan);
+      
+      const resultsToSave = recordResultsList.map((student, index) => {
+        console.log(`Processing student ${index}:`, student);
+        console.log(`Student ${index} details:`, {
+          consentFormID: student.consentFormID,
+          vaccinationStatus: student.vaccinationStatus,
+          actualVaccinationDate: student.actualVaccinationDate,
+          performer: student.performer,
+          postVaccinationReaction: student.postVaccinationReaction,
+          notes: student.notes
+        });
+        const result = {
+          ConsentFormID: student.consentFormID, // Chú ý: viết hoa chữ cái đầu
+          VaccineTypeID: selectedPlan?.vaccineTypeID || selectedPlan?.VaccineTypeID || selectedPlan?.vaccineType?.id || selectedPlan?.VaccineType?.ID || 'VC0001', // Default vaccine type
+          ActualVaccinationDate: student.vaccinationStatus === 'Completed' ? student.actualVaccinationDate : null,
+          Performer: student.vaccinationStatus === 'Completed' ? student.performer : null,
+          PostVaccinationReaction: student.vaccinationStatus === 'Completed' ? student.postVaccinationReaction : null,
+          Notes: student.notes,
+          NeedToContactParent: student.needToContactParent || false,
+          VaccinationStatus: student.vaccinationStatus || 'Completed', // Default to Completed if not set
+          PostponementReason: student.vaccinationStatus === 'Postponed' ? student.postponementReason : null,
+          FailureReason: student.vaccinationStatus === 'Failed' ? student.failureReason : null,
+          RefusalReason: student.vaccinationStatus === 'Refused' ? student.refusalReason : null,
+          RecordedBy: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định'
+        };
+        console.log('Result to save:', result);
+        return result;
+      });
+
+      console.log('All results to save:', resultsToSave);
+
+      // Save each result
+      console.log('Sending requests to:', '/VaccinationResult/record');
+      
+      // Kiểm tra xem backend có hoạt động không
+      try {
+        console.log('Testing backend connection...');
+        const testResponse = await apiClient.get('/VaccinationResult');
+        console.log('Backend is working, vaccination results:', testResponse.data);
+        
+        // Kiểm tra vaccine types
+        const vaccineResponse = await apiClient.get('/VaccineType');
+        console.log('Available vaccine types:', vaccineResponse.data);
+      } catch (error) {
+        console.error('Backend connection test failed:', error);
+        alert('Không thể kết nối đến backend. Vui lòng kiểm tra lại!');
+        return;
+      }
+      
+      // Thử gọi từng API một thay vì Promise.all
+      for (let i = 0; i < resultsToSave.length; i++) {
+        const result = resultsToSave[i];
+        try {
+          console.log(`Sending result ${i + 1}:`, result);
+          console.log(`Result ${i + 1} details:`, {
+            ConsentFormID: result.ConsentFormID,
+            VaccineTypeID: result.VaccineTypeID,
+            VaccinationStatus: result.VaccinationStatus,
+            ActualVaccinationDate: result.ActualVaccinationDate,
+            Performer: result.Performer,
+            PostVaccinationReaction: result.PostVaccinationReaction,
+            Notes: result.Notes,
+            RecordedBy: result.RecordedBy,
+            PostponementReason: result.PostponementReason,
+            FailureReason: result.FailureReason,
+            RefusalReason: result.RefusalReason
+          });
+          
+          // Thử gọi API với dữ liệu đơn giản hơn
+          const simpleResult = {
+            ConsentFormID: result.ConsentFormID,
+            VaccineTypeID: result.VaccineTypeID,
+            VaccinationStatus: result.VaccinationStatus,
+            ActualVaccinationDate: result.ActualVaccinationDate,
+            Performer: result.Performer,
+            Notes: result.Notes || '',
+            RecordedBy: result.RecordedBy
+          };
+          
+          // Validate dữ liệu trước khi gửi
+          if (!simpleResult.ConsentFormID) {
+            throw new Error('ConsentFormID is required');
+          }
+          if (!simpleResult.VaccineTypeID) {
+            throw new Error('VaccineTypeID is required');
+          }
+          if (!simpleResult.VaccinationStatus) {
+            throw new Error('VaccinationStatus is required');
+          }
+          if (simpleResult.VaccinationStatus === "Completed" && !simpleResult.ActualVaccinationDate) {
+            throw new Error('ActualVaccinationDate is required for completed vaccinations');
+          }
+          
+          console.log(`Simple result ${i + 1}:`, simpleResult);
+          console.log('Full URL will be:', apiClient.defaults.baseURL + '/VaccinationResult/record');
+          
+          // Gửi đầy đủ dữ liệu thay vì chỉ tối thiểu
+          const fullResult = {
+            ConsentFormID: simpleResult.ConsentFormID,
+            VaccineTypeID: simpleResult.VaccineTypeID,
+            VaccinationStatus: simpleResult.VaccinationStatus,
+            ActualVaccinationDate: simpleResult.ActualVaccinationDate,
+            Performer: simpleResult.Performer,
+            PostVaccinationReaction: result.PostVaccinationReaction, // Lấy từ result gốc
+            Notes: simpleResult.Notes,
+            RecordedBy: simpleResult.RecordedBy,
+            // Thêm các trường reason theo status
+            PostponementReason: result.PostponementReason,
+            FailureReason: result.FailureReason,
+            RefusalReason: result.RefusalReason
+          };
+          
+          // Đảm bảo các trường không bị undefined
+          if (fullResult.Performer === undefined || fullResult.Performer === null) {
+            fullResult.Performer = '';
+          }
+          if (fullResult.PostVaccinationReaction === undefined || fullResult.PostVaccinationReaction === null) {
+            fullResult.PostVaccinationReaction = '';
+          }
+          if (fullResult.Notes === undefined || fullResult.Notes === null) {
+            fullResult.Notes = '';
+          }
+          if (fullResult.PostponementReason === undefined || fullResult.PostponementReason === null) {
+            fullResult.PostponementReason = '';
+          }
+          if (fullResult.FailureReason === undefined || fullResult.FailureReason === null) {
+            fullResult.FailureReason = '';
+          }
+          if (fullResult.RefusalReason === undefined || fullResult.RefusalReason === null) {
+            fullResult.RefusalReason = '';
+          }
+          
+          // Thêm ActualVaccinationDate nếu status là Completed
+          if (fullResult.VaccinationStatus === "Completed") {
+            // Đảm bảo format ngày đúng
+            const vaccinationDate = fullResult.ActualVaccinationDate || new Date().toISOString().split('T')[0];
+            fullResult.ActualVaccinationDate = vaccinationDate + 'T00:00:00'; // Thêm time để đảm bảo format đúng
+          } else {
+            // Nếu không phải Completed thì set null
+            fullResult.ActualVaccinationDate = null;
+          }
+          
+          // Validate fullResult
+          if (!fullResult.ConsentFormID) {
+            throw new Error('ConsentFormID is required');
+          }
+          if (!fullResult.VaccineTypeID) {
+            throw new Error('VaccineTypeID is required');
+          }
+          if (!fullResult.VaccinationStatus) {
+            throw new Error('VaccinationStatus is required');
+          }
+          
+          // Validate theo từng status
+          if (fullResult.VaccinationStatus === "Completed") {
+            if (!fullResult.ActualVaccinationDate) {
+              throw new Error('ActualVaccinationDate is required for completed vaccinations');
+            }
+            if (!fullResult.Performer) {
+              throw new Error('Performer is required for completed vaccinations');
+            }
+          }
+          
+          if (fullResult.VaccinationStatus === "Postponed" && !fullResult.PostponementReason) {
+            throw new Error('Postponement reason is required for postponed vaccinations');
+          }
+          
+          if (fullResult.VaccinationStatus === "Failed" && !fullResult.FailureReason) {
+            throw new Error('Failure reason is required for failed vaccinations');
+          }
+          
+          if (fullResult.VaccinationStatus === "Refused" && !fullResult.RefusalReason) {
+            throw new Error('Refusal reason is required for refused vaccinations');
+          }
+          
+          console.log('Full result:', fullResult);
+          console.log('Full result JSON:', JSON.stringify(fullResult, null, 2));
+          
+          // Kiểm tra dữ liệu trước khi gửi
+          console.log('Data validation:', {
+            hasConsentFormID: !!fullResult.ConsentFormID,
+            hasVaccineTypeID: !!fullResult.VaccineTypeID,
+            hasVaccinationStatus: !!fullResult.VaccinationStatus,
+            hasActualVaccinationDate: !!fullResult.ActualVaccinationDate,
+            hasPerformer: !!fullResult.Performer,
+            hasPostVaccinationReaction: !!fullResult.PostVaccinationReaction,
+            hasNotes: !!fullResult.Notes,
+            hasRecordedBy: !!fullResult.RecordedBy,
+            hasPostponementReason: !!fullResult.PostponementReason,
+            hasFailureReason: !!fullResult.FailureReason,
+            hasRefusalReason: !!fullResult.RefusalReason
+          });
+          
+          const response = await apiClient.post('/VaccinationResult/record', fullResult);
+          console.log(`Result ${i + 1} saved successfully:`, response.data);
+        } catch (error) {
+          console.error(`Error saving result ${i + 1}:`, error);
+          console.error('Error details:', error.response?.data);
+          console.error('Error status:', error.response?.status);
+          console.error('Error message:', error.message);
+          console.error('Error config:', error.config);
+          throw error;
+        }
+      }
+      
+      // Show success message
+      setShowRecordResultsModal(false);
+      setRecordResultsList([]);
+      
+      // Refresh data để cập nhật thống kê
+      console.log('Refreshing data after successful vaccination result save...');
+      await fetchData();
+      
+      // Show success notification
+      setNotifyMessage('Ghi nhận kết quả tiêm chủng thành công!');
+      setTimeout(() => {
+        setNotifyMessage('');
+      }, 3000);
+    } catch (error) {
+      console.error('Lỗi khi ghi nhận kết quả tiêm chủng:', error);
+      
+      // Hiển thị thông báo lỗi chi tiết
+      let errorMessage = 'Có lỗi xảy ra khi ghi nhận kết quả tiêm chủng!';
+      
+      if (error.response?.data) {
+        errorMessage = error.response.data;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Show error notification
+      setNotifyMessage(`Lỗi: ${errorMessage}`);
+      setTimeout(() => {
+        setNotifyMessage('');
+      }, 5000);
+    }
+  };
+
+  const handleVaccinationStatusChange = (index, newStatus) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].vaccinationStatus = newStatus;
+    setRecordResultsList(updatedList);
+  };
+
+  const handleVaccinationNotesChange = (index, notes) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].notes = notes;
+    setRecordResultsList(updatedList);
+  };
+
+  const handleVaccinationDateChange = (index, date) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].actualVaccinationDate = date;
+    setRecordResultsList(updatedList);
+  };
+
+  const handlePerformerChange = (index, performer) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].performer = performer;
+    setRecordResultsList(updatedList);
+  };
+
+  const handlePostVaccinationReactionChange = (index, reaction) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].postVaccinationReaction = reaction;
+    setRecordResultsList(updatedList);
+  };
+
+  const handlePostponementReasonChange = (index, reason) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].postponementReason = reason;
+    setRecordResultsList(updatedList);
+  };
+
+  const handleFailureReasonChange = (index, reason) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].failureReason = reason;
+    setRecordResultsList(updatedList);
+  };
+
+  const handleRefusalReasonChange = (index, reason) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].refusalReason = reason;
+    setRecordResultsList(updatedList);
+  };
+
+  const handleNeedToContactParentChange = (index, needContact) => {
+    const updatedList = [...recordResultsList];
+    updatedList[index].needToContactParent = needContact;
+    setRecordResultsList(updatedList);
+  };
+
+  const handleOpenVaccinationModal = async (index) => {
+    try {
+      // Refresh data trước khi mở modal để đảm bảo dữ liệu mới nhất
+      await fetchData();
+      
+      setSelectedStudentIndex(index);
+      setShowVaccinationDetailModal(true);
+    } catch (error) {
+      console.error('Error refreshing data before opening modal:', error);
+      setSelectedStudentIndex(index);
+      setShowVaccinationDetailModal(true);
+    }
+  };
+
+  const handleSaveVaccinationDetail = async () => {
+    setShowVaccinationDetailModal(false);
+    setSelectedStudentIndex(null);
+    
+    // Refresh data sau khi đóng modal
+    try {
+      await fetchData();
+    } catch (error) {
+      console.error('Error refreshing data after closing modal:', error);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -347,24 +963,30 @@ const VaccinationManagement = () => {
   const handleEditPlan = (plan) => {
     console.log('plan object:', plan);
     const setEditData = (vaccineListData) => {
-      console.log('plan.planName:', plan.PlanName);
+      // Lấy tên vaccine từ plan, có thể là planName, PlanName, hoặc vaccineName
+      const planVaccineName = plan.planName || plan.PlanName || plan.vaccineName || plan.VaccineName || '';
+      console.log('plan vaccine name:', planVaccineName);
       console.log('vaccineList:', vaccineListData.map(v => v.vaccineName || v.VaccineName));
+      
       let matchedVaccine = '';
-      if (vaccineListData.length > 0) {
+      if (vaccineListData.length > 0 && planVaccineName) {
         const found = vaccineListData.find(
-          v => normalize(v.vaccineName || v.VaccineName) === normalize(plan.PlanName)
+          v => normalize(v.vaccineName || v.VaccineName) === normalize(planVaccineName)
         );
-        matchedVaccine = found ? (found.vaccineName || found.VaccineName) : plan.PlanName;
+        matchedVaccine = found ? (found.vaccineName || found.VaccineName) : planVaccineName;
       } else {
-        matchedVaccine = plan.PlanName;
+        matchedVaccine = planVaccineName;
       }
+      
+      console.log('matched vaccine:', matchedVaccine);
+      
       setEditFormData({
         id: plan.id,
         PlanName: matchedVaccine,
         ScheduledDate: plan.scheduledDate ? plan.scheduledDate.slice(0, 10) : '',
-        Description: plan.description,
-        Status: plan.status,
-        Grade: plan.grade || 'Toàn trường',
+        Description: plan.description || plan.Description || '',
+        Status: plan.status || plan.Status || 'Active',
+        Grade: plan.grade || plan.Grade || 'Toàn trường',
       });
       setShowEditModal(true);
     };
@@ -552,9 +1174,46 @@ const VaccinationManagement = () => {
   return (
     <div className="vaccination-management-container">
       <div className="vaccination-header">
-        <h1>Quản lý tiêm chủng</h1>
-        <p>Lên kế hoạch và quản lý tiêm chủng cho học sinh</p>
-        {notifyMessage && <div className="notification-message">{notifyMessage}</div>}
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <h1>Quản lý tiêm chủng</h1>
+            <p>Lên kế hoạch và quản lý tiêm chủng cho học sinh</p>
+          </div>
+          <button 
+            className="btn btn-primary" 
+            onClick={fetchData}
+            disabled={loading}
+          >
+            <i className="fas fa-sync-alt"></i> Làm mới
+          </button>
+        </div>
+        {notifyMessage && (
+          <div style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 10000,
+            padding: '16px 24px',
+            borderRadius: '12px',
+            background: notifyMessage.includes('thành công') 
+              ? 'linear-gradient(135deg, #10b981, #059669)' 
+              : 'linear-gradient(135deg, #ef4444, #dc2626)',
+            color: 'white',
+            fontSize: '0.95rem',
+            fontWeight: '600',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            minWidth: '300px',
+            maxWidth: '400px',
+            animation: 'slideInRight 0.3s ease-out'
+          }}>
+            <i className={`fas ${notifyMessage.includes('thành công') ? 'fa-check-circle' : 'fa-exclamation-triangle'}`} 
+               style={{ fontSize: '1.2rem' }}></i>
+            <span>{notifyMessage}</span>
+          </div>
+        )}
       </div>
 
       {/* Thống kê */}
@@ -571,8 +1230,8 @@ const VaccinationManagement = () => {
         <div className="col-md-3">
           <div className="card health-stat-card">
             <div className="card-body">
-              <h5 className="card-title">Đã tiêm</h5>
-              <p className="card-number">{completed}</p>
+              <h5 className="card-title">Đã xác nhận</h5>
+              <p className="card-number">{confirmed}</p>
               <p className="card-text">Học sinh</p>
             </div>
           </div>
@@ -580,8 +1239,8 @@ const VaccinationManagement = () => {
         <div className="col-md-3">
           <div className="card health-stat-card">
             <div className="card-body">
-              <h5 className="card-title">Chờ tiêm</h5>
-              <p className="card-number">{pending}</p>
+              <h5 className="card-title">Đã tiêm</h5>
+              <p className="card-number">{completed}</p>
               <p className="card-text">Học sinh</p>
             </div>
           </div>
@@ -693,7 +1352,8 @@ const VaccinationManagement = () => {
               <div className="plan-target">
                 <h4>Đối tượng</h4>
                 <p><strong>Khối:</strong> {plan.grade || 'Toàn trường'}</p>
-                        </div>
+                <p><strong>Vaccine:</strong> {plan.planName || plan.PlanName || 'Không xác định'}</p>
+              </div>
               </div>
 
               <div className="plan-stats">
@@ -706,6 +1366,8 @@ const VaccinationManagement = () => {
                   <div className="stat-item">
                     <span className="stat-label">Đã xác nhận:</span>
                     <span className="stat-value confirmed">{plan.confirmedCount || 0}</span>
+                    {/* Debug info */}
+                    <small style={{display: 'none'}}>Debug: {JSON.stringify({confirmedCount: plan.confirmedCount, totalStudents: plan.totalStudents})}</small>
                   </div>
                   <div className="stat-item">
                     <span className="stat-label">Chờ phản hồi:</span>
@@ -878,7 +1540,9 @@ const VaccinationManagement = () => {
               </h3>
               <button 
                 className="close-btn"
-                onClick={() => setShowDetailsModal(false)}
+                onClick={() => {
+                  setShowDetailsModal(false);
+                }}
               >
                 <i className="fas fa-times"></i>
               </button>
@@ -906,15 +1570,15 @@ const VaccinationManagement = () => {
                 <div className="detail-grid">
                   <div className="detail-item">
                     <label>Tên vaccine:</label>
-                    <span className="highlight-value">{selectedPlan.PlanName}</span>
+                    <span className="highlight-value">{selectedPlan.planName || selectedPlan.PlanName || selectedPlan.vaccineName || selectedPlan.VaccineName || 'Không xác định'}</span>
                   </div>
                   <div className="detail-item">
                     <label>Người tạo:</label>
-                    <span>{selectedPlan?.Creator?.Username || "Không rõ"}</span>
+                    <span>{selectedPlan?.creatorInfo?.username || selectedPlan?.creatorInfo?.Username || selectedPlan?.creatorInfo?.fullName || selectedPlan?.creatorInfo?.FullName || selectedPlan?.Creator?.Username || selectedPlan?.creatorName || selectedPlan?.CreatorName || "Không rõ"}</span>
                   </div>
                   <div className="detail-item">
                     <label>Ngày tạo:</label>
-                    <span>{new Date(selectedPlan.createdDate).toLocaleDateString('vi-VN')}</span>
+                    <span>{selectedPlan.createdDate ? new Date(selectedPlan.createdDate).toLocaleDateString('vi-VN') : 'Không xác định'}</span>
                   </div>
                 </div>
               </div>
@@ -942,13 +1606,27 @@ const VaccinationManagement = () => {
 
               <div className="detail-section">
                 <h4><i className="fas fa-chart-pie"></i> Thống kê tiêm chủng</h4>
+                {/* Debug thống kê */}
+                <div style={{ 
+                  background: '#f0f0f0', 
+                  padding: '10px', 
+                  marginBottom: '10px', 
+                  borderRadius: '5px',
+                  fontSize: '12px',
+                  display: 'none' // Ẩn debug trong production
+                }}>
+                  <strong>DEBUG:</strong> totalStudents={selectedPlan.totalStudents}, 
+                  confirmedCount={selectedPlan.confirmedCount}, 
+                  pendingCount={selectedPlan.pendingCount}, 
+                  completedCount={selectedPlan.completedCount}
+                </div>
                 <div className="vaccination-stats">
                   <div className="stat-card total">
                     <div className="stat-icon">
                       <i className="fas fa-users"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{totalStudents}</div>
+                      <div className="stat-number">{selectedPlan.totalStudents || 0}</div>
                       <div className="stat-label">Tổng học sinh</div>
                     </div>
                   </div>
@@ -958,8 +1636,8 @@ const VaccinationManagement = () => {
                       <i className="fas fa-check-circle"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{completed}</div>
-                      <div className="stat-label">Đã tiêm</div>
+                      <div className="stat-number">{selectedPlan.confirmedCount || 0}</div>
+                      <div className="stat-label">Đã xác nhận</div>
                     </div>
                   </div>
                   
@@ -968,7 +1646,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-clock"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{pending}</div>
+                      <div className="stat-number">{selectedPlan.pendingCount || 0}</div>
                       <div className="stat-label">Chờ phản hồi</div>
                     </div>
                   </div>
@@ -978,7 +1656,7 @@ const VaccinationManagement = () => {
                       <i className="fas fa-syringe"></i>
                     </div>
                     <div className="stat-content">
-                      <div className="stat-number">{completed}</div>
+                      <div className="stat-number">{selectedPlan.completedCount || 0}</div>
                       <div className="stat-label">Đã tiêm</div>
                     </div>
                   </div>
@@ -995,16 +1673,10 @@ const VaccinationManagement = () => {
               )}
               
               <div className="detail-actions">
-                <button className="action-btn view-students" onClick={() => {
-                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.StatusID === 1 || f.ConsentStatus === "Approved").map(f => f.Student);
-                  navigate(`/vaccination-plan/${selectedPlan.id}/students`, { state: { students: confirmedStudents } });
-                }}>
+                <button className="action-btn view-students" onClick={() => handleViewStudents(selectedPlan)}>
                   <i className="fas fa-users"></i> Xem danh sách học sinh
                 </button>
-                <button className="action-btn record-results" onClick={() => {
-                  const confirmedStudents = selectedPlan?.ConsentForms?.filter(f => f.StatusID === 1 || f.ConsentStatus === "Approved").map(f => f.Student);
-                  navigate(`/vaccination-plan/${selectedPlan.id}/record`, { state: { students: confirmedStudents } });
-                }}>
+                <button className="action-btn record-results" onClick={() => handleRecordResults(selectedPlan)}>
                   <i className="fas fa-clipboard-check"></i> Ghi nhận kết quả
                 </button>
               </div>
@@ -1015,26 +1687,91 @@ const VaccinationManagement = () => {
 
       {/* Edit Plan Modal */}
       {showEditModal && (
-        <div className="modal-overlay">
-          <div className="edit-plan-modal" style={{ background: '#f4f8fb', width: '540px', maxWidth: '95%' }}>
-            <div className="modal-header">
-              <h3>Chỉnh sửa kế hoạch tiêm chủng</h3>
+        <div className="modal-overlay" style={{ zIndex: 10001 }}>
+          <div style={{
+            background: '#fff',
+            width: '95%',
+            maxWidth: '600px',
+            margin: '20px auto',
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            overflow: 'hidden',
+            animation: 'slideInUp 0.3s ease',
+            maxHeight: '95vh'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '16px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: 'white'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <i className="fas fa-edit" style={{ fontSize: '1.5rem' }}></i>
+                <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '600' }}>
+                  Chỉnh sửa kế hoạch tiêm chủng
+                </h3>
+              </div>
               <button
-                className="close-btn"
                 onClick={() => setShowEditModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.transform = 'scale(1.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.transform = 'scale(1)';
+                }}
               >
                 <i className="fas fa-times"></i>
               </button>
             </div>
+
+            {/* Body */}
             <form onSubmit={handleUpdatePlan}>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label>Tên kế hoạch (Tên vaccine):</label>
+              <div style={{ padding: '20px 24px', maxHeight: '60vh', overflowY: 'auto' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    fontSize: '0.95rem'
+                  }}>
+                    <i className="fas fa-syringe" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                    Tên kế hoạch (Tên vaccine):
+                  </label>
                   <select
                     name="PlanName"
                     value={editFormData.PlanName ?? ""}
                     onChange={e => setEditFormData({ ...editFormData, PlanName: e.target.value })}
                     required
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '2px solid #e5e7eb',
+                      fontSize: '0.95rem',
+                      background: '#fff',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                   >
                     <option value="">Chọn vaccine...</option>
                     {vaccineList.map(v => (
@@ -1042,33 +1779,98 @@ const VaccinationManagement = () => {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Ngày dự kiến:</label>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    fontSize: '0.95rem'
+                  }}>
+                    <i className="fas fa-calendar-alt" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                    Ngày dự kiến:
+                  </label>
                   <input
                     type="date"
                     name="ScheduledDate"
                     value={editFormData.ScheduledDate ?? ""}
                     onChange={e => setEditFormData({ ...editFormData, ScheduledDate: e.target.value })}
                     required
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '2px solid #e5e7eb',
+                      fontSize: '0.95rem',
+                      background: '#fff',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                   />
                 </div>
-                <div className="form-group">
-                  <label>Mô tả:</label>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    fontSize: '0.95rem'
+                  }}>
+                    <i className="fas fa-file-alt" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                    Mô tả:
+                  </label>
                   <textarea
                     name="Description"
                     value={editFormData.Description ?? ""}
                     onChange={e => setEditFormData({ ...editFormData, Description: e.target.value })}
-                    rows="3"
+                    rows="4"
                     required
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '2px solid #e5e7eb',
+                      fontSize: '0.95rem',
+                      background: '#fff',
+                      resize: 'vertical',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                   />
                 </div>
-                <div className="form-group">
-                  <label>Trạng thái:</label>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    fontSize: '0.95rem'
+                  }}>
+                    <i className="fas fa-info-circle" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                    Trạng thái:
+                  </label>
                   <select
                     name="Status"
                     value={editFormData.Status ?? ""}
                     onChange={e => setEditFormData({ ...editFormData, Status: e.target.value })}
                     required
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '2px solid #e5e7eb',
+                      fontSize: '0.95rem',
+                      background: '#fff',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                   >
                     <option value="Active">Đang thực hiện</option>
                     <option value="Pending">Chờ thực hiện</option>
@@ -1076,13 +1878,34 @@ const VaccinationManagement = () => {
                     <option value="Cancelled">Đã hủy</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Khối:</label>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    fontSize: '0.95rem'
+                  }}>
+                    <i className="fas fa-graduation-cap" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                    Khối:
+                  </label>
                   <select
                     name="Grade"
                     value={editFormData.Grade}
                     onChange={e => setEditFormData({ ...editFormData, Grade: e.target.value })}
                     required
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '2px solid #e5e7eb',
+                      fontSize: '0.95rem',
+                      background: '#fff',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                   >
                     {gradeOptions.map(opt => (
                       <option key={opt} value={opt}>{opt}</option>
@@ -1090,19 +1913,72 @@ const VaccinationManagement = () => {
                   </select>
                 </div>
               </div>
-              <div className="modal-actions">
+
+              {/* Footer */}
+              <div style={{
+                padding: '16px 24px',
+                background: '#f9fafb',
+                borderTop: '1px solid #e5e7eb',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '16px'
+              }}>
                 <button
                   type="button"
-                  className="cancel-btn"
                   onClick={() => setShowEditModal(false)}
+                  style={{
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    border: '2px solid #d1d5db',
+                    background: '#ffffff',
+                    color: '#6b7280',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#f3f4f6';
+                    e.target.style.borderColor = '#9ca3af';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#ffffff';
+                    e.target.style.borderColor = '#d1d5db';
+                  }}
                 >
+                  <i className="fas fa-times" style={{ marginRight: '8px' }}></i>
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="submit-btn"
                   disabled={loading}
+                  style={{
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: '#ffffff',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 6px rgba(102, 126, 234, 0.3)',
+                    opacity: loading ? 0.7 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.target.style.transform = 'translateY(-1px)';
+                      e.target.style.boxShadow = '0 6px 8px rgba(102, 126, 234, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 6px rgba(102, 126, 234, 0.3)';
+                    }
+                  }}
                 >
+                  <i className="fas fa-save" style={{ marginRight: '8px' }}></i>
                   {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
                 </button>
               </div>
@@ -1614,6 +2490,916 @@ const VaccinationManagement = () => {
         </div>
       )}
 
+      {/* Modal danh sách học sinh */}
+      {showStudentsModal && (
+        <div className="modal-overlay" style={{ zIndex: 10001 }}>
+          <div style={{
+            background: '#fff',
+            width: '90%',
+            maxWidth: '800px',
+            margin: '50px auto',
+            borderRadius: '12px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            overflow: 'hidden',
+            maxHeight: '80vh'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '20px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: 'white'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <i className="fas fa-users" style={{ fontSize: '1.5rem' }}></i>
+                <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '600' }}>
+                  Danh sách học sinh đã xác nhận tiêm chủng
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowStudentsModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.transform = 'scale(1.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '24px', maxHeight: '60vh', overflowY: 'auto' }}>
+              {studentsList.length === 0 ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '40px 20px',
+                  color: '#6b7280'
+                }}>
+                  <i className="fas fa-user-times" style={{ fontSize: '3rem', marginBottom: '16px', color: '#d1d5db' }}></i>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '500' }}>
+                    Không có học sinh nào đã xác nhận tiêm chủng
+                  </div>
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    background: '#fff',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <thead style={{
+                      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                      borderBottom: '2px solid #e2e8f0'
+                    }}>
+                      <tr>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>STT</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Mã học sinh</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Họ tên</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Lớp</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {studentsList.map((student, idx) => (
+                        <tr key={student?.userID || idx} style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => e.target.parentElement.style.backgroundColor = '#f8fafc'}
+                        onMouseLeave={(e) => e.target.parentElement.style.backgroundColor = '#fff'}
+                        >
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '500',
+                            color: '#6b7280'
+                          }}>{idx + 1}</td>
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '600',
+                            color: '#374151'
+                          }}>{student?.userID || 'Không rõ'}</td>
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '500',
+                            color: '#374151'
+                          }}>{student?.name || 'Không rõ tên'}</td>
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '500',
+                            color: '#6b7280'
+                          }}>{student?.classID || 'Không rõ'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '20px 24px',
+              background: '#f9fafb',
+              borderTop: '1px solid #e5e7eb',
+              display: 'flex',
+              justifyContent: 'flex-end'
+            }}>
+              <button
+                onClick={() => setShowStudentsModal(false)}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: '2px solid #d1d5db',
+                  background: '#ffffff',
+                  color: '#6b7280',
+                  fontSize: '0.95rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#f3f4f6';
+                  e.target.style.borderColor = '#9ca3af';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ffffff';
+                  e.target.style.borderColor = '#d1d5db';
+                }}
+              >
+                <i className="fas fa-times" style={{ marginRight: '8px' }}></i>
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal ghi nhận kết quả tiêm chủng */}
+      {showRecordResultsModal && (
+        <div className="modal-overlay" style={{ zIndex: 10001 }}>
+          <div style={{
+            background: '#fff',
+            width: '95%',
+            maxWidth: '1000px',
+            margin: '30px auto',
+            borderRadius: '12px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            overflow: 'hidden',
+            maxHeight: '90vh'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '20px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: 'white'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <i className="fas fa-clipboard-check" style={{ fontSize: '1.5rem' }}></i>
+                <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '600' }}>
+                  Ghi nhận kết quả tiêm chủng
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowRecordResultsModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.transform = 'scale(1.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '24px', maxHeight: '70vh', overflowY: 'auto' }}>
+              {recordResultsList.length === 0 ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '40px 20px',
+                  color: '#6b7280'
+                }}>
+                  <i className="fas fa-user-times" style={{ fontSize: '3rem', marginBottom: '16px', color: '#d1d5db' }}></i>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '500' }}>
+                    Không có học sinh nào đã xác nhận tiêm chủng
+                  </div>
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    background: '#fff',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <thead style={{
+                      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                      borderBottom: '2px solid #e2e8f0'
+                    }}>
+                      <tr>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>STT</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Mã học sinh</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Tên Học Sinh</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'center',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Trạng Thái</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Hành Động</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recordResultsList.map((student, idx) => (
+                        <tr key={student?.userID || idx} style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => e.target.parentElement.style.backgroundColor = '#f8fafc'}
+                        onMouseLeave={(e) => e.target.parentElement.style.backgroundColor = '#fff'}
+                        >
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '500',
+                            color: '#6b7280'
+                          }}>{idx + 1}</td>
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '600',
+                            color: '#374151'
+                          }}>{student?.userID || 'Không rõ'}</td>
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '500',
+                            color: '#374151'
+                          }}>{student?.name || 'Không rõ tên'}</td>
+                          <td style={{
+                            padding: '14px 12px',
+                            textAlign: 'center'
+                          }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '0.8rem',
+                              fontWeight: '600',
+                              color: 'white',
+                              backgroundColor: getVaccinationStatusColor(student?.vaccinationStatus),
+                              display: 'inline-block',
+                              minWidth: '100px',
+                              textAlign: 'center'
+                            }}>
+                              {getVaccinationStatusText(student?.vaccinationStatus)}
+                            </span>
+                          </td>
+                          <td style={{
+                            padding: '14px 12px'
+                          }}>
+                            <button
+                              onClick={() => handleOpenVaccinationModal(idx)}
+                              style={{
+                                padding: '8px 16px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                color: 'white',
+                                fontSize: '0.9rem',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 4px rgba(102, 126, 234, 0.3)'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.transform = 'translateY(-1px)';
+                                e.target.style.boxShadow = '0 4px 6px rgba(102, 126, 234, 0.4)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = '0 2px 4px rgba(102, 126, 234, 0.3)';
+                              }}
+                            >
+                              <i className="fas fa-edit" style={{ marginRight: '6px' }}></i>
+                              Ghi nhận
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '20px 24px',
+              background: '#f9fafb',
+              borderTop: '1px solid #e5e7eb',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>
+                Tổng cộng: <strong>{recordResultsList.length}</strong> học sinh
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setShowRecordResultsModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    border: '2px solid #d1d5db',
+                    background: '#ffffff',
+                    color: '#6b7280',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#f3f4f6';
+                    e.target.style.borderColor = '#9ca3af';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#ffffff';
+                    e.target.style.borderColor = '#d1d5db';
+                  }}
+                >
+                  <i className="fas fa-times" style={{ marginRight: '8px' }}></i>
+                  Hủy
+                </button>
+                <button
+                  onClick={handleSaveVaccinationResults}
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: '#ffffff',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 6px rgba(102, 126, 234, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-1px)';
+                    e.target.style.boxShadow = '0 6px 8px rgba(102, 126, 234, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 6px rgba(102, 126, 234, 0.3)';
+                  }}
+                >
+                  <i className="fas fa-save" style={{ marginRight: '8px' }}></i>
+                  Lưu kết quả
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal chi tiết ghi nhận kết quả tiêm chủng */}
+      {showVaccinationDetailModal && selectedStudentIndex !== null && (
+        <div className="modal-overlay" style={{ zIndex: 10002 }}>
+          <div style={{
+            background: '#fff',
+            width: '70%',
+            maxWidth: '500px',
+            margin: '30px auto',
+            borderRadius: '12px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            overflow: 'hidden',
+            maxHeight: '80vh'
+          }}>
+            {/* Header */}
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: 'white'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <i className="fas fa-user-edit" style={{ fontSize: '1.3rem' }}></i>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>
+                  Ghi nhận kết quả tiêm chủng
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowVaccinationDetailModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.transform = 'scale(1.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '20px', maxHeight: '60vh', overflowY: 'auto' }}>
+              {(() => {
+                const student = recordResultsList[selectedStudentIndex];
+                return (
+                  <div>
+                    {/* Thông tin học sinh */}
+                    <div style={{
+                      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      marginBottom: '20px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <h4 style={{ margin: '0 0 12px 0', color: '#374151', fontSize: '1.1rem' }}>
+                        <i className="fas fa-user" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                        Thông tin học sinh
+                      </h4>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div>
+                          <strong>Mã học sinh:</strong> {student?.userID || 'Không rõ'}
+                        </div>
+                        <div>
+                          <strong>Tên học sinh:</strong> {student?.name || 'Không rõ tên'}
+                        </div>
+                        <div>
+                          <strong>Lớp:</strong> {student?.classID || 'Không rõ'}
+                        </div>
+                        <div>
+                          <strong>Trạng thái hiện tại:</strong>
+                          <span style={{
+                            marginLeft: '8px',
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            color: 'white',
+                            backgroundColor: getVaccinationStatusColor(student?.vaccinationStatus),
+                            display: 'inline-block'
+                          }}>
+                            {getVaccinationStatusText(student?.vaccinationStatus)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                                         {/* Form ghi nhận kết quả */}
+                     <form>
+                       {/* Trạng thái tiêm chủng */}
+                       <div style={{ marginBottom: '16px' }}>
+                         <label style={{
+                           display: 'block',
+                           marginBottom: '8px',
+                           fontWeight: '600',
+                           color: '#374151'
+                         }}>
+                           <i className="fas fa-clipboard-check" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                           Trạng thái tiêm chủng *
+                         </label>
+                         <select
+                           style={{
+                             width: '100%',
+                             padding: '10px',
+                             borderRadius: '8px',
+                             border: '1px solid #d1d5db',
+                             fontSize: '0.95rem',
+                             background: '#fff'
+                           }}
+                           value={student.vaccinationStatus || 'Completed'}
+                           onChange={(e) => handleVaccinationStatusChange(selectedStudentIndex, e.target.value)}
+                         >
+                           <option value="Completed">Đã tiêm thành công</option>
+                           <option value="Failed">Tiêm không thành công</option>
+                           <option value="Postponed">Hoãn tiêm</option>
+                           <option value="Refused">Từ chối tiêm</option>
+                         </select>
+                       </div>
+
+                       {/* Ngày thực tế tiêm - chỉ hiển thị khi Completed */}
+                       {student.vaccinationStatus === 'Completed' && (
+                         <div style={{ marginBottom: '20px' }}>
+                           <label style={{
+                             display: 'block',
+                             marginBottom: '8px',
+                             fontWeight: '600',
+                             color: '#374151'
+                           }}>
+                             <i className="fas fa-calendar-alt" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                             Ngày thực tế tiêm *
+                           </label>
+                           <input
+                             type="date"
+                             style={{
+                               width: '100%',
+                               padding: '12px',
+                               borderRadius: '8px',
+                               border: '1px solid #d1d5db',
+                               fontSize: '1rem',
+                               background: '#fff'
+                             }}
+                             value={student.actualVaccinationDate || ''}
+                             onChange={(e) => handleVaccinationDateChange(selectedStudentIndex, e.target.value)}
+                           />
+                         </div>
+                       )}
+
+                       {/* Người thực hiện tiêm - chỉ hiển thị khi Completed */}
+                       {student.vaccinationStatus === 'Completed' && (
+                         <div style={{ marginBottom: '20px' }}>
+                           <label style={{
+                             display: 'block',
+                             marginBottom: '8px',
+                             fontWeight: '600',
+                             color: '#374151'
+                           }}>
+                             <i className="fas fa-user-md" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                             Người thực hiện tiêm *
+                           </label>
+                           <input
+                             type="text"
+                             placeholder="Nhập tên người thực hiện..."
+                             style={{
+                               width: '100%',
+                               padding: '12px',
+                               borderRadius: '8px',
+                               border: '1px solid #d1d5db',
+                               fontSize: '1rem',
+                               background: '#fff'
+                             }}
+                             value={student.performer || ''}
+                             onChange={(e) => handlePerformerChange(selectedStudentIndex, e.target.value)}
+                           />
+                         </div>
+                       )}
+
+                       {/* Phản ứng sau tiêm - chỉ hiển thị khi Completed */}
+                       {student.vaccinationStatus === 'Completed' && (
+                         <div style={{ marginBottom: '20px' }}>
+                           <label style={{
+                             display: 'block',
+                             marginBottom: '8px',
+                             fontWeight: '600',
+                             color: '#374151'
+                           }}>
+                             <i className="fas fa-exclamation-triangle" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                             Phản ứng sau tiêm
+                           </label>
+                           <textarea
+                             placeholder="Mô tả phản ứng sau tiêm (nếu có)..."
+                             style={{
+                               width: '100%',
+                               padding: '12px',
+                               borderRadius: '8px',
+                               border: '1px solid #d1d5db',
+                               fontSize: '1rem',
+                               background: '#fff',
+                               minHeight: '80px',
+                               resize: 'vertical'
+                             }}
+                             value={student.postVaccinationReaction || ''}
+                             onChange={(e) => handlePostVaccinationReactionChange(selectedStudentIndex, e.target.value)}
+                           />
+                         </div>
+                       )}
+
+                       {/* Lý do hoãn - chỉ hiển thị khi Postponed */}
+                       {student.vaccinationStatus === 'Postponed' && (
+                         <div style={{ marginBottom: '20px' }}>
+                           <label style={{
+                             display: 'block',
+                             marginBottom: '8px',
+                             fontWeight: '600',
+                             color: '#374151'
+                           }}>
+                             <i className="fas fa-clock" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                             Lý do hoãn tiêm *
+                           </label>
+                           <textarea
+                             placeholder="Nhập lý do hoãn tiêm..."
+                             style={{
+                               width: '100%',
+                               padding: '12px',
+                               borderRadius: '8px',
+                               border: '1px solid #d1d5db',
+                               fontSize: '1rem',
+                               background: '#fff',
+                               minHeight: '80px',
+                               resize: 'vertical'
+                             }}
+                             value={student.postponementReason || ''}
+                             onChange={(e) => handlePostponementReasonChange(selectedStudentIndex, e.target.value)}
+                           />
+                         </div>
+                       )}
+
+                       {/* Lý do thất bại - chỉ hiển thị khi Failed */}
+                       {student.vaccinationStatus === 'Failed' && (
+                         <div style={{ marginBottom: '20px' }}>
+                           <label style={{
+                             display: 'block',
+                             marginBottom: '8px',
+                             fontWeight: '600',
+                             color: '#374151'
+                           }}>
+                             <i className="fas fa-times-circle" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                             Lý do tiêm không thành công *
+                           </label>
+                           <textarea
+                             placeholder="Nhập lý do tiêm không thành công..."
+                             style={{
+                               width: '100%',
+                               padding: '12px',
+                               borderRadius: '8px',
+                               border: '1px solid #d1d5db',
+                               fontSize: '1rem',
+                               background: '#fff',
+                               minHeight: '80px',
+                               resize: 'vertical'
+                             }}
+                             value={student.failureReason || ''}
+                             onChange={(e) => handleFailureReasonChange(selectedStudentIndex, e.target.value)}
+                           />
+                         </div>
+                       )}
+
+                       {/* Lý do từ chối - chỉ hiển thị khi Refused */}
+                       {student.vaccinationStatus === 'Refused' && (
+                         <div style={{ marginBottom: '20px' }}>
+                           <label style={{
+                             display: 'block',
+                             marginBottom: '8px',
+                             fontWeight: '600',
+                             color: '#374151'
+                           }}>
+                             <i className="fas fa-ban" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                             Lý do từ chối tiêm *
+                           </label>
+                           <textarea
+                             placeholder="Nhập lý do từ chối tiêm..."
+                             style={{
+                               width: '100%',
+                               padding: '12px',
+                               borderRadius: '8px',
+                               border: '1px solid #d1d5db',
+                               fontSize: '1rem',
+                               background: '#fff',
+                               minHeight: '80px',
+                               resize: 'vertical'
+                             }}
+                             value={student.refusalReason || ''}
+                             onChange={(e) => handleRefusalReasonChange(selectedStudentIndex, e.target.value)}
+                           />
+                         </div>
+                       )}
+
+                       {/* Ghi chú chung */}
+                       <div style={{ marginBottom: '20px' }}>
+                         <label style={{
+                           display: 'block',
+                           marginBottom: '8px',
+                           fontWeight: '600',
+                           color: '#374151'
+                         }}>
+                           <i className="fas fa-comment-alt" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                           Ghi chú chung
+                         </label>
+                         <textarea
+                           placeholder="Nhập ghi chú chung..."
+                           style={{
+                             width: '100%',
+                             padding: '12px',
+                             borderRadius: '8px',
+                             border: '1px solid #d1d5db',
+                             fontSize: '1rem',
+                             background: '#fff',
+                             minHeight: '80px',
+                             resize: 'vertical'
+                           }}
+                           value={student.notes || ''}
+                           onChange={(e) => handleVaccinationNotesChange(selectedStudentIndex, e.target.value)}
+                         />
+                       </div>
+
+                       {/* Cần liên hệ phụ huynh */}
+                       <div style={{ marginBottom: '20px' }}>
+                         <label style={{
+                           display: 'flex',
+                           alignItems: 'center',
+                           marginBottom: '8px',
+                           fontWeight: '600',
+                           color: '#374151',
+                           cursor: 'pointer'
+                         }}>
+                           <input
+                             type="checkbox"
+                             style={{
+                               marginRight: '8px',
+                               transform: 'scale(1.2)'
+                             }}
+                             checked={student.needToContactParent || false}
+                             onChange={(e) => handleNeedToContactParentChange(selectedStudentIndex, e.target.checked)}
+                           />
+                           <i className="fas fa-phone" style={{ marginRight: '8px', color: '#667eea' }}></i>
+                           Cần liên hệ phụ huynh
+                         </label>
+                       </div>
+                     </form>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '16px 20px',
+              background: '#f9fafb',
+              borderTop: '1px solid #e5e7eb',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '10px'
+            }}>
+              <button
+                onClick={() => setShowVaccinationDetailModal(false)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: '2px solid #d1d5db',
+                  background: '#ffffff',
+                  color: '#6b7280',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#f3f4f6';
+                  e.target.style.borderColor = '#9ca3af';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#ffffff';
+                  e.target.style.borderColor = '#d1d5db';
+                }}
+              >
+                <i className="fas fa-times" style={{ marginRight: '8px' }}></i>
+                Hủy
+              </button>
+              <button
+                onClick={handleSaveVaccinationDetail}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: '#ffffff',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 6px rgba(102, 126, 234, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 6px 8px rgba(102, 126, 234, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 6px rgba(102, 126, 234, 0.3)';
+                }}
+              >
+                <i className="fas fa-save" style={{ marginRight: '8px' }}></i>
+                Lưu kết quả
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

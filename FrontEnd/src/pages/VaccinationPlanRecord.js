@@ -45,7 +45,7 @@ const VaccinationPlanRecord = () => {
       try {
         const res = await apiClient.get(`/VaccinationConsentForm/plan/${planId}`);
         // Lọc các học sinh đã xác nhận
-        const confirmed = res.data.filter(f => (f.statusID === 1 || f.consentStatus === "Approved") && f.studentID);
+        const confirmed = res.data.filter(f => f.consentStatus === "Approved" && f.studentID);
         // Lấy thông tin profile cho từng studentID (UserID)
         const studentProfiles = await Promise.all(
           confirmed.map(async (f) => {

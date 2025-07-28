@@ -1,6 +1,6 @@
 using Businessobjects.Models;
 using Repositories.Interfaces;
-using Services.Interfaces; // Add this using directive
+using Services.Interfaces;
 
 namespace Services.Implements
 {
@@ -43,6 +43,11 @@ namespace Services.Implements
             return await _resultRepository.GetVaccinationResultsByVaccineTypeAsync(vaccineTypeId);
         }
 
+        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByPlanAsync(string planId)
+        {
+            return await _resultRepository.GetVaccinationResultsByPlanAsync(planId);
+        }
+
         public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByStudentAsync(string studentId)
         {
             var allResults = await _resultRepository.GetAllVaccinationResultsAsync();
@@ -56,6 +61,12 @@ namespace Services.Implements
             var filtered = allResults.Where(r => r.ConsentForm != null && r.ConsentForm.StudentID == studentId).ToList();
             Console.WriteLine($"[LOG] Số bản ghi sau khi lọc theo studentId={studentId}: {filtered.Count}");
             return filtered;
+        }
+
+        public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByStatusAsync(string status)
+        {
+            var allResults = await _resultRepository.GetAllVaccinationResultsAsync();
+            return allResults.Where(r => r.VaccinationStatus == status).ToList();
         }
 
         public async Task<VaccinationResult> CreateVaccinationResultAsync(VaccinationResult result)
@@ -73,7 +84,7 @@ namespace Services.Implements
             if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeID))
                 throw new KeyNotFoundException("Vaccine type not found");
 
-            if (result.ActualVaccinationDate.Value.Date > DateTime.Today)
+            if (result.ActualVaccinationDate.HasValue && result.ActualVaccinationDate.Value.Date > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for actual vaccination date");
 
             if (string.IsNullOrEmpty(result.ID))
@@ -124,7 +135,7 @@ namespace Services.Implements
             if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(result.VaccineTypeID))
                 throw new KeyNotFoundException("Vaccine type not found");
 
-            if (result.ActualVaccinationDate.Value.Date > DateTime.Today)
+            if (result.ActualVaccinationDate.HasValue && result.ActualVaccinationDate.Value.Date > DateTime.Today)
                 throw new InvalidOperationException("Cannot set future date for actual vaccination date");
 
             await _resultRepository.UpdateVaccinationResultAsync(result);
@@ -136,6 +147,73 @@ namespace Services.Implements
                 throw new KeyNotFoundException("Vaccination result not found");
 
             await _resultRepository.DeleteVaccinationResultAsync(id);
+        }
+
+        public async Task<VaccinationResult> RecordVaccinationResultAsync(VaccinationResultDto resultDto)
+        {
+            // Validate consent form
+            var consentForm = await _consentFormRepository.GetVaccinationConsentFormByIdAsync(resultDto.ConsentFormID);
+            if (consentForm == null)
+                throw new KeyNotFoundException("Vaccination consent form not found");
+
+            if (consentForm.ConsentStatus != "Approved")
+                throw new InvalidOperationException("Cannot record vaccination result for a non-approved consent form");
+
+            // Validate vaccine type
+            if (!await _vaccineTypeRepository.VaccineTypeExistsAsync(resultDto.VaccineTypeID))
+                throw new KeyNotFoundException("Vaccine type not found");
+
+            // Validate vaccination status
+            var validStatuses = new[] { "Completed", "Postponed", "Failed", "Refused" };
+            if (!validStatuses.Contains(resultDto.VaccinationStatus))
+                throw new ArgumentException("Invalid vaccination status");
+
+            // Validate date for completed vaccinations
+            if (resultDto.VaccinationStatus == "Completed")
+            {
+                if (!resultDto.ActualVaccinationDate.HasValue)
+                    throw new ArgumentException("Actual vaccination date is required for completed vaccinations");
+
+                if (resultDto.ActualVaccinationDate.Value.Date > DateTime.Today)
+                    throw new InvalidOperationException("Cannot set future date for actual vaccination date");
+            }
+
+            // Validate reasons based on status
+            if (resultDto.VaccinationStatus == "Postponed" && string.IsNullOrEmpty(resultDto.PostponementReason))
+                throw new ArgumentException("Postponement reason is required for postponed vaccinations");
+
+            if (resultDto.VaccinationStatus == "Failed" && string.IsNullOrEmpty(resultDto.FailureReason))
+                throw new ArgumentException("Failure reason is required for failed vaccinations");
+
+            if (resultDto.VaccinationStatus == "Refused" && string.IsNullOrEmpty(resultDto.RefusalReason))
+                throw new ArgumentException("Refusal reason is required for refused vaccinations");
+
+            // Create or update vaccination result
+            var result = await _resultRepository.CreateOrUpdateVaccinationResultAsync(resultDto);
+
+            // Send notification to parent
+            if (!string.IsNullOrEmpty(consentForm.ParentID))
+            {
+                string statusMessage = resultDto.VaccinationStatus switch
+                {
+                    "Completed" => "đã hoàn thành tiêm chủng",
+                    "Postponed" => "đã được hoãn tiêm chủng",
+                    "Failed" => "tiêm chủng không thành công",
+                    "Refused" => "đã từ chối tiêm chủng",
+                    _ => "có cập nhật về tiêm chủng"
+                };
+
+                var notification = new Notification
+                {
+                    UserID = consentForm.ParentID,
+                    Title = "Cập nhật kết quả tiêm chủng",
+                    Message = $"Học sinh mã {consentForm.StudentID} {statusMessage}. Vui lòng kiểm tra chi tiết trong hệ thống.",
+                    ConsentFormID = consentForm.ID
+                };
+                await _notificationService.CreateNotificationAsync(notification);
+            }
+
+            return result;
         }
     }
 }

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import apiClient from '../services/apiClient';
 import './HealthRecord.css';
 
 const VaccinationPlanStudents = () => {
   const { id: planId } = useParams();
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +14,7 @@ const VaccinationPlanStudents = () => {
       try {
         const res = await apiClient.get(`/VaccinationConsentForm/plan/${planId}`);
         // Lọc các học sinh đã xác nhận
-        const confirmed = res.data.filter(f => (f.statusID === 1 || f.consentStatus === "Approved") && f.studentID);
+        const confirmed = res.data.filter(f => f.consentStatus === "Approved" && f.studentID);
         // Lấy thông tin profile cho từng studentID (UserID)
         const studentProfiles = await Promise.all(
           confirmed.map(async (f) => {
@@ -47,9 +48,40 @@ const VaccinationPlanStudents = () => {
     <div className="main-container" style={{ minHeight: '80vh' }}>
       <div className="main-content">
         <div className="page-header">
-          <div className="page-title">
-            <i className="fas fa-user-check" style={{ color: 'var(--primary-blue)' }}></i>
-            Danh sách học sinh đã xác nhận tiêm chủng
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <button
+              onClick={() => navigate('/vaccination-management')}
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '10px 16px',
+                fontSize: '0.95rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 6px rgba(102, 126, 234, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-1px)';
+                e.target.style.boxShadow = '0 6px 8px rgba(102, 126, 234, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 6px rgba(102, 126, 234, 0.3)';
+              }}
+            >
+              <i className="fas fa-arrow-left"></i>
+              Quay lại
+            </button>
+            <div className="page-title">
+              <i className="fas fa-user-check" style={{ color: 'var(--primary-blue)' }}></i>
+              Danh sách học sinh đã xác nhận tiêm chủng
+            </div>
           </div>
           <div className="page-subtitle">
             Chỉ hiển thị học sinh đã được phụ huynh xác nhận đồng ý tiêm chủng.

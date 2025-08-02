@@ -1662,10 +1662,105 @@ const HealthCheckManagement = () => {
         )}
         <ErrorDialog open={showError} message={error} onClose={() => setShowError(false)} type={errorType} />
         {/* Dialog xác nhận gửi thông báo */}
-        <ErrorDialog open={showConfirm} message={confirmMessage} onClose={() => setShowConfirm(false)} type="info"
-          // Nút xác nhận
-          onConfirm={onConfirm}
-        />
+        {showConfirm && (
+          <div className="error-dialog-overlay" style={{zIndex: 9999}}>
+            <div className="modal-container" style={{maxWidth: 480, padding: 0}}>
+              <div style={{
+                background: 'linear-gradient(135deg, #6366f1, #3b82f6)',
+                borderTopLeftRadius: '12px',
+                borderTopRightRadius: '12px',
+                padding: '20px 28px 16px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                color: 'white'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <i className="fas fa-bell" style={{ fontSize: '1.5rem' }}></i>
+                  <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '600', letterSpacing: '0.5px' }}>
+                    Xác nhận gửi thông báo
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  style={{
+                    background: 'rgba(255,255,255,0.2)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: 'white',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={e => { e.target.style.background = 'rgba(255,255,255,0.3)'; e.target.style.transform = 'scale(1.1)'; }}
+                  onMouseLeave={e => { e.target.style.background = 'rgba(255,255,255,0.2)'; e.target.style.transform = 'scale(1)'; }}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+              <div style={{ padding: '28px 28px 16px 28px', background: '#fff', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 20 }}>
+                  <div style={{
+                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                    borderRadius: '50%',
+                    width: 48,
+                    height: 48,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 16,
+                    flexShrink: 0
+                  }}>
+                    <i className="fas fa-info" style={{ color: '#fff', fontSize: '1.3rem' }}></i>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: 0, color: '#374151', fontSize: '1.05rem', lineHeight: 1.6, fontWeight: 500 }}>
+                      {confirmMessage}
+                    </p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>
+                  <button
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #e5e7eb, #f3f4f6)',
+                      color: '#374151',
+                      fontWeight: 600,
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      marginRight: 4
+                    }}
+                    onClick={() => setShowConfirm(false)}
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
+                      color: 'white',
+                      fontWeight: 600,
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(59,130,246,0.08)'
+                    }}
+                    onClick={() => { setShowConfirm(false); if (onConfirm) onConfirm(); }}
+                  >
+                    Xác nhận
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

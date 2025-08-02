@@ -6,12 +6,26 @@ using Repositories.Interfaces;
 using Services;
 using Services.Interfaces;
 using Services.Implements;
+using BackEnd;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Log environment và configuration
+var environment = builder.Environment.EnvironmentName;
+Console.WriteLine($"🚀 Starting application in {environment} environment");
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add JWT Service
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+// Log JWT settings
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+Console.WriteLine($"🔐 JWT Issuer: {jwtSettings["Issuer"]}");
+Console.WriteLine($"🔐 JWT Audience: {jwtSettings["Audience"]}");
+Console.WriteLine($"🔐 JWT Expiration: {jwtSettings["ExpirationInMinutes"]} minutes");
 
 // Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -89,14 +103,18 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    Console.WriteLine("🔧 Development mode: Swagger UI enabled");
 }
 
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+Console.WriteLine("✅ Application configured successfully!");
 
 app.Run();

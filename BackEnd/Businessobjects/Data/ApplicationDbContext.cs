@@ -21,6 +21,7 @@ namespace Businessobjects.Data
         public DbSet<HealthCheckConsentForm> HealthCheckConsentForms { get; set; }
         public DbSet<HealthCheckResult> HealthCheckResults { get; set; }
         public DbSet<VaccineType> VaccinationTypes { get; set; }
+        public DbSet<VaccineDisease> VaccineDiseases { get; set; }
         public DbSet<VaccinationPlan> VaccinationPlans { get; set; }
         public DbSet<VaccinationConsentForm> VaccinationConsentForms { get; set; }
         public DbSet<VaccinationResult> VaccinationResults { get; set; }
@@ -48,6 +49,7 @@ namespace Businessobjects.Data
             modelBuilder.Entity<HealthCheckConsentForm>().ToTable("Health_Check_Consent_Form");
             modelBuilder.Entity<HealthCheckResult>().ToTable("Health_Check_Result");
             modelBuilder.Entity<VaccineType>().ToTable("Vaccine_Type");
+            modelBuilder.Entity<VaccineDisease>().ToTable("VaccineDisease");
             modelBuilder.Entity<VaccinationPlan>().ToTable("Vaccination_Plan");
             modelBuilder.Entity<VaccinationConsentForm>().ToTable("Vaccination_Consent_Form");
             modelBuilder.Entity<VaccinationResult>().ToTable("Vaccination_Result");
@@ -193,6 +195,13 @@ namespace Businessobjects.Data
                 .WithMany(t => t.VaccinationResults)
                 .HasForeignKey(r => r.VaccineTypeID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Cấu hình relationship giữa VaccineType và VaccineDisease
+            modelBuilder.Entity<VaccineDisease>()
+                .HasOne(d => d.VaccineType)
+                .WithMany(v => v.VaccineDiseases)
+                .HasForeignKey(d => d.VaccinationID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void ConfigureHealthCheckResultRelationships(ModelBuilder modelBuilder)

@@ -18,6 +18,7 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationTypes
                 .Include(v => v.VaccinationResults)
+                .Include(v => v.VaccineDiseases)
                 .ToListAsync();
         }
 
@@ -25,6 +26,7 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationTypes
                 .Include(v => v.VaccinationResults)
+                .Include(v => v.VaccineDiseases)
                 .FirstOrDefaultAsync(v => v.VaccinationID == id);
         }
 

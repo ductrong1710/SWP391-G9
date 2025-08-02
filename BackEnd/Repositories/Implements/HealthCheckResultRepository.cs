@@ -18,9 +18,9 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.HealthCheckPlan)
+                    .ThenInclude(c => c!.HealthCheckPlan)
                 .ToListAsync();
         }
 
@@ -28,9 +28,9 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.HealthCheckPlan)
+                    .ThenInclude(c => c!.HealthCheckPlan)
                 .FirstOrDefaultAsync(r => r.ID == id);
         }
 
@@ -38,9 +38,9 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.HealthCheckPlan)
+                    .ThenInclude(c => c!.HealthCheckPlan)
                 .FirstOrDefaultAsync(r => r.HealthCheckConsentID == consentId);
         }
 
@@ -48,9 +48,9 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.HealthCheckPlan)
+                    .ThenInclude(c => c!.HealthCheckPlan)
                 .Where(r => r.Checker == checker)
                 .OrderByDescending(r => r.CheckUpDate)
                 .ToListAsync();
@@ -60,9 +60,9 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.HealthCheckPlan)
+                    .ThenInclude(c => c!.HealthCheckPlan)
                 .Where(r => r.CheckUpDate >= startDate && r.CheckUpDate <= endDate)
                 .OrderByDescending(r => r.CheckUpDate)
                 .ToListAsync();
@@ -72,9 +72,9 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.HealthCheckPlan)
+                    .ThenInclude(c => c!.HealthCheckPlan)
                 .Where(r => r.NeedToContactParent == true && r.FollowUpDate >= DateTime.Today)
                 .OrderBy(r => r.FollowUpDate)
                 .ToListAsync();
@@ -116,9 +116,9 @@ namespace Repositories.Implements
         {
             return await _context.HealthCheckResults
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.HealthCheckConsent)
-                    .ThenInclude(c => c.HealthCheckPlan)
+                    .ThenInclude(c => c!.HealthCheckPlan)
                 .Where(r => consentIds.Contains(r.HealthCheckConsentID))
                 .ToListAsync();
         }

@@ -220,7 +220,7 @@ export default function Notifications() {
               </button>
             </div>
             
-            <ul className="notifications-list">
+          <ul className="notifications-list">
             {notifications.map((n, idx) => {
               const consentFormId = n.ConsentFormID || n.consentFormID || n.consentformid;
               const uniqueKey = n.notificationID ? n.notificationID : `notif-${idx}`;

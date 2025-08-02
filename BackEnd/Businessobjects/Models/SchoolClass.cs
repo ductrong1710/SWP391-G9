@@ -7,9 +7,9 @@ namespace Businessobjects.Models
     public class SchoolClass
     {
         [Key]
-        public string ClassID { get; set; }
-        public string ClassName { get; set; }
-        public string Grade { get; set; }
+        public required string ClassID { get; set; }
+        public required string ClassName { get; set; }
+        public required string Grade { get; set; }
         // Thêm các trường khác nếu cần
     }
 } 

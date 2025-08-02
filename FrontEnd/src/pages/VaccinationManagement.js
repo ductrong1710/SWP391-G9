@@ -194,7 +194,10 @@ const VaccinationManagement = () => {
 
   useEffect(() => {
     if (showCreateModal) {
-      apiClient.get('/VaccineType').then(res => {
+      console.log('Calling API: /VaccineType/with-diseases (showCreateModal)');
+      apiClient.get('/VaccineType/with-diseases').then(res => {
+        console.log('API Response showCreateModal:', res.data);
+        console.log('First vaccine diseases showCreateModal:', res.data[0]?.diseases);
         setVaccineList(res.data);
       });
     }
@@ -202,7 +205,10 @@ const VaccinationManagement = () => {
 
   useEffect(() => {
     if (showEditModal && vaccineList.length === 0) {
-      apiClient.get('/VaccineType').then(res => {
+      console.log('Calling API: /VaccineType/with-diseases (showEditModal)');
+      apiClient.get('/VaccineType/with-diseases').then(res => {
+        console.log('API Response showEditModal:', res.data);
+        console.log('First vaccine diseases showEditModal:', res.data[0]?.diseases);
         setVaccineList(res.data);
       });
     }
@@ -463,8 +469,8 @@ const VaccinationManagement = () => {
       console.log('=== END PLAN DETAILS DEBUG ===');
       
       // Sử dụng plan hiện tại thay vì fetch lại để tránh mất thống kê đã tính
-      setSelectedPlan(plan);
-      setShowDetailsModal(true);
+    setSelectedPlan(plan);
+    setShowDetailsModal(true);
     } catch (error) {
       console.error('Error opening plan details:', error);
       setSelectedPlan(plan);
@@ -543,12 +549,12 @@ const VaccinationManagement = () => {
             
             // Nếu có kết quả trong database, sử dụng dữ liệu đó
             if (existingResult) {
-              return {
-                userID: f.studentID,
-                name: profileRes.data?.name || profileRes.data?.Name || 'Không rõ tên',
-                classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
+            return {
+              userID: f.studentID,
+              name: profileRes.data?.name || profileRes.data?.Name || 'Không rõ tên',
+              classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
                 consentFormID: f.id || f.ID || f.consentFormID,
-                status: f.status || f.statusID || 'Pending',
+              status: f.status || f.statusID || 'Pending',
                 vaccinationStatus: existingResult.vaccinationStatus || existingResult.VaccinationStatus || 'Pending',
                 notes: existingResult.notes || existingResult.Notes || '',
                 actualVaccinationDate: existingResult.actualVaccinationDate || existingResult.ActualVaccinationDate ? 
@@ -570,15 +576,15 @@ const VaccinationManagement = () => {
                 consentFormID: f.id || f.ID || f.consentFormID,
                 status: f.status || f.statusID || 'Pending',
                 vaccinationStatus: 'Pending', // Chưa ghi kết quả thì là Pending
-                notes: '',
-                actualVaccinationDate: new Date().toISOString().split('T')[0], // Default to today
-                performer: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định',
-                postVaccinationReaction: '',
-                postponementReason: '',
-                failureReason: '',
-                refusalReason: '',
-                needToContactParent: false
-              };
+              notes: '',
+              actualVaccinationDate: new Date().toISOString().split('T')[0], // Default to today
+              performer: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định',
+              postVaccinationReaction: '',
+              postponementReason: '',
+              failureReason: '',
+              refusalReason: '',
+              needToContactParent: false
+            };
             }
           } catch {
             return {
@@ -647,8 +653,8 @@ const VaccinationManagement = () => {
       const resultsToSave = recordResultsList.map((student, index) => {
         console.log(`Processing student ${index}:`, student);
         console.log(`Student ${index} details:`, {
-          consentFormID: student.consentFormID,
-          vaccinationStatus: student.vaccinationStatus,
+        consentFormID: student.consentFormID,
+        vaccinationStatus: student.vaccinationStatus,
           actualVaccinationDate: student.actualVaccinationDate,
           performer: student.performer,
           postVaccinationReaction: student.postVaccinationReaction,
@@ -684,7 +690,7 @@ const VaccinationManagement = () => {
         console.log('Backend is working, vaccination results:', testResponse.data);
         
         // Kiểm tra vaccine types
-        const vaccineResponse = await apiClient.get('/VaccineType');
+        const vaccineResponse = await apiClient.get('/VaccineType/with-diseases');
         console.log('Available vaccine types:', vaccineResponse.data);
       } catch (error) {
         console.error('Backend connection test failed:', error);
@@ -941,8 +947,8 @@ const VaccinationManagement = () => {
       // Refresh data trước khi mở modal để đảm bảo dữ liệu mới nhất
       await fetchData();
       
-      setSelectedStudentIndex(index);
-      setShowVaccinationDetailModal(true);
+    setSelectedStudentIndex(index);
+    setShowVaccinationDetailModal(true);
     } catch (error) {
       console.error('Error refreshing data before opening modal:', error);
       setSelectedStudentIndex(index);
@@ -1028,12 +1034,15 @@ const VaccinationManagement = () => {
       setShowEditModal(true);
     };
 
-    if (vaccineList.length === 0) {
-      apiClient.get('/VaccineType').then(res => {
-        setVaccineList(res.data);
-        setEditData(res.data);
-      });
-    } else {
+          if (vaccineList.length === 0) {
+        console.log('Calling API: /VaccineType/with-diseases (setEditData)');
+        apiClient.get('/VaccineType/with-diseases').then(res => {
+          console.log('API Response setEditData:', res.data);
+          console.log('First vaccine diseases setEditData:', res.data[0]?.diseases);
+          setVaccineList(res.data);
+          setEditData(res.data);
+        });
+      } else {
       setEditData(vaccineList);
     }
   };
@@ -1122,7 +1131,7 @@ const VaccinationManagement = () => {
       
       setAddVaccineData({ VaccineName: '', Description: '' });
       // Cập nhật lại danh sách vaccine
-      const res = await apiClient.get('/VaccineType');
+      const res = await apiClient.get('/VaccineType/with-diseases');
       setVaccineList(res.data);
       setNotifyMessage('Thêm vaccine thành công!');
       setShowToast(true);
@@ -1146,9 +1155,15 @@ const VaccinationManagement = () => {
   const openVaccineManager = async () => {
     setShowVaccineManager(true);
     try {
-      const res = await apiClient.get('/VaccineType');
+      console.log('Calling API: /VaccineType/with-diseases (openVaccineManager)');
+      const res = await apiClient.get('/VaccineType/with-diseases');
+      console.log('Vaccine data from API:', res.data);
+      console.log('All vaccines diseases check:', res.data.map(v => ({ id: v.vaccinationID, diseases: v.diseases, hasDiseases: !!v.diseases })));
       setVaccineList(res.data);
-    } catch {}
+    } catch (error) {
+      console.error('Error fetching vaccine types:', error);
+      setVaccineList([]);
+    }
   };
   const closeVaccineManager = () => {
     setShowVaccineManager(false);
@@ -1178,7 +1193,7 @@ const VaccinationManagement = () => {
         Description: editVaccineData.Description
       });
       
-      const res = await apiClient.get('/VaccineType');
+      const res = await apiClient.get('/VaccineType/with-diseases');
       setVaccineList(res.data);
       setEditVaccineId(null);
       setEditVaccineData({ VaccineName: '', Description: '' });
@@ -1202,7 +1217,7 @@ const VaccinationManagement = () => {
     try {
       console.log('Deleting vaccine with ID:', id);
       await apiClient.delete(`/VaccineType/${id}`);
-      const res = await apiClient.get('/VaccineType');
+      const res = await apiClient.get('/VaccineType/with-diseases');
       setVaccineList(res.data);
       setNotifyMessage('Xóa vaccine thành công!');
       setDeleteVaccineId(null);
@@ -1238,8 +1253,8 @@ const VaccinationManagement = () => {
       <div className="vaccination-header">
         <div className="d-flex justify-content-between align-items-center">
           <div>
-            <h1>Quản lý tiêm chủng</h1>
-            <p>Lên kế hoạch và quản lý tiêm chủng cho học sinh</p>
+        <h1>Quản lý tiêm chủng</h1>
+        <p>Lên kế hoạch và quản lý tiêm chủng cho học sinh</p>
           </div>
           <button 
             className="btn btn-primary" 
@@ -2405,6 +2420,9 @@ const VaccinationManagement = () => {
                           <th>Mã</th>
                           <th>Tên vaccine</th>
                           <th>Mô tả</th>
+                          <th>Tên bệnh</th>
+                          <th>Số mũi</th>
+                          <th>Ghi chú</th>
                           <th>Hành động</th>
                   </tr>
                 </thead>
@@ -2438,6 +2456,57 @@ const VaccinationManagement = () => {
                                 vaccine.description || vaccine.Description
                               )}
                       </td>
+                            <td>
+                              {console.log('Vaccine:', vaccine.vaccinationID, 'Diseases:', vaccine.diseases, 'Full vaccine object:', vaccine)}
+                              {vaccine.diseases && Array.isArray(vaccine.diseases) && vaccine.diseases.length > 0 ? (
+                                <div style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                                  {vaccine.diseases.map((disease, index) => (
+                                    <div key={index} style={{ 
+                                      padding: '2px 0', 
+                                      fontSize: '0.85rem',
+                                      borderBottom: index < vaccine.diseases.length - 1 ? '1px solid #eee' : 'none'
+                                    }}>
+                                      <strong>{disease.diseaseName}</strong>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span style={{ color: '#999', fontStyle: 'italic' }}>Không có dữ liệu</span>
+                              )}
+                            </td>
+                            <td>
+                              {vaccine.diseases && Array.isArray(vaccine.diseases) && vaccine.diseases.length > 0 ? (
+                                <div style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                                  {vaccine.diseases.map((disease, index) => (
+                                    <div key={index} style={{ 
+                                      padding: '2px 0', 
+                                      fontSize: '0.85rem',
+                                      borderBottom: index < vaccine.diseases.length - 1 ? '1px solid #eee' : 'none'
+                                    }}>
+                                      {disease.requiredDoses || 'N/A'}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span style={{ color: '#999', fontStyle: 'italic' }}>N/A</span>
+                              )}
+                            </td>
+                            <td>
+                              {vaccine.diseases && Array.isArray(vaccine.diseases) && vaccine.diseases.length > 0 ? (
+                                <div style={{ maxHeight: '100px', overflowY: 'auto', fontSize: '0.8rem' }}>
+                                  {vaccine.diseases.map((disease, index) => (
+                                    <div key={index} style={{ 
+                                      padding: '2px 0', 
+                                      borderBottom: index < vaccine.diseases.length - 1 ? '1px solid #eee' : 'none'
+                                    }}>
+                                      {disease.notes || 'Không có ghi chú'}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span style={{ color: '#999', fontStyle: 'italic' }}>Không có ghi chú</span>
+                              )}
+                            </td>
                             <td>
                               {editVaccineId === (vaccine.vaccinationID || vaccine.VaccinationID) ? (
                                 <div className="btn-group btn-group-sm">

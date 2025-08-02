@@ -155,6 +155,57 @@ namespace BackEnd.Controllers
                         ConsentFormID = consentForm.ID // Gán ID của consent form
                     };
                     await _notificationService.CreateNotificationAsync(notification);
+
+                    // Gửi email cho phụ huynh
+                    var profile = dbContext.Profiles.FirstOrDefault(p => p.UserID == record.ParentID);
+                    var parentEmail = profile?.Email;
+                    var student = dbContext.Profiles.FirstOrDefault(p => p.UserID == record.StudentID);
+                    var studentName = student?.Name ?? "học sinh";
+                    string className = "(không rõ)";
+                    if (!string.IsNullOrEmpty(student?.ClassID))
+                    {
+                        var schoolClass = dbContext.SchoolClasses.FirstOrDefault(c => c.ClassID == student.ClassID);
+                        if (schoolClass != null)
+                            className = schoolClass.ClassName;
+                    }
+                    string scheduledDate = plan.ScheduleDate.HasValue ? plan.ScheduleDate.Value.ToString("dd/MM/yyyy") : "(vui lòng xem chi tiết trên hệ thống)";
+                    
+                    if (!string.IsNullOrEmpty(parentEmail))
+                    {
+                        var gmailService = new GmailEmailService("credentials/credentials.json", "token.json");
+                        string subject = "Thông báo và xác nhận lịch khám sức khỏe cho học sinh";
+                        string body = $@"
+Kính gửi Quý phụ huynh,
+
+Nhà trường xin trân trọng thông báo về lịch khám sức khỏe định kỳ sắp tới dành cho học sinh:
+
+- Họ và tên học sinh: {studentName}
+- Lớp: {className}
+- Thời gian khám sức khỏe: {scheduledDate}
+- Địa điểm: Phòng Y tế trường
+- Nội dung khám: Khám sức khỏe định kỳ
+
+Để đảm bảo quyền lợi và sức khỏe cho các em học sinh, kính mong Quý phụ huynh vui lòng đăng nhập vào hệ thống quản lý sức khỏe học đường và xác nhận sự đồng ý cho con em mình tham gia khám sức khỏe.
+
+**Hướng dẫn xác nhận:**
+1. Truy cập trang web của nhà trường: http://localhost:3000/
+2. Đăng nhập bằng tài khoản phụ huynh.
+3. Vào mục ""Lịch khám sức khỏe"" và thực hiện xác nhận cho học sinh.
+
+Nếu Quý phụ huynh có bất kỳ thắc mắc nào về lịch khám sức khỏe hoặc cần hỗ trợ thêm thông tin, xin vui lòng liên hệ với nhà trường qua số điện thoại hoặc email trên hệ thống.
+
+Xin chân thành cảm ơn sự hợp tác của Quý phụ huynh!
+
+Trân trọng,
+Ban Y tế Trường
+";
+                        await gmailService.SendEmailAsync(
+                            parentEmail,
+                            subject,
+                            body,
+                            isHtml: false
+                        );
+                    }
                 }
             }
             return Ok(new { message = "Notifications sent!" });

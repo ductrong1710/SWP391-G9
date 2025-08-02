@@ -51,15 +51,7 @@ namespace Services.Implements
         public async Task<IEnumerable<VaccinationResult>> GetVaccinationResultsByStudentAsync(string studentId)
         {
             var allResults = await _resultRepository.GetAllVaccinationResultsAsync();
-            Console.WriteLine($"[LOG] Tổng số VaccinationResult: {allResults.Count()}");
-            foreach (var r in allResults)
-            {
-                var consentFormId = r.ConsentForm != null ? r.ConsentForm.ID : "null";
-                var student = r.ConsentForm != null ? r.ConsentForm.StudentID : "null";
-                Console.WriteLine($"[LOG] ResultID: {r.ID}, ConsentFormID: {consentFormId}, StudentID: {student}");
-            }
             var filtered = allResults.Where(r => r.ConsentForm != null && r.ConsentForm.StudentID == studentId).ToList();
-            Console.WriteLine($"[LOG] Số bản ghi sau khi lọc theo studentId={studentId}: {filtered.Count}");
             return filtered;
         }
 

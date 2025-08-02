@@ -24,6 +24,28 @@ namespace BackEnd.Controllers
             return Ok(vaccineTypes);
         }
 
+        // GET: api/VaccineType/with-diseases
+        [HttpGet("with-diseases")]
+        public async Task<ActionResult<IEnumerable<object>>> GetVaccineTypesWithDiseases()
+        {
+            var vaccineTypes = await _vaccineTypeService.GetAllVaccineTypesAsync();
+            
+            var result = vaccineTypes.Select(v => new
+            {
+                VaccinationID = v.VaccinationID,
+                VaccineName = v.VaccineName,
+                Description = v.Description,
+                Diseases = v.VaccineDiseases?.Select(d => new
+                {
+                    DiseaseName = d.DiseaseName,
+                    RequiredDoses = d.RequiredDoses,
+                    Notes = d.Notes
+                }).Cast<object>().ToList() ?? new List<object>()
+            });
+            
+            return Ok(result);
+        }
+
         // GET: api/VaccineType/5
         [HttpGet("{id}")]
         public async Task<ActionResult<VaccineType>> GetVaccineType(string id)
@@ -33,6 +55,32 @@ namespace BackEnd.Controllers
                 return NotFound();
 
             return Ok(vaccineType);
+        }
+
+        // GET: api/VaccineType/5/with-diseases
+        [HttpGet("{id}/with-diseases")]
+        public async Task<ActionResult<object>> GetVaccineTypeWithDiseases(string id)
+        {
+            var vaccineType = await _vaccineTypeService.GetVaccineTypeByIdAsync(id);
+            if (vaccineType == null)
+                return NotFound();
+
+            var diseases = vaccineType.VaccineDiseases?.Select(d => new
+            {
+                DiseaseName = d.DiseaseName,
+                RequiredDoses = d.RequiredDoses,
+                Notes = d.Notes
+            }).Cast<object>().ToList() ?? new List<object>();
+
+            var result = new
+            {
+                VaccinationID = vaccineType.VaccinationID,
+                VaccineName = vaccineType.VaccineName,
+                Description = vaccineType.Description,
+                Diseases = diseases
+            };
+
+            return Ok(result);
         }
 
         // POST: api/VaccineType
@@ -103,10 +151,6 @@ namespace BackEnd.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
             }
             catch (Exception ex)
             {

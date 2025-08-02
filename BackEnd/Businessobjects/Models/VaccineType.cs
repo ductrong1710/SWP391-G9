@@ -18,5 +18,6 @@ namespace Businessobjects.Models
         public string? Description { get; set; }
         [JsonIgnore]
         public virtual ICollection<VaccinationResult>? VaccinationResults { get; set; }
+        public virtual ICollection<VaccineDisease>? VaccineDiseases { get; set; }
     }
 }

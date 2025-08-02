@@ -3,8 +3,8 @@ using Businessobjects.Models;
 using Services.Interfaces;
 using Repositories.Interfaces;
 using System.Threading.Tasks;
-using Services.Interfaces;
 using System.Linq;
+using BackEnd.Models;
 
 namespace BackEnd.Controllers
 {
@@ -16,13 +16,20 @@ namespace BackEnd.Controllers
         private readonly IRoleRepository _roleRepository;
         private readonly IProfileService _profileService;
         private readonly ISchoolClassService _schoolClassService;
+        private readonly IJwtService _jwtService;
 
-        public AuthController(IUserService userService, IRoleRepository roleRepository, IProfileService profileService, ISchoolClassService schoolClassService)
+        public AuthController(
+            IUserService userService, 
+            IRoleRepository roleRepository, 
+            IProfileService profileService, 
+            ISchoolClassService schoolClassService,
+            IJwtService jwtService)
         {
             _userService = userService;
             _roleRepository = roleRepository;
             _profileService = profileService;
             _schoolClassService = schoolClassService;
+            _jwtService = jwtService;
         }
 
         [HttpPost("login")]
@@ -47,6 +54,9 @@ namespace BackEnd.Controllers
             
             System.Console.WriteLine($"--- Login successful for user: {loginRequest.Username} ---");
 
+            // Tạo JWT token
+            var token = _jwtService.GenerateToken(user);
+
             // Lấy thông tin lớp học nếu có
             var profile = await _profileService.GetProfileByUserIdAsync(user.UserID);
             object? classInfo = null;
@@ -64,14 +74,41 @@ namespace BackEnd.Controllers
                 }
             }
 
-            // Tạo response object với thông tin user, role và class
+            // Tạo response object với JWT token và thông tin user
             var response = new
             {
+                Token = token,
                 UserID = user.UserID,
                 Username = user.Username,
                 RoleID = user.RoleID,
                 RoleType = user.Role?.RoleType ?? "Unknown",
-                Class = classInfo
+                Class = classInfo,
+                ExpiresIn = 3600 // 60 minutes in seconds
+            };
+
+            return Ok(response);
+        }
+
+        [HttpPost("validate-token")]
+        public IActionResult ValidateToken([FromBody] TokenValidationRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Token))
+            {
+                return BadRequest("Token is required");
+            }
+
+            var principal = _jwtService.ValidateToken(request.Token);
+            if (principal == null)
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var response = new
+            {
+                IsValid = true,
+                UserID = principal.FindFirst("UserID")?.Value,
+                Username = principal.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value,
+                Role = principal.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
             };
 
             return Ok(response);

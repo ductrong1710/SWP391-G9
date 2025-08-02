@@ -18,9 +18,9 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.VaccinationPlan)
+                    .ThenInclude(c => c!.Parent)
                 .Include(r => r.VaccineType)
                 .ToListAsync();
         }
@@ -29,9 +29,9 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.VaccinationPlan)
+                    .ThenInclude(c => c!.Parent)
                 .Include(r => r.VaccineType)
                 .FirstOrDefaultAsync(r => r.ID == id);
         }
@@ -40,9 +40,9 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.VaccinationPlan)
+                    .ThenInclude(c => c!.Parent)
                 .Include(r => r.VaccineType)
                 .FirstOrDefaultAsync(r => r.ConsentFormID == consentFormId);
         }
@@ -51,9 +51,9 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.VaccinationPlan)
+                    .ThenInclude(c => c!.Parent)
                 .Include(r => r.VaccineType)
                 .Where(r => r.VaccineTypeID == vaccineTypeId)
                 .ToListAsync();
@@ -63,11 +63,11 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationResults
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.Student)
+                    .ThenInclude(c => c!.Student)
                 .Include(r => r.ConsentForm)
-                    .ThenInclude(f => f.VaccinationPlan)
+                    .ThenInclude(c => c!.Parent)
                 .Include(r => r.VaccineType)
-                .Where(r => r.ConsentForm.VaccinationPlanID == planId)
+                .Where(r => r.ConsentForm!.VaccinationPlanID == planId)
                 .ToListAsync();
         }
 

@@ -287,6 +287,81 @@ namespace Businessobjects.Data
                     ParentContact = "0987654321"
                 }
             );
+
+            // VaccineType seed data
+            modelBuilder.Entity<VaccineType>().HasData(
+                new VaccineType
+                {
+                    VaccinationID = "VC0001",
+                    VaccineName = "Vắc-xin Viêm gan B",
+                    Description = "Bảo vệ chống lại virus viêm gan B"
+                },
+                new VaccineType
+                {
+                    VaccinationID = "VC0002",
+                    VaccineName = "Vắc-xin Sởi - Quai bị - Rubella",
+                    Description = "Ngăn ngừa các bệnh sởi, quai bị và rubella"
+                },
+                new VaccineType
+                {
+                    VaccinationID = "VC0003",
+                    VaccineName = "Vắc-xin DPT",
+                    Description = "Bảo vệ chống lại bạch hầu, ho gà và uốn ván"
+                }
+            );
+
+            // VaccineDisease seed data
+            modelBuilder.Entity<VaccineDisease>().HasData(
+                new VaccineDisease
+                {
+                    VaccineDiseaseID = "VD0001",
+                    VaccinationID = "VC0001",
+                    DiseaseName = "Viêm gan B",
+                    RequiredDoses = 3
+                },
+                new VaccineDisease
+                {
+                    VaccineDiseaseID = "VD0002",
+                    VaccinationID = "VC0002",
+                    DiseaseName = "Sởi",
+                    RequiredDoses = 2
+                },
+                new VaccineDisease
+                {
+                    VaccineDiseaseID = "VD0003",
+                    VaccinationID = "VC0002",
+                    DiseaseName = "Quai bị",
+                    RequiredDoses = 2
+                },
+                new VaccineDisease
+                {
+                    VaccineDiseaseID = "VD0004",
+                    VaccinationID = "VC0002",
+                    DiseaseName = "Rubella",
+                    RequiredDoses = 2
+                },
+                new VaccineDisease
+                {
+                    VaccineDiseaseID = "VD0005",
+                    VaccinationID = "VC0003",
+                    DiseaseName = "Bạch hầu",
+                    RequiredDoses = 4
+                },
+                new VaccineDisease
+                {
+                    VaccineDiseaseID = "VD0006",
+                    VaccinationID = "VC0003",
+                    DiseaseName = "Ho gà",
+                    RequiredDoses = 4
+                },
+                new VaccineDisease
+                {
+                    VaccineDiseaseID = "VD0007",
+                    VaccinationID = "VC0003",
+                    DiseaseName = "Uốn ván",
+                    RequiredDoses = 4
+                }
+            );
         }
     }
 }

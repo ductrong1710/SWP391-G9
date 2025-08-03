@@ -22,8 +22,7 @@ namespace Businessobjects.Models
         
         public int? RequiredDoses { get; set; }
         
-        [StringLength(255)]
-        public string? Notes { get; set; }
+        public int? IntervalBetweenDoses { get; set; } // Khoảng cách tiêm giữa 2 mũi (tính bằng ngày)
         
         // Navigation property
         public virtual VaccineType? VaccineType { get; set; }

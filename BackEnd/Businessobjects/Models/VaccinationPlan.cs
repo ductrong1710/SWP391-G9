@@ -17,6 +17,7 @@ namespace Businessobjects.Models
         public string? Description { get; set; }
         public string? Status { get; set; }
         public string? Grade { get; set; }
+        public int? DoseNumber { get; set; } // Mũi thứ mấy (1, 2, 3, ...)
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         [Required]
         [Column("CreatorID")]

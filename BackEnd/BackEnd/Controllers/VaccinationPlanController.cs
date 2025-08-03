@@ -12,15 +12,18 @@ namespace BackEnd.Controllers
         private readonly IVaccinationPlanService _planService;
         private readonly IVaccinationConsentFormService _consentFormService;
         private readonly INotificationService _notificationService;
+        private readonly IVaccineTypeService _vaccineTypeService;
 
         public VaccinationPlanController(
             IVaccinationPlanService planService,
             IVaccinationConsentFormService consentFormService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IVaccineTypeService vaccineTypeService)
         {
             _planService = planService;
             _consentFormService = consentFormService;
             _notificationService = notificationService;
+            _vaccineTypeService = vaccineTypeService;
         }
 
         // GET: api/VaccinationPlan
@@ -58,12 +61,81 @@ namespace BackEnd.Controllers
             return Ok(plans);
         }
 
+        // GET: api/VaccinationPlan/vaccine-info/{vaccineId}
+        [HttpGet("vaccine-info/{vaccineId}")]
+        public async Task<ActionResult<object>> GetVaccineInfo(string vaccineId)
+        {
+            try
+            {
+                var vaccine = await _vaccineTypeService.GetVaccineTypeByIdAsync(vaccineId);
+                if (vaccine == null)
+                    return NotFound("Vaccine not found");
+
+                var diseases = vaccine.VaccineDiseases?.ToList() ?? new List<VaccineDisease>();
+                
+                var vaccineInfo = new
+                {
+                    VaccinationID = vaccine.VaccinationID,
+                    VaccineName = vaccine.VaccineName,
+                    Description = vaccine.Description,
+                    TotalDiseases = diseases.Count,
+                    DiseaseNames = diseases.Select(d => d.DiseaseName).ToList(),
+                    RequiredDoses = diseases.FirstOrDefault()?.RequiredDoses ?? 0,
+                    IntervalBetweenDoses = diseases.FirstOrDefault()?.IntervalBetweenDoses ?? 0,
+                    Diseases = diseases.Select(d => new
+                    {
+                        DiseaseName = d.DiseaseName,
+                        RequiredDoses = d.RequiredDoses,
+                        IntervalBetweenDoses = d.IntervalBetweenDoses
+                    }).ToList()
+                };
+
+                return Ok(vaccineInfo);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error getting vaccine info: {ex.Message}");
+            }
+        }
+
+        // Helper method để extract vaccine ID từ PlanName
+        private string ExtractVaccineIdFromPlanName(string planName)
+        {
+            // Giả sử PlanName có format: "Tiêm chủng [VaccineID] - [Description]"
+            // Hoặc có thể chứa vaccine ID ở đâu đó
+            if (string.IsNullOrEmpty(planName))
+                return string.Empty;
+
+            // Tìm pattern VCxxxx trong PlanName
+            var match = System.Text.RegularExpressions.Regex.Match(planName, @"VC\d{4}");
+            return match.Success ? match.Value : string.Empty;
+        }
+
         // POST: api/VaccinationPlan
         [HttpPost]
         public async Task<ActionResult<VaccinationPlan>> CreateVaccinationPlan(VaccinationPlan plan)
         {
             try
             {
+                // Validation: Kiểm tra DoseNumber nếu có
+                if (plan.DoseNumber.HasValue && plan.DoseNumber.Value > 0)
+                {
+                    // Lấy thông tin vaccine từ PlanName (giả sử PlanName chứa vaccine ID)
+                    var vaccineId = ExtractVaccineIdFromPlanName(plan.PlanName);
+                    if (!string.IsNullOrEmpty(vaccineId))
+                    {
+                        var vaccine = await _vaccineTypeService.GetVaccineTypeByIdAsync(vaccineId);
+                        if (vaccine != null)
+                        {
+                            var maxDoses = vaccine.VaccineDiseases?.Max(d => d.RequiredDoses) ?? 0;
+                            if (plan.DoseNumber.Value > maxDoses)
+                            {
+                                return BadRequest($"Số mũi tiêm ({plan.DoseNumber.Value}) không được lớn hơn số mũi cần thiết của vaccine ({maxDoses})");
+                            }
+                        }
+                    }
+                }
+
                 var createdPlan = await _planService.CreateVaccinationPlanAsync(plan);
 
                 // Lấy danh sách consent form theo planId

@@ -80,5 +80,48 @@ namespace Repositories.Implements
         {
             return await _context.VaccinationTypes.AnyAsync(v => v.VaccineName.ToLower() == name.ToLower());
         }
+
+        public async Task<IEnumerable<VaccineDisease>> GetAllVaccineDiseasesAsync()
+        {
+            return await _context.VaccineDiseases.ToListAsync();
+        }
+
+        public async Task CreateVaccineDiseaseAsync(VaccineDisease disease)
+        {
+            await _context.VaccineDiseases.AddAsync(disease);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<VaccineDisease>> GetDiseasesByVaccineIdAsync(string vaccineId)
+        {
+            return await _context.VaccineDiseases
+                .Where(d => d.VaccinationID == vaccineId)
+                .ToListAsync();
+        }
+
+        public async Task UpdateVaccineDiseaseAsync(VaccineDisease disease)
+        {
+            var existingDisease = await _context.VaccineDiseases
+                .FirstOrDefaultAsync(d => d.VaccineDiseaseID == disease.VaccineDiseaseID);
+            
+            if (existingDisease != null)
+            {
+                existingDisease.DiseaseName = disease.DiseaseName;
+                existingDisease.RequiredDoses = disease.RequiredDoses;
+                existingDisease.IntervalBetweenDoses = disease.IntervalBetweenDoses;
+                
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteAllDiseasesForVaccineAsync(string vaccineId)
+        {
+            var diseases = await _context.VaccineDiseases
+                .Where(d => d.VaccinationID == vaccineId)
+                .ToListAsync();
+            
+            _context.VaccineDiseases.RemoveRange(diseases);
+            await _context.SaveChangesAsync();
+        }
     }
 }

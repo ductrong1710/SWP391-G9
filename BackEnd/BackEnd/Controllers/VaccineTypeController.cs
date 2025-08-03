@@ -30,17 +30,31 @@ namespace BackEnd.Controllers
         {
             var vaccineTypes = await _vaccineTypeService.GetAllVaccineTypesAsync();
             
-            var result = vaccineTypes.Select(v => new
-            {
-                VaccinationID = v.VaccinationID,
-                VaccineName = v.VaccineName,
-                Description = v.Description,
-                Diseases = v.VaccineDiseases?.Select(d => new
+            var result = vaccineTypes.Select(v => {
+                var diseases = v.VaccineDiseases?.ToList() ?? new List<VaccineDisease>();
+                
+                // Gộp thông tin vaccine
+                var vaccineInfo = new
                 {
-                    DiseaseName = d.DiseaseName,
-                    RequiredDoses = d.RequiredDoses,
-                    Notes = d.Notes
-                }).Cast<object>().ToList() ?? new List<object>()
+                    VaccinationID = v.VaccinationID,
+                    VaccineName = v.VaccineName,
+                    Description = v.Description,
+                    // Thông tin tổng hợp từ các bệnh
+                    TotalDiseases = diseases.Count,
+                    DiseaseNames = diseases.Select(d => d.DiseaseName).ToList(),
+                    // Lấy thông tin chung (giả sử tất cả bệnh có cùng số mũi và khoảng cách)
+                    RequiredDoses = diseases.FirstOrDefault()?.RequiredDoses ?? 0,
+                    IntervalBetweenDoses = diseases.FirstOrDefault()?.IntervalBetweenDoses ?? 0,
+                    // Giữ lại thông tin chi tiết từng bệnh nếu cần
+                    Diseases = diseases.Select(d => new
+                    {
+                        DiseaseName = d.DiseaseName,
+                        RequiredDoses = d.RequiredDoses,
+                        IntervalBetweenDoses = d.IntervalBetweenDoses
+                    }).Cast<object>().ToList()
+                };
+                
+                return vaccineInfo;
             });
             
             return Ok(result);
@@ -69,7 +83,7 @@ namespace BackEnd.Controllers
             {
                 DiseaseName = d.DiseaseName,
                 RequiredDoses = d.RequiredDoses,
-                Notes = d.Notes
+                IntervalBetweenDoses = d.IntervalBetweenDoses
             }).Cast<object>().ToList() ?? new List<object>();
 
             var result = new
@@ -95,6 +109,67 @@ namespace BackEnd.Controllers
             catch (InvalidOperationException ex)
             {
                 return Conflict(ex.Message);
+            }
+        }
+
+        // POST: api/VaccineType/with-diseases
+        [HttpPost("with-diseases")]
+        public async Task<ActionResult<object>> CreateVaccineTypeWithDiseases(VaccineTypeDto vaccineDto)
+        {
+            try
+            {
+                // Tạo vaccine type
+                var vaccineType = new VaccineType
+                {
+                    VaccineName = vaccineDto.VaccineName,
+                    Description = vaccineDto.Description
+                };
+
+                var createdVaccineType = await _vaccineTypeService.CreateVaccineTypeAsync(vaccineType);
+
+                // Tạo các bệnh tương ứng nếu có
+                if (vaccineDto.Diseases != null && vaccineDto.Diseases.Any())
+                {
+                    foreach (var diseaseDto in vaccineDto.Diseases)
+                    {
+                        var disease = new VaccineDisease
+                        {
+                            VaccinationID = createdVaccineType.VaccinationID,
+                            DiseaseName = diseaseDto.DiseaseName,
+                            RequiredDoses = diseaseDto.RequiredDoses,
+                            IntervalBetweenDoses = diseaseDto.IntervalBetweenDoses
+                        };
+
+                        // Thêm bệnh vào database
+                        await _vaccineTypeService.AddDiseaseToVaccineAsync(createdVaccineType.VaccinationID, disease);
+                    }
+                }
+
+                // Trả về vaccine với bệnh
+                var diseases = vaccineDto.Diseases?.Select(d => new
+                {
+                    DiseaseName = d.DiseaseName,
+                    RequiredDoses = d.RequiredDoses,
+                    IntervalBetweenDoses = d.IntervalBetweenDoses
+                }).Cast<object>().ToList() ?? new List<object>();
+
+                var result = new
+                {
+                    VaccinationID = createdVaccineType.VaccinationID,
+                    VaccineName = createdVaccineType.VaccineName,
+                    Description = createdVaccineType.Description,
+                    Diseases = diseases
+                };
+
+                return CreatedAtAction(nameof(GetVaccineTypeWithDiseases), new { id = createdVaccineType.VaccinationID }, result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
@@ -147,6 +222,43 @@ namespace BackEnd.Controllers
             {
                 await _vaccineTypeService.DeleteVaccineTypeAsync(id);
                 return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // PUT: api/VaccineType/{id}/diseases
+        [HttpPut("{id}/diseases")]
+        public async Task<ActionResult<object>> UpdateVaccineDiseases(string id, List<VaccineDiseaseDto> diseases)
+        {
+            try
+            {
+                await _vaccineTypeService.UpdateVaccineDiseasesAsync(id, diseases);
+                
+                // Trả về vaccine với bệnh đã cập nhật
+                var vaccineType = await _vaccineTypeService.GetVaccineTypeByIdAsync(id);
+                if (vaccineType == null)
+                    return NotFound();
+
+                var result = new
+                {
+                    VaccinationID = vaccineType.VaccinationID,
+                    VaccineName = vaccineType.VaccineName,
+                    Description = vaccineType.Description,
+                    Diseases = vaccineType.VaccineDiseases?.Select(d => new
+                    {
+                        DiseaseName = d.DiseaseName,
+                        RequiredDoses = d.RequiredDoses
+                    }).Cast<object>().ToList() ?? new List<object>()
+                };
+
+                return Ok(result);
             }
             catch (KeyNotFoundException ex)
             {

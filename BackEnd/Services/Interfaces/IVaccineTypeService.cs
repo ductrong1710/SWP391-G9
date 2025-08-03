@@ -9,5 +9,7 @@ namespace Services.Interfaces
         Task<VaccineType> CreateVaccineTypeAsync(VaccineType vaccineType);
         Task UpdateVaccineTypeAsync(string id, VaccineType vaccineType);
         Task DeleteVaccineTypeAsync(string id);
+        Task AddDiseaseToVaccineAsync(string vaccineId, VaccineDisease disease);
+        Task UpdateVaccineDiseasesAsync(string vaccineId, List<VaccineDiseaseDto> diseases);
     }
 }

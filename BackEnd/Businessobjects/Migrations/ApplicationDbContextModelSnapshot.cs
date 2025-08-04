@@ -248,7 +248,7 @@ namespace Businessobjects.Migrations
 
                     b.HasIndex("StudentID");
 
-                    b.ToTable("IncidentInvolvements");
+                    b.ToTable("IncidentInvolvements", (string)null);
                 });
 
             modelBuilder.Entity("Businessobjects.Models.MedicalIncident", b =>
@@ -289,7 +289,7 @@ namespace Businessobjects.Migrations
 
                     b.HasIndex("MedicalStaffID");
 
-                    b.ToTable("MedicalIncidents");
+                    b.ToTable("MedicalIncidents", (string)null);
                 });
 
             modelBuilder.Entity("Businessobjects.Models.MedicalSupply", b =>
@@ -639,7 +639,7 @@ namespace Businessobjects.Migrations
 
                     b.HasKey("ClassID");
 
-                    b.ToTable("SchoolClass");
+                    b.ToTable("SchoolClass", (string)null);
                 });
 
             modelBuilder.Entity("Businessobjects.Models.Status", b =>
@@ -721,7 +721,7 @@ namespace Businessobjects.Migrations
 
                     b.HasIndex("SupplyID");
 
-                    b.ToTable("SupplyMedUsages");
+                    b.ToTable("SupplyMedUsages", (string)null);
                 });
 
             modelBuilder.Entity("Businessobjects.Models.User", b =>

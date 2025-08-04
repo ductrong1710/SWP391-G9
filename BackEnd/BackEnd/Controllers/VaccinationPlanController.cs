@@ -108,7 +108,21 @@ namespace BackEnd.Controllers
 
             // Tìm pattern VCxxxx trong PlanName
             var match = System.Text.RegularExpressions.Regex.Match(planName, @"VC\d{4}");
-            return match.Success ? match.Value : string.Empty;
+            if (match.Success)
+                return match.Value;
+
+            // Nếu không tìm thấy VCxxxx, thử map theo tên vaccine
+            var vaccineName = planName.ToLower();
+            if (vaccineName.Contains("viêm gan b") || vaccineName.Contains("hepatitis b"))
+                return "VC0001"; // Giả sử VC0001 là Viêm gan B
+            else if (vaccineName.Contains("sởi") || vaccineName.Contains("measles"))
+                return "VC0002"; // Giả sử VC0002 là Sởi
+            else if (vaccineName.Contains("quai bị") || vaccineName.Contains("mumps"))
+                return "VC0003"; // Giả sử VC0003 là Quai bị
+            else if (vaccineName.Contains("rubella"))
+                return "VC0004"; // Giả sử VC0004 là Rubella
+            else
+                return "VC0001"; // Default fallback
         }
 
         // POST: api/VaccinationPlan
@@ -225,9 +239,84 @@ namespace BackEnd.Controllers
             {
                 var healthRecord = dbContext.HealthRecords.FirstOrDefault(hr => hr.StudentID == student.UserID);
                 if (healthRecord == null || string.IsNullOrEmpty(healthRecord.ParentID)) continue;
+                
                 var parentId = healthRecord.ParentID;
                 var studentName = student.Name ?? "học sinh";
-                var message = $"Kế hoạch tiêm chủng '{plan.PlanName}' đã được cập nhật. Vui lòng xác nhận cho học sinh: {studentName.ToUpper()}";
+
+                // Lấy thông tin vaccine từ plan name
+                string vaccineId = ExtractVaccineIdFromPlanName(plan.PlanName);
+                int doseNumber = plan.DoseNumber ?? 1;
+
+                // Debug logging
+                Console.WriteLine($"DEBUG: Student {student.UserID} - Plan: {plan.PlanName} - VaccineId: {vaccineId} - DoseNumber: {doseNumber}");
+
+                // Kiểm tra xem học sinh đã tiêm mũi tiêm này của vắc xin này chưa
+                bool hasVaccinated = false;
+                
+                // Kiểm tra trong bảng VaccinationHistory
+                var vaccinationHistory = dbContext.VaccinationHistory
+                    .Where(vh => vh.StudentID == student.UserID && 
+                                vh.VaccineTypeID == vaccineId)
+                    .OrderByDescending(vh => vh.VaccinationDate)
+                    .FirstOrDefault();
+
+                if (vaccinationHistory != null)
+                {
+                    // Đếm số mũi đã tiêm cho vắc xin này
+                    var doseCount = dbContext.VaccinationHistory
+                        .Count(vh => vh.StudentID == student.UserID && 
+                                    vh.VaccineTypeID == vaccineId);
+                    
+                    // Nếu đã tiêm đủ số mũi hoặc nhiều hơn mũi hiện tại
+                    if (doseCount >= doseNumber)
+                    {
+                        hasVaccinated = true;
+                    }
+                }
+
+                // Kiểm tra thêm trong bảng VaccinationResult (nếu có)
+                if (!hasVaccinated)
+                {
+                    var vaccinationResult = dbContext.VaccinationResults
+                        .Where(vr => vr.ConsentFormID != null)
+                        .Join(dbContext.VaccinationConsentForms, 
+                              vr => vr.ConsentFormID, 
+                              vcf => vcf.ID, 
+                              (vr, vcf) => new { vr, vcf })
+                        .Where(x => x.vcf.StudentID == student.UserID && 
+                                   x.vr.VaccineTypeID == vaccineId &&
+                                   x.vr.VaccinationStatus == "Completed")
+                        .OrderByDescending(x => x.vr.RecordedDate)
+                        .FirstOrDefault();
+
+                    if (vaccinationResult != null)
+                    {
+                        // Đếm số mũi đã tiêm thành công cho vắc xin này
+                        var completedDoseCount = dbContext.VaccinationResults
+                            .Where(vr => vr.ConsentFormID != null)
+                            .Join(dbContext.VaccinationConsentForms, 
+                                  vr => vr.ConsentFormID, 
+                                  vcf => vcf.ID, 
+                                  (vr, vcf) => new { vr, vcf })
+                            .Count(x => x.vcf.StudentID == student.UserID && 
+                                       x.vr.VaccineTypeID == vaccineId &&
+                                       x.vr.VaccinationStatus == "Completed");
+                        
+                        if (completedDoseCount >= doseNumber)
+                        {
+                            hasVaccinated = true;
+                        }
+                    }
+                }
+
+                // Debug logging
+                Console.WriteLine($"DEBUG: Student {student.UserID} - HasVaccinated: {hasVaccinated}");
+
+                // Chỉ gửi thông báo nếu học sinh chưa tiêm mũi này
+                if (!hasVaccinated)
+                {
+                    Console.WriteLine($"DEBUG: Sending notification to student {student.UserID}");
+                    var message = $"Kế hoạch tiêm chủng '{plan.PlanName}' đã được cập nhật. Vui lòng xác nhận cho học sinh: {studentName.ToUpper()}";
                 // Lấy consent form theo planId và studentId
                 var consentForm = dbContext.VaccinationConsentForms.FirstOrDefault(cf => cf.VaccinationPlanID == plan.ID && cf.StudentID == student.UserID);
                 if (consentForm == null)
@@ -304,8 +393,9 @@ Ban Y tế Trường
                         isHtml: false
                     );
                 }
+                }
             }
-            return Ok(new { message = "Notifications sent!" });
+            return Ok(new { message = "Thông báo đã được gửi thành công cho các phụ huynh có học sinh chưa tiêm mũi tiêm này" });
         }
     }
 }

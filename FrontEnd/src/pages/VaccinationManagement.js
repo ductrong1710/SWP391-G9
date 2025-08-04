@@ -76,16 +76,12 @@ const VaccinationManagement = () => {
   const confirmed = vaccinationPlans.reduce((sum, plan) => sum + (plan.confirmedCount || 0), 0);
   const completed = vaccinationPlans.reduce((sum, plan) => sum + (plan.completedCount || 0), 0);
   const pending = vaccinationPlans.reduce((sum, plan) => sum + (plan.pendingCount || 0), 0);
+  const refused = vaccinationPlans.reduce((sum, plan) => sum + (plan.refusedCount || 0), 0);
   const totalRounds = vaccinationPlans.length;
 
   // Debug thống kê
-  console.log('=== THỐNG KÊ DEBUG ===');
-  console.log('vaccinationPlans:', vaccinationPlans);
-  console.log('totalStudents:', totalStudents);
-  console.log('confirmed:', confirmed);
-  console.log('completed:', completed);
-  console.log('pending:', pending);
-  console.log('totalRounds:', totalRounds);
+  
+  console.log('refused:', refused);
   console.log('=== END THỐNG KÊ DEBUG ===');
 
 
@@ -258,8 +254,9 @@ const VaccinationManagement = () => {
           const confirmedCount = consents.filter(c => c.consentStatus === 'Approved').length;
           const pendingCount = consents.filter(c => c.consentStatus === 'Pending' || !c.consentStatus).length;
           
-          // Tính completedCount từ VaccinationResult thay vì consentStatus
+          // Tính completedCount và refusedCount từ VaccinationResult
           let completedCount = 0;
+          let refusedCount = 0;
           try {
             // Lấy tất cả kết quả tiêm chủng cho plan này
             const resultsResponse = await apiClient.get(`/VaccinationResult/plan/${plan.vaccinationPlanID || plan.id}`);
@@ -270,14 +267,30 @@ const VaccinationManagement = () => {
               result.vaccinationStatus === 'Completed' || result.VaccinationStatus === 'Completed'
             ).length;
             
+            // Đếm số kết quả có status "Refused"
+            refusedCount = results.filter(result => 
+              result.vaccinationStatus === 'Refused' || result.VaccinationStatus === 'Refused'
+            ).length;
+            
             console.log(`=== VACCINATION RESULTS FOR PLAN ${plan.id} ===`);
             console.log('results:', results);
             console.log('completedCount from results:', completedCount);
+            console.log('refusedCount from results:', refusedCount);
             console.log('=== END VACCINATION RESULTS ===');
           } catch (error) {
             console.error(`Error fetching vaccination results for plan ${plan.id}:`, error);
             completedCount = 0;
+            refusedCount = 0;
           }
+          
+          // Đếm thêm số người từ chối từ ConsentStatus "Denied"
+          const deniedConsents = consents.filter(c => c.consentStatus === 'Denied').length;
+          refusedCount += deniedConsents;
+          
+          console.log(`=== DENIED CONSENTS FOR PLAN ${plan.id} ===`);
+          console.log('deniedConsents:', deniedConsents);
+          console.log('total refusedCount (results + denied):', refusedCount);
+          console.log('=== END DENIED CONSENTS ===');
           
           // Debug thống kê cho từng plan
           console.log(`=== THỐNG KÊ PLAN ${plan.id} ===`);
@@ -286,6 +299,7 @@ const VaccinationManagement = () => {
           console.log('confirmedCount:', confirmedCount);
           console.log('pendingCount:', pendingCount);
           console.log('completedCount:', completedCount);
+          console.log('refusedCount:', refusedCount);
           console.log('=== END THỐNG KÊ PLAN ===');
           
           // Fetch thông tin người tạo
@@ -305,6 +319,7 @@ const VaccinationManagement = () => {
             confirmedCount,
             pendingCount,
             completedCount,
+            refusedCount,
             creatorInfo
           };
         } catch (error) {
@@ -314,7 +329,8 @@ const VaccinationManagement = () => {
             totalStudents: 0,
             confirmedCount: 0,
             pendingCount: 0,
-            completedCount: 0
+            completedCount: 0,
+            refusedCount: 0
           };
         }
       }));
@@ -485,23 +501,30 @@ const VaccinationManagement = () => {
   const handleViewStudents = async (plan) => {
     try {
       const res = await apiClient.get(`/VaccinationConsentForm/plan/${plan.id || plan.vaccinationPlanID}`);
-      // Lọc các học sinh đã xác nhận
-      const confirmed = res.data.filter(f => f.consentStatus === "Approved" && f.studentID);
+      // Lấy tất cả học sinh (không chỉ Approved)
+      const allConsents = res.data.filter(f => f.studentID);
+      
       // Lấy thông tin profile cho từng studentID
       const studentProfiles = await Promise.all(
-        confirmed.map(async (f) => {
+        allConsents.map(async (f) => {
           try {
             const profileRes = await apiClient.get(`/Profile/user/${f.studentID}`);
             return {
               userID: f.studentID,
               name: profileRes.data?.name || profileRes.data?.Name || 'Không rõ tên',
               classID: profileRes.data?.classID || profileRes.data?.ClassID || 'Không rõ',
+              consentStatus: f.consentStatus || f.ConsentStatus || 'Pending',
+              reasonForDenial: f.reasonForDenial || f.ReasonForDenial || '',
+              consentFormID: f.id || f.ID
             };
           } catch {
             return {
               userID: f.studentID,
               name: 'Không rõ tên',
               classID: 'Không rõ',
+              consentStatus: f.consentStatus || f.ConsentStatus || 'Pending',
+              reasonForDenial: f.reasonForDenial || f.ReasonForDenial || '',
+              consentFormID: f.id || f.ID
             };
           }
         })
@@ -616,7 +639,7 @@ const VaccinationManagement = () => {
         console.log(`Student ${index + 1} (${student.name}): ${student.vaccinationStatus}`);
       });
       
-      // Kiểm tra xem có học sinh nào đã có dữ liệu trong database không
+      // Kiểm tra xem có học sinh nào đã có dữ liệu trong database không (ẩn thông báo)
       const studentsWithData = studentProfiles.filter(student => 
         student.vaccinationStatus !== 'Completed' || 
         student.notes || 
@@ -626,10 +649,11 @@ const VaccinationManagement = () => {
         student.refusalReason
       );
       
+      // Ẩn thông báo - chỉ log để debug
       if (studentsWithData.length > 0) {
         console.log('Found students with existing data:', studentsWithData);
-        setNotifyMessage(`Đã tìm thấy ${studentsWithData.length} học sinh có dữ liệu đã lưu. Dữ liệu sẽ được hiển thị trong form.`);
-        setTimeout(() => setNotifyMessage(''), 3000);
+        // setNotifyMessage(`Đã tìm thấy ${studentsWithData.length} học sinh có dữ liệu đã lưu. Dữ liệu sẽ được hiển thị trong form.`);
+        // setTimeout(() => setNotifyMessage(''), 3000);
       }
       
       setSelectedPlan(plan);
@@ -672,8 +696,8 @@ const VaccinationManagement = () => {
           PostVaccinationReaction: student.vaccinationStatus === 'Completed' ? student.postVaccinationReaction : null,
           Notes: student.notes,
           NeedToContactParent: student.needToContactParent || false,
-          VaccinationStatus: student.vaccinationStatus || 'Pending', // Default to Pending if not set
-          PostponementReason: student.vaccinationStatus === 'Postponed' ? student.postponementReason : null,
+          VaccinationStatus: student.vaccinationStatus === 'Pending' ? 'Postponed' : (student.vaccinationStatus || 'Postponed'), // Convert Pending to Postponed for backend
+          PostponementReason: (student.vaccinationStatus === 'Postponed' || student.vaccinationStatus === 'Pending') ? (student.postponementReason || student.notes || 'Chờ phản hồi từ phụ huynh') : null,
           FailureReason: student.vaccinationStatus === 'Failed' ? student.failureReason : null,
           RefusalReason: student.vaccinationStatus === 'Refused' ? student.refusalReason : null,
           RecordedBy: currentUser?.fullName || currentUser?.FullName || currentUser?.username || currentUser?.Username || 'Không xác định'
@@ -744,6 +768,10 @@ const VaccinationManagement = () => {
           }
           if (simpleResult.VaccinationStatus === "Completed" && !simpleResult.ActualVaccinationDate) {
             throw new Error('ActualVaccinationDate is required for completed vaccinations');
+          }
+          if (simpleResult.VaccinationStatus === "Postponed" && !simpleResult.Notes) {
+            // Add default reason for postponed status (converted from Pending)
+            simpleResult.Notes = "Chờ phản hồi từ phụ huynh";
           }
           
           console.log(`Simple result ${i + 1}:`, simpleResult);
@@ -1425,7 +1453,7 @@ const VaccinationManagement = () => {
 
       {/* Thống kê */}
       <div className="row mb-4">
-        <div className="col-md-3">
+        <div className="col-md-2-4">
           <div className="card health-stat-card">
             <div className="card-body">
               <h5 className="card-title">Tổng số học sinh</h5>
@@ -1434,7 +1462,7 @@ const VaccinationManagement = () => {
             </div>
           </div>
         </div>
-        <div className="col-md-3">
+        <div className="col-md-2-4">
           <div className="card health-stat-card">
             <div className="card-body">
               <h5 className="card-title">Đã xác nhận</h5>
@@ -1443,7 +1471,7 @@ const VaccinationManagement = () => {
             </div>
           </div>
         </div>
-        <div className="col-md-3">
+        <div className="col-md-2-4">
           <div className="card health-stat-card">
             <div className="card-body">
               <h5 className="card-title">Đã tiêm</h5>
@@ -1452,8 +1480,17 @@ const VaccinationManagement = () => {
             </div>
           </div>
         </div>
-        <div className="col-md-3">
-          <div className="card health-stat-card">
+        <div className="col-md-2-4">
+          <div className="card health-stat-card refused-stat-card">
+            <div className="card-body">
+              <h5 className="card-title">Đã từ chối</h5>
+              <p className="card-number">{refused}</p>
+              <p className="card-text">Học sinh</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-2-4">
+          <div className="card health-stat-card rounds-stat-card">
             <div className="card-body">
               <h5 className="card-title">Đợt tiêm</h5>
               <p className="card-number">{totalRounds.toString().padStart(2, '0')}</p>
@@ -1584,6 +1621,14 @@ const VaccinationManagement = () => {
                   <div className="stat-item">
                     <span className="stat-label">Đã tiêm:</span>
                     <span className="stat-value completed">{plan.completedCount || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Đã từ chối:</span>
+                    <span className="stat-value refused">{plan.refusedCount || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">Đợt tiêm:</span>
+                    <span className="stat-value rounds">{plan.doseNumber || 1}</span>
                   </div>
                 </div>
               </div>
@@ -1858,7 +1903,8 @@ const VaccinationManagement = () => {
                   <strong>DEBUG:</strong> totalStudents={selectedPlan.totalStudents}, 
                   confirmedCount={selectedPlan.confirmedCount}, 
                   pendingCount={selectedPlan.pendingCount}, 
-                  completedCount={selectedPlan.completedCount}
+                  completedCount={selectedPlan.completedCount},
+                  refusedCount={selectedPlan.refusedCount}
                 </div>
                 <div className="vaccination-stats">
                   <div className="stat-card total">
@@ -1898,6 +1944,16 @@ const VaccinationManagement = () => {
                     <div className="stat-content">
                       <div className="stat-number">{selectedPlan.completedCount || 0}</div>
                       <div className="stat-label">Đã tiêm</div>
+                    </div>
+                  </div>
+                  
+                  <div className="stat-card refused">
+                    <div className="stat-icon">
+                      <i className="fas fa-times-circle"></i>
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-number">{selectedPlan.refusedCount || 0}</div>
+                      <div className="stat-label">Đã từ chối</div>
                     </div>
                   </div>
                 </div>
@@ -2983,7 +3039,7 @@ const VaccinationManagement = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <i className="fas fa-users" style={{ fontSize: '1.5rem' }}></i>
                 <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '600' }}>
-                  Danh sách học sinh đã xác nhận tiêm chủng
+                  Danh sách học sinh tiêm chủng
                 </h3>
               </div>
               <button
@@ -3109,7 +3165,7 @@ const VaccinationManagement = () => {
                 }}>
                   <i className="fas fa-search" style={{ fontSize: '3rem', marginBottom: '16px', color: '#d1d5db' }}></i>
                   <div style={{ fontSize: '1.1rem', fontWeight: '500' }}>
-                    {studentsListSearch ? 'Không tìm thấy học sinh nào phù hợp' : 'Không có học sinh nào đã xác nhận tiêm chủng'}
+                    {studentsListSearch ? 'Không tìm thấy học sinh nào phù hợp' : 'Không có học sinh nào trong kế hoạch tiêm chủng'}
                   </div>
                 </div>
               ) : (
@@ -3163,6 +3219,15 @@ const VaccinationManagement = () => {
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px'
                         }}>Lớp</th>
+                        <th style={{
+                          padding: '16px 12px',
+                          textAlign: 'left',
+                          fontWeight: '600',
+                          color: '#374151',
+                          fontSize: '0.95rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>Trạng Thái</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -3194,6 +3259,71 @@ const VaccinationManagement = () => {
                             fontWeight: '500',
                             color: '#6b7280'
                           }}>{student?.classID || 'Không rõ'}</td>
+                          <td style={{
+                            padding: '14px 12px',
+                            fontWeight: '500'
+                          }}>
+                            {(() => {
+                              const status = student?.consentStatus;
+                              if (status === 'Approved') {
+                                return (
+                                  <span style={{
+                                    background: '#dcfce7',
+                                    color: '#166534',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600'
+                                  }}>
+                                    <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
+                                    Đã xác nhận
+                                  </span>
+                                );
+                              } else if (status === 'Denied') {
+                                return (
+                                  <div>
+                                    <span style={{
+                                      background: '#fef2f2',
+                                      color: '#dc2626',
+                                      padding: '4px 8px',
+                                      borderRadius: '6px',
+                                      fontSize: '0.85rem',
+                                      fontWeight: '600',
+                                      display: 'inline-block',
+                                      marginBottom: '4px'
+                                    }}>
+                                      <i className="fas fa-times-circle" style={{ marginRight: '4px' }}></i>
+                                      Đã từ chối
+                                    </span>
+                                    {student?.reasonForDenial && (
+                                      <div style={{
+                                        fontSize: '0.8rem',
+                                        color: '#6b7280',
+                                        marginTop: '4px',
+                                        fontStyle: 'italic'
+                                      }}>
+                                        Lý do: {student.reasonForDenial}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <span style={{
+                                    background: '#fef3c7',
+                                    color: '#d97706',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600'
+                                  }}>
+                                    <i className="fas fa-clock" style={{ marginRight: '4px' }}></i>
+                                    Chờ phản hồi
+                                  </span>
+                                );
+                              }
+                            })()}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

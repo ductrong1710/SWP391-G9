@@ -425,6 +425,14 @@ body .health-stat-card .card-text {
   color: #475569 !important;
 }
 
+.refused-stat-card .card-number {
+  color: #c62828 !important;
+}
+
+.rounds-stat-card .card-number {
+  color: #6b46c1 !important;
+}
+
 .nav-tabs .nav-link {
   color: #495057;
   background-color: transparent;
@@ -630,7 +638,7 @@ body .health-stat-card .card-text {
 }
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px 12px;
 }
 .stat-item {
@@ -654,6 +662,12 @@ body .health-stat-card .card-text {
 }
 .stat-value.completed {
   color: #3182ce;
+}
+.stat-value.refused {
+  color: #c62828;
+}
+.stat-value.rounds {
+  color: #6b46c1;
 }
 .plan-actions {
   margin-top: 10px;
@@ -1022,7 +1036,7 @@ body .health-stat-card .card-text {
 /* Vaccination Statistics */
 .vaccination-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
 }
 
@@ -1075,6 +1089,11 @@ body .health-stat-card .card-text {
   color: #2e7d32;
 }
 
+.stat-card.refused .stat-icon {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
 .stat-content {
   flex: 1;
 }
@@ -1100,6 +1119,10 @@ body .health-stat-card .card-text {
 
 .stat-card.completed .stat-number {
   color: #2e7d32;
+}
+
+.stat-card.refused .stat-number {
+  color: #c62828;
 }
 
 .stat-label {
@@ -1149,10 +1172,19 @@ body .health-stat-card .card-text {
   background-color: #1565c0;
 }
 
+/* Custom 5-column layout */
+.col-md-2-4 {
+  flex: 0 0 20%;
+  max-width: 20%;
+}
+
 /* Final comprehensive override for all cards to ensure bright backgrounds */
 .vaccination-management-container .row .col-md-3 .card,
 .vaccination-management-container .row .col-md-3 .health-stat-card,
 .vaccination-management-container .row .col-md-3 .card.health-stat-card,
+.vaccination-management-container .row .col-md-2-4 .card,
+.vaccination-management-container .row .col-md-2-4 .health-stat-card,
+.vaccination-management-container .row .col-md-2-4 .card.health-stat-card,
 .vaccination-management-container .health-stat-card,
 .health-stat-card,
 .vaccination-management-container .card {
@@ -1169,6 +1201,11 @@ body .health-stat-card .card-text {
 .vaccination-management-container .row .col-md-3 .card .card-title,
 .vaccination-management-container .row .col-md-3 .card .card-number,
 .vaccination-management-container .row .col-md-3 .card .card-text,
+.vaccination-management-container .row .col-md-2-4 .card h5,
+.vaccination-management-container .row .col-md-2-4 .card p,
+.vaccination-management-container .row .col-md-2-4 .card .card-title,
+.vaccination-management-container .row .col-md-2-4 .card .card-number,
+.vaccination-management-container .row .col-md-2-4 .card .card-text,
 .vaccination-management-container .health-stat-card h5,
 .vaccination-management-container .health-stat-card p,
 .vaccination-management-container .health-stat-card .card-title,

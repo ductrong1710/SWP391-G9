@@ -34,6 +34,7 @@ namespace Businessobjects.Data
         public DbSet<MedicalIncident> MedicalIncidents { get; set; }
         public DbSet<IncidentInvolvement> IncidentInvolvements { get; set; }
         public DbSet<SupplyMedUsage> SupplyMedUsages { get; set; }
+        public DbSet<VaccinationHistory> VaccinationHistory { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,6 +59,7 @@ namespace Businessobjects.Data
             modelBuilder.Entity<VaccinationHealthCheck>().ToTable("Vaccination_Health_Check");
             modelBuilder.Entity<Notification>().ToTable("Notification");
             modelBuilder.Entity<Status>().ToTable("Status");
+            modelBuilder.Entity<VaccinationHistory>().ToTable("VaccinationHistory");
 
             base.OnModelCreating(modelBuilder);
 
@@ -202,6 +204,19 @@ namespace Businessobjects.Data
                 .WithMany(v => v.VaccineDiseases)
                 .HasForeignKey(d => d.VaccinationID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Cấu hình relationship cho VaccinationHistory
+            modelBuilder.Entity<VaccinationHistory>()
+                .HasOne(vh => vh.Student)
+                .WithMany()
+                .HasForeignKey(vh => vh.StudentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VaccinationHistory>()
+                .HasOne(vh => vh.VaccineType)
+                .WithMany()
+                .HasForeignKey(vh => vh.VaccineTypeID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private void ConfigureHealthCheckResultRelationships(ModelBuilder modelBuilder)
